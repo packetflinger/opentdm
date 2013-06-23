@@ -1075,6 +1075,8 @@ void TDM_BeginCountdown (void)
 		if (client->inuse && client->client->pers.team && (g_force_record->value == 1 || client->client->pers.config.auto_record))
 			G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName (client));
 	}
+
+	// record server demo
 }
 
 /*
@@ -1089,7 +1091,7 @@ void TDM_EndIntermission (void)
 	int			i;
 
 	//for test server
-	gi.bprintf (PRINT_CHAT, "Please report any bugs at www.opentdm.net.\n");
+	//gi.bprintf (PRINT_CHAT, "Please report any bugs at www.opentdm.net.\n");
 
 	// wision: stop demo recording if we enforce it
 	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
@@ -1100,6 +1102,8 @@ void TDM_EndIntermission (void)
 		if (client->client->pers.team && (g_force_record->value == 1 || client->client->pers.config.auto_record))
 			G_StuffCmd (client, "stop\n");
 	}
+
+	// stop server demo
 
 
 	//shuffle current stats to old and cleanup any players who never reconnected
