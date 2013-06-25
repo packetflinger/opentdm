@@ -1032,6 +1032,52 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	return string;
 }
 
+
+const char *TDM_MakeMultiViewDemoName (void)
+{
+        int                     i;
+        int                     len;
+        struct tm       *ts;
+        time_t          t;
+        cvar_t          *hostname;
+        char            *servername;
+        static char     string[1400];
+
+        hostname = gi.cvar ("hostname", NULL, 0);
+
+        if (hostname)
+                servername = hostname->string;
+        else
+                servername = "unnamed_server";
+
+        t = time (NULL);
+        ts = localtime (&t);
+
+	Com_sprintf (string, sizeof(string), "%s-%s_%d-%02d-%02d_%02d-%02d-%02d",
+                        servername,
+                        level.mapname,
+                        ts->tm_year + 1900,
+                        ts->tm_mon + 1,
+                        ts->tm_mday,
+                        ts->tm_hour,
+                        ts->tm_min,
+                        ts->tm_sec
+                        );
+	len = strlen(string);
+	
+	// filter out the crap
+        for (i = 0; i < len; i++)
+        {
+                if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
+                                string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
+                                string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ')
+                        string[i] = '_';
+        }
+
+        return string;
+}
+
+
 /*
 ==============
 TDM_BeginCountdown
@@ -1077,6 +1123,12 @@ void TDM_BeginCountdown (void)
 	}
 
 	// record server demo
+	if (g_record_mvd->value == 1)
+	{
+		// record it
+		//gi.dprintf ("Trying to record a MVD...");
+		gi.AddCommandString (va("mvdrecord %s\n", TDM_MakeMultiViewDemoName ()));
+	}
 }
 
 /*
@@ -1104,7 +1156,12 @@ void TDM_EndIntermission (void)
 	}
 
 	// stop server demo
-
+	if (g_record_mvd->value == 1)
+	{
+		// stop the recording
+		//gi.dprintf ("Trying to stop a MVD...");
+		gi.AddCommandString("mvdstop");
+	}
 
 	//shuffle current stats to old and cleanup any players who never reconnected
 	if (current_matchinfo.teamplayers)
