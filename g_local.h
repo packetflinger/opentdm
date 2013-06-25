@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef OPENTDM_RELEASE
 #define	OPENTDM_VERSION	"1.0"
 #else
-#define	OPENTDM_VERSION "$Revision: 182 $"
+#define	OPENTDM_VERSION "$Revision: 191-pf $"
 //dummy string to force g_local.h commit: asdf
 #endif
 

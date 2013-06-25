@@ -1053,7 +1053,7 @@ const char *TDM_MakeMultiViewDemoName (void)
         t = time (NULL);
         ts = localtime (&t);
 
-	Com_sprintf (string, sizeof(string), "%s-%s_%d-%02d-%02d_%02d-%02d-%02d",
+	Com_sprintf (string, sizeof(string), "%s-%s_%d%02d%02d%02d%02d%02d",
                         servername,
                         level.mapname,
                         ts->tm_year + 1900,
