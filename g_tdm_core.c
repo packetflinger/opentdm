@@ -1032,49 +1032,75 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	return string;
 }
 
-
+// build a demo name string for server-side MVD
 const char *TDM_MakeMultiViewDemoName (void)
 {
-        int                     i;
-        int                     len;
+        int		i,j;
+        int		len;
         struct tm       *ts;
         time_t          t;
         cvar_t          *hostname;
         char            *servername;
         static char     string[1400];
+	static char	string2[1400];
 
         hostname = gi.cvar ("hostname", NULL, 0);
 
         if (hostname)
+	{
                 servername = hostname->string;
+	}
         else
+	{
                 servername = "unnamed_server";
+	}
 
         t = time (NULL);
         ts = localtime (&t);
 
-	Com_sprintf (string, sizeof(string), "%s-%s_%d%02d%02d%02d%02d%02d",
-                        servername,
-                        level.mapname,
+	Com_sprintf (string, sizeof(string), "%d%02d%02d%02d%02d%02d-%s-%s",
                         ts->tm_year + 1900,
                         ts->tm_mon + 1,
                         ts->tm_mday,
                         ts->tm_hour,
                         ts->tm_min,
-                        ts->tm_sec
+                        ts->tm_sec,
+			level.mapname,
+			servername
                         );
 	len = strlen(string);
 	
-	// filter out the crap
-        for (i = 0; i < len; i++)
+	// filter out the crap while removing consecutive underscores. Probably a much
+	// better way of doing this, but I currently have a 4mo old and can't think straight
+        for (i=0, j=0; i < len; i++)
         {
                 if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
                                 string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
                                 string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ')
+		{
                         string[i] = '_';
+			if (i > 0)
+			{
+				if (string[i-1] != '_')
+				{
+					string2[j] = string[i];
+					j++;
+				}
+			}
+			else
+			{
+				string2[j] = string[i];
+				j++;
+			}
+		}
+		else
+		{
+			string2[j] = string[i];
+			j++;
+		}
         }
 
-        return string;
+        return string2;
 }
 
 
