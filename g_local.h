@@ -33,9 +33,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef OPENTDM_RELEASE
 #define	OPENTDM_VERSION	"1.0"
 #else
-#define	OPENTDM_VERSION "$Revision: 191-pf $"
+#define	OPENTDM_VERSION "$Revision: 192-pf $"
 //dummy string to force g_local.h commit: asdf
 #endif
+
+// build with libcurl to enable http functions
+#define HAVE_CURL		1
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
