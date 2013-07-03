@@ -1,7 +1,20 @@
 # this nice line comes from the linux kernel makefile
 ARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/ -e s/alpha/axp/)
 
-CFLAGS=-O -g -fPIC -Wall
+
+ifndef REV
+    REV := $(shell git rev-list HEAD | wc -l)
+    #REV := $(shell echo $$((181+$REV1)))
+endif
+
+ifndef VER
+    VER := r$(REV)~$(shell git rev-parse --short HEAD)~pf
+endif
+
+CURL_CFLAGS ?= $(shell pkg-config libcurl --cflags)
+CFLAGS=-O -g -fPIC -Wall -DHAVE_CURL $(CURL_CFLAGS)
+CFLAGS += -DOPENTDM_VERSION='"$(VER)"' -DOPENTDM_REVISION=$(REV)
+
 #LDFLAGS=-lcurl
 
 game_SRC:=g_chase.c g_cmds.c g_combat.c g_func.c g_items.c g_main.c g_misc.c \
