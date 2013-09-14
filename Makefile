@@ -29,13 +29,13 @@ ALLSRC:=$(game_SRC)
 
 .PHONY: default clean
 
-default: game$(ARCH).so
+default: game$(ARCH)-opentdm-$(VER).so
 
 TARGETS:=game$(ARCH).so
 
-game$(ARCH).so: $(game_OBJ)
+game$(ARCH)-opentdm-$(VER).so: $(game_OBJ)
 	$(CC) -lcurl -shared -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -f *.o game$(ARCH).so
+	rm -f *.o game$(ARCH)*.so
 
