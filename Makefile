@@ -8,7 +8,7 @@ ifndef REV
 endif
 
 ifndef VER
-    VER := r$(REV)~$(shell git rev-parse --short HEAD)~pf
+    VER := r$(REV)-$(shell git rev-parse --short HEAD)-pf
 endif
 
 CURL_CFLAGS ?= $(shell pkg-config libcurl --cflags)
