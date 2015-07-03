@@ -49,6 +49,7 @@ g_utils.o g_weapon.o mt19937.o p_client.o p_hud.o p_menu.o p_view.o p_weapon.o \
 g_tdm_votemenu.o q_shared.o
 
 ifdef CONFIG_WINDOWS
+    CPU := x86
     OBJS += sys_win32.o
     OBJS += opentdm.o
     ifdef CONFIG_HTTP
