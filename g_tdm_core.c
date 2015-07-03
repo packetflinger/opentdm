@@ -2575,6 +2575,7 @@ void TDM_Init (void)
 		if (!game.server_features)
 		{
 			//super cheesy notice!
+			/*
 			gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 			gi.dprintf ("               W A R N I N G !\n");
 			gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
@@ -2585,6 +2586,7 @@ void TDM_Init (void)
 			gi.dprintf ("  date. Some features may not work correctly.\n");
 			gi.dprintf ("\n");
 			gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+			*/
 		}
 	}
 	else
