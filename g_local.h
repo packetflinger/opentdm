@@ -30,15 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"OpenTDM"
 
-#ifdef OPENTDM_RELEASE
-#define	OPENTDM_VERSION	"1.0"
-#else
-//#define	OPENTDM_VERSION "$Revision: 192-pf $"
-//dummy string to force g_local.h commit: asdf
+#ifndef	OPENTDM_VERSION
+#define	OPENTDM_VERSION "Unknown"
 #endif
-
-// build with libcurl to enable http functions
-//#define HAVE_CURL		1
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -197,11 +191,8 @@ void PMenu_Select(edict_t *ent);
 //==================================================================
 
 // view pitching times
-#define DAMAGE_TIME		(0.5f * (1 * SERVER_FPS))
-#define	FALL_TIME		(0.3f * (1 * SERVER_FPS))
-
-//#define DAMAGE_TIME		0.5f
-//#define	FALL_TIME		0.3f
+#define	DAMAGE_FRAMES		SECS_TO_FRAMES(0.5f)
+#define	FALL_FRAMES			SECS_TO_FRAMES(0.3f)
 
 // edict->spawnflags
 // these are set with checkboxes on each entity in the map editor
@@ -513,7 +504,6 @@ typedef struct
 typedef struct
 {
 	int			framenum;
-	unsigned	time;
 
 	char		level_name[MAX_QPATH];	// the descriptive name (Outer Base, etc)
 	char		mapname[MAX_QPATH];		// the server name (base1, etc)
@@ -717,10 +707,10 @@ extern	int	meansOfDeath;
 
 extern	edict_t			*g_edicts;
 
-#define	FOFS(x) (int)&(((edict_t *)0)->x)
-#define	STOFS(x) (int)&(((spawn_temp_t *)0)->x)
-#define	LLOFS(x) (int)&(((level_locals_t *)0)->x)
-#define	CLOFS(x) (int)&(((gclient_t *)0)->x)
+#define	FOFS(x) (size_t)&(((edict_t *)0)->x)
+#define	STOFS(x) (size_t)&(((spawn_temp_t *)0)->x)
+#define	LLOFS(x) (size_t)&(((level_locals_t *)0)->x)
+#define	CLOFS(x) (size_t)&(((gclient_t *)0)->x)
 
 /*#ifdef random
 #undef random
@@ -788,8 +778,6 @@ extern	cvar_t	*g_intermission_time;
 extern	cvar_t	*g_force_screenshot;
 extern	cvar_t	*g_force_record;
 
-extern	cvar_t	*g_record_mvd;
-
 extern	cvar_t	*g_tdmflags;
 extern	cvar_t	*g_itdmflags;
 extern	cvar_t	*g_1v1flags;
@@ -814,6 +802,8 @@ extern	cvar_t	*g_idle_time;
 extern	cvar_t	*g_http_enabled;
 extern	cvar_t	*g_http_bind;
 extern	cvar_t	*g_http_proxy;
+extern	cvar_t	*g_http_debug;
+
 extern	cvar_t	*g_http_path;
 extern	cvar_t	*g_http_domain;
 
@@ -874,7 +864,7 @@ typedef enum {
 typedef struct
 {
 	char	*name;
-	int		ofs;
+	size_t		ofs;
 	fieldtype_t	type;
 	int		flags;
 } field_t;
@@ -926,7 +916,7 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 //
 qboolean	KillBox (edict_t *ent);
 void	G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
-edict_t *G_Find (edict_t *from, int fieldofs, char *match);
+edict_t *G_Find (edict_t *from, size_t fieldofs, char *match);
 edict_t *findradius (edict_t *from, vec3_t org, float rad);
 edict_t *G_PickTarget (char *targetname);
 void	G_UseTargets (edict_t *ent, edict_t *activator);
@@ -1552,8 +1542,10 @@ struct gclient_s
 	vec3_t		kick_origin_final;
 	unsigned	kick_origin_start;
 	unsigned	kick_origin_end;
-	float		v_dmg_roll, v_dmg_pitch, v_dmg_time;	// damage kicks
-	float		fall_time, fall_value;		// for view drop on fall
+	float		v_dmg_roll, v_dmg_pitch;	// damage kicks
+	int			v_dmg_framenum;
+	float		fall_value;		// for view drop on fall
+	int			fall_framenum;
 	float		damage_alpha;
 	float		bonus_alpha;
 	vec3_t		damage_blend;
@@ -1562,7 +1554,7 @@ struct gclient_s
 	vec3_t		oldviewangles;
 	vec3_t		oldvelocity;
 
-	unsigned	next_drown_time;
+	unsigned	next_drown_framenum;
 	int			old_waterlevel;
 	int			breather_sound;
 
@@ -1581,11 +1573,11 @@ struct gclient_s
 	unsigned	enviro_framenum;
 
 	grenade_state_t	grenade_state;
-	unsigned	grenade_time;
+	unsigned	grenade_framenum;
 	int			silencer_shots;
 	int			weapon_sound;
 
-	unsigned	pickup_msg_time;
+	unsigned	pickup_msg_framenum;
 
 	unsigned	respawn_framenum;	// can respawn when time > this
 
@@ -1671,7 +1663,7 @@ struct edict_s
 	int			flags;
 
 	const char	*model;
-	float		freetime;			// sv.time when the object was freed
+	unsigned	freed_framenum;			// level.framenum when the object was freed
 	
 	//
 	// only used locally in game, not by server
@@ -1700,7 +1692,7 @@ struct edict_s
 	vec3_t		velocity;
 	vec3_t		avelocity;
 	int			mass;
-	unsigned	air_finished;
+	unsigned	air_finished_framenum;
 	float		gravity;		// per entity gravity multiplier (1.0 is normal)
 								// use for lowgrav artifact, flares
 
@@ -1718,11 +1710,10 @@ struct edict_s
 	void		(*pain)(edict_t *self, edict_t *other, float kick, int damage);
 	void		(*die)(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
 
-	unsigned	touch_debounce_time;		// are all these legit?  do we need more/less of them?
-	unsigned	pain_debounce_time;
-	unsigned	damage_debounce_time;
-	unsigned	fly_sound_debounce_time;	//move to clientinfo
-	unsigned	last_move_time;
+	unsigned	touch_debounce_framenum;		// are all these legit?  do we need more/less of them?
+	unsigned	pain_debounce_framenum;
+	unsigned	damage_debounce_framenum;
+	unsigned	fly_sound_debounce_framenum;	//move to clientinfo
 
 	int			health;
 	int			max_health;
@@ -1730,7 +1721,7 @@ struct edict_s
 	int			deadflag;
 	qboolean	show_hostile;
 
-	unsigned	powerarmor_time;
+	unsigned	powerarmor_framenum;
 
 	char		*map;			// target_changelevel
 
@@ -1764,8 +1755,6 @@ struct edict_s
 	float		delay;			// before firing targets
 	float		random;
 
-	float		teleport_time;
-
 	int			watertype;
 	int			waterlevel;
 
@@ -1784,6 +1773,9 @@ struct edict_s
 	//monsterinfo_t	monsterinfo;
 
 	enttype_t	enttype;
+
+	// hack for proper s.old_origin updates
+	vec3_t		old_origin;
 };
 
 //server features

@@ -130,10 +130,10 @@ void P_DamageFeedback (edict_t *player)
 		count = 10;	// always make a visible effect
 
 	// play an apropriate pain sound
-	if ((level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE) && (client->invincible_framenum <= level.framenum))
+	if ((level.framenum > player->pain_debounce_framenum) && !(player->flags & FL_GODMODE) && (client->invincible_framenum <= level.framenum))
 	{
 		r = genrand_int32() & 1;
-		player->pain_debounce_time = level.time + 0.7f * (1 * SERVER_FPS);
+		player->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(0.7f);
 		if (player->health < 25)
 			l = SND_PAIN25_1;
 		else if (player->health < 50)
@@ -188,7 +188,7 @@ void P_DamageFeedback (edict_t *player)
 		side = -DotProduct (v, forward);
 		client->v_dmg_pitch = kick*side*0.3f;
 
-		client->v_dmg_time = level.time + DAMAGE_TIME;
+		client->v_dmg_framenum = level.framenum + DAMAGE_FRAMES;
 	}
 
 	//
@@ -257,7 +257,7 @@ void SV_CalcViewOffset (edict_t *ent)
 			VectorCopy (ent->client->kick_angles, angles);
 
 			// add angles based on damage kick
-			ratio = (ent->client->v_dmg_time - level.time) / DAMAGE_TIME;
+			ratio = (ent->client->v_dmg_framenum - level.framenum) / (float)DAMAGE_FRAMES;
 			if (ratio < 0)
 			{
 				ratio = 0;
@@ -269,7 +269,7 @@ void SV_CalcViewOffset (edict_t *ent)
 
 			// add pitch based on fall kick
 
-			ratio = (ent->client->fall_time - level.time) / FALL_TIME;
+			ratio = (ent->client->fall_framenum - level.framenum) / (float)FALL_FRAMES;
 			if (ratio < 0)
 				ratio = 0;
 			angles[PITCH] += ratio * ent->client->fall_value;
@@ -314,7 +314,7 @@ void SV_CalcViewOffset (edict_t *ent)
 
 	// add fall height
 
-	ratio = (ent->client->fall_time - level.time) / FALL_TIME;
+	ratio = (ent->client->fall_framenum - level.framenum) / (float)FALL_FRAMES;
 	if (ratio < 0)
 		ratio = 0;
 	v[2] -= ratio * ent->client->fall_value * 0.4f;
@@ -458,7 +458,7 @@ void SV_CalcBlend (edict_t *ent)
 		remaining = ent->client->quad_framenum - level.framenum;
 		if (remaining == SECS_TO_FRAMES(3))	// beginning to fade
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage2.wav"), 1, ATTN_NORM, 0);
-		if (remaining > SECS_TO_FRAMES(3) || (remaining & 4) )
+		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
 			SV_AddBlend (0, 0, 1, 0.08f, ent->client->ps.blend);
 	}
 	else if (ent->client->invincible_framenum > level.framenum)
@@ -466,7 +466,7 @@ void SV_CalcBlend (edict_t *ent)
 		remaining = ent->client->invincible_framenum - level.framenum;
 		if (remaining == SECS_TO_FRAMES(3))	// beginning to fade
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect2.wav"), 1, ATTN_NORM, 0);
-		if (remaining > SECS_TO_FRAMES(3) || (remaining & 4) )
+		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
 			SV_AddBlend (1, 1, 0, 0.08f, ent->client->ps.blend);
 	}
 	else if (ent->client->enviro_framenum > level.framenum)
@@ -474,7 +474,7 @@ void SV_CalcBlend (edict_t *ent)
 		remaining = ent->client->enviro_framenum - level.framenum;
 		if (remaining == SECS_TO_FRAMES(3))	// beginning to fade
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/airout.wav"), 1, ATTN_NORM, 0);
-		if (remaining > SECS_TO_FRAMES(3) || (remaining & 4) )
+		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
 			SV_AddBlend (0, 1, 0, 0.08f, ent->client->ps.blend);
 	}
 	else if (ent->client->breather_framenum > level.framenum)
@@ -482,7 +482,7 @@ void SV_CalcBlend (edict_t *ent)
 		remaining = ent->client->breather_framenum - level.framenum;
 		if (remaining == SECS_TO_FRAMES(3))	// beginning to fade
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/airout.wav"), 1, ATTN_NORM, 0);
-		if (remaining > SECS_TO_FRAMES(3) || (remaining & 4) )
+		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
 			SV_AddBlend (0.4f, 1, 0.4f, 0.04f, ent->client->ps.blend);
 	}
 
@@ -495,12 +495,12 @@ void SV_CalcBlend (edict_t *ent)
 		SV_AddBlend (0.85f, 0.7f, 0.3f, ent->client->bonus_alpha, ent->client->ps.blend);
 
 	// drop the damage value
-	ent->client->damage_alpha -= 0.06f;
+	ent->client->damage_alpha -= 0.6f*FRAMETIME;
 	if (ent->client->damage_alpha < 0)
 		ent->client->damage_alpha = 0;
 
 	// drop the bonus value
-	ent->client->bonus_alpha -= 0.1f;
+	ent->client->bonus_alpha -= 1.0f*FRAMETIME;
 	if (ent->client->bonus_alpha < 0)
 		ent->client->bonus_alpha = 0;
 }
@@ -559,7 +559,7 @@ void P_FallingDamage (edict_t *ent)
 	if (ent->client->fall_value > 40)
 		ent->client->fall_value = 40;
 
-	ent->client->fall_time = level.time + FALL_TIME;
+	ent->client->fall_framenum = level.framenum + FALL_FRAMES;
 
 	if (delta > 30)
 	{
@@ -570,7 +570,7 @@ void P_FallingDamage (edict_t *ent)
 			else
 				gi.sound (ent, CHAN_AUTO, soundcache[SND_FALL2], 1, ATTN_NORM, 0);
 		}
-		ent->pain_debounce_time = level.time;	// no normal pain sound
+		ent->pain_debounce_framenum = level.framenum;	// no normal pain sound
 		damage = (delta-30)/2;
 		if (damage < 1)
 			damage = 1;
@@ -601,7 +601,7 @@ void P_WorldEffects (void)
 
 	if (current_player->movetype == MOVETYPE_NOCLIP)
 	{
-		current_player->air_finished = level.time + 12 * (1 * SERVER_FPS);	// don't need air
+		current_player->air_finished_framenum = level.framenum + SECS_TO_FRAMES(12);	// don't need air
 		return;
 	}
 
@@ -626,7 +626,7 @@ void P_WorldEffects (void)
 		current_player->flags |= FL_INWATER;
 
 		// clear damage_debounce, so the pain sound will play immediately
-		current_player->damage_debounce_time = level.time - 1;
+		current_player->damage_debounce_framenum = level.framenum - 1;
 	}
 
 	//
@@ -651,11 +651,11 @@ void P_WorldEffects (void)
 	//
 	if (old_waterlevel == 3 && waterlevel != 3)
 	{
-		if (current_player->air_finished < level.time)
+		if (current_player->air_finished_framenum < level.framenum)
 		{	// gasp for air
 			gi.sound (current_player, CHAN_VOICE, gi.soundindex("player/gasp1.wav"), 1, ATTN_NORM, 0);
 		}
-		else  if (current_player->air_finished < level.time + 11 * (1 * SERVER_FPS))
+		else  if (current_player->air_finished_framenum < level.framenum + SECS_TO_FRAMES(11))
 		{	// just break surface
 			gi.sound (current_player, CHAN_VOICE, gi.soundindex("player/gasp2.wav"), 1, ATTN_NORM, 0);
 		}
@@ -669,9 +669,9 @@ void P_WorldEffects (void)
 		// breather or envirosuit give air
 		if (breather || envirosuit)
 		{
-			current_player->air_finished = level.time + 10 * (1 * SERVER_FPS);
+			current_player->air_finished_framenum = level.framenum + SECS_TO_FRAMES(10);
 
-			if (((int)(current_client->breather_framenum - level.framenum) % 25) == 0)
+			if (((current_client->breather_framenum - level.framenum) % (25*SECS_TO_FRAMES(0.1f))) == 0)
 			{
 				if (!current_client->breather_sound)
 					gi.sound (current_player, CHAN_AUTO, gi.soundindex("player/u_breath1.wav"), 1, ATTN_NORM, 0);
@@ -683,12 +683,12 @@ void P_WorldEffects (void)
 		}
 
 		// if out of air, start drowning
-		if (current_player->air_finished < level.time)
+		if (current_player->air_finished_framenum < level.framenum)
 		{	// drown!
-			if (current_player->client->next_drown_time < level.time 
+			if (current_player->client->next_drown_framenum < level.framenum
 				&& current_player->health > 0)
 			{
-				current_player->client->next_drown_time = level.time + 1 * (1 * SERVER_FPS);
+				current_player->client->next_drown_framenum = level.framenum + SECS_TO_FRAMES(1);
 
 				// take more damage the longer underwater
 				current_player->dmg += 2;
@@ -703,7 +703,7 @@ void P_WorldEffects (void)
 				else
 					gi.sound (current_player, CHAN_VOICE, soundcache[SND_GURP2], 1, ATTN_NORM, 0);
 
-				current_player->pain_debounce_time = level.time;
+				current_player->pain_debounce_framenum = level.framenum;
 
 				T_Damage (current_player, world, world, vec3_origin, current_player->s.origin, vec3_origin, current_player->dmg, 0, DAMAGE_NO_ARMOR, MOD_WATER);
 			}
@@ -711,7 +711,7 @@ void P_WorldEffects (void)
 	}
 	else
 	{
-		current_player->air_finished = level.time + 12 * (1 * SERVER_FPS);
+		current_player->air_finished_framenum = level.framenum + SECS_TO_FRAMES(12);
 		current_player->dmg = 2;
 	}
 
@@ -723,14 +723,14 @@ void P_WorldEffects (void)
 		if (current_player->watertype & CONTENTS_LAVA)
 		{
 			if (current_player->health > 0
-				&& current_player->pain_debounce_time <= level.time
+				&& current_player->pain_debounce_framenum <= level.framenum
 				&& current_client->invincible_framenum < level.framenum)
 			{
 				if (genrand_int32()&1)
 					gi.sound (current_player, CHAN_VOICE, gi.soundindex("player/burn1.wav"), 1, ATTN_NORM, 0);
 				else
 					gi.sound (current_player, CHAN_VOICE, gi.soundindex("player/burn2.wav"), 1, ATTN_NORM, 0);
-				current_player->pain_debounce_time = level.time + 1 * (1 * SERVER_FPS);
+				current_player->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
 			}
 
 			//FIXME: ugly hack to a void sizzle damage being multiplied based on server framenum, can be biased depending on what
@@ -777,7 +777,7 @@ void G_SetClientEffects (edict_t *ent)
 	if (ent->health <= 0 || tdm_match_status == MM_SCOREBOARD)
 		return;
 
-	if (ent->powerarmor_time > level.time)
+	if (ent->powerarmor_framenum > level.framenum)
 	{
 		pa_type = PowerArmorType (ent);
 		if (pa_type == POWER_ARMOR_SCREEN)
@@ -794,14 +794,14 @@ void G_SetClientEffects (edict_t *ent)
 	if (ent->client->quad_framenum > level.framenum)
 	{
 		remaining = ent->client->quad_framenum - level.framenum;
-		if (remaining > 30 || (remaining & 4) )
+		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
 			ent->s.effects |= EF_QUAD;
 	}
 
 	if (ent->client->invincible_framenum > level.framenum)
 	{
 		remaining = ent->client->invincible_framenum - level.framenum;
-		if (remaining > 30 || (remaining & 4) )
+		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
 			ent->s.effects |= EF_PENT;
 	}
 
@@ -1147,10 +1147,9 @@ void ClientEndServerFrame (edict_t *ent)
 
 	// if the scoreboard is up, update it
 	// wision: update every 15 frames during timeout/warmup
-	// FIXME: maybe use SECS_TO_FRAMES because of sv_fps?
 	if (ent->client->showscores &&
-			((!(level.realframenum & 31) && tdm_match_status != MM_WARMUP && tdm_match_status != MM_TIMEOUT) || 
-			(!(level.realframenum & 15) && (tdm_match_status == MM_WARMUP || tdm_match_status == MM_TIMEOUT))))
+			((!(level.realframenum % SECS_TO_FRAMES(3)) && tdm_match_status != MM_WARMUP && tdm_match_status != MM_TIMEOUT) ||
+			(!(level.realframenum % SECS_TO_FRAMES(1.5f)) && (tdm_match_status == MM_WARMUP || tdm_match_status == MM_TIMEOUT))))
 	{
 		//DeathmatchScoreboardMessage (ent, ent->enemy);
 		gi.WriteByte (svc_layout);

@@ -107,7 +107,7 @@ static void TDM_ApplyVote (void)
 		if (tdm_match_status >= MM_PLAYING && tdm_match_status < MM_SCOREBOARD)
 		{
 			current_matchinfo.timelimit = g_match_time->value / 60;
-			level.match_end_framenum = level.match_start_framenum + (int)(g_match_time->value * SERVER_FPS);
+			level.match_end_framenum = level.match_start_framenum + SECS_TO_FRAMES(g_match_time->value);
 
 			//end immediately if timelimit was reduced
 			if (level.match_end_framenum < level.framenum)
@@ -1957,7 +1957,7 @@ A player started a vote, set up common vote stuff.
 void TDM_SetupVote (edict_t *ent)
 {
 	vote.initiator = ent;
-	vote.end_frame = level.framenum + (int)g_vote_time->value * (1 * SERVER_FPS);
+	vote.end_frame = level.framenum + SECS_TO_FRAMES(g_vote_time->value);
 	vote.active = true;
 
 	ent->client->resp.vote = VOTE_YES;
@@ -2209,6 +2209,25 @@ void TDM_VoteMenuApply (edict_t *ent)
 		return;
 	}
 
+	//global 'disallow voting' check
+	if (!(int)g_vote_mask->value)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "Proposing new settings is not allowed on this server.\n");
+		return;
+	}
+
+	if (!ent->client->pers.team && !ent->client->pers.admin)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "Spectators cannot vote.\n");
+		return;
+	}
+
+	if (tdm_match_status != MM_PLAYING && tdm_match_status != MM_WARMUP)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "You can propose new settings only during warmup.\n");
+		return;
+	}
+
 	if (ent->client->pers.votemenu_values.timelimit != ((unsigned)g_match_time->value / 60))
 	{
 		vote.newtimelimit = ent->client->pers.votemenu_values.timelimit;
@@ -2217,14 +2236,9 @@ void TDM_VoteMenuApply (edict_t *ent)
 	}
 
 	// things above this can be voted during the match
-	if (tdm_match_status == MM_PLAYING && newvote)
+	if (tdm_match_status != MM_WARMUP)
 	{
-		PMenu_Close (ent);
-
-		TDM_SetupVote (ent);
-		TDM_AnnounceVote ();
-		TDM_CheckVote();
-		return;
+		goto done;
 	}
 
 	if (ent->client->pers.votemenu_values.map[0] != '\0' && ent->client->pers.votemenu_values.map[0] != '-' &&
@@ -2342,6 +2356,7 @@ void TDM_VoteMenuApply (edict_t *ent)
 		}
 	}
 	
+done:
 	PMenu_Close (ent);
 
 	if (newvote)

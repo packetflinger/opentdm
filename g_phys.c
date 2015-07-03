@@ -101,7 +101,7 @@ qboolean SV_RunThink (edict_t *ent)
 	if (thinktime <= 0)
 		return true;
 
-	if (thinktime > level.time)
+	if (thinktime > level.framenum)
 		return true;
 	
 	ent->nextthink = 0;

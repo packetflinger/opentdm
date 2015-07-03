@@ -361,7 +361,7 @@ void TossClientWeapon (edict_t *self)
 	if (!((int)(dmflags->value) & DF_QUAD_DROP))
 		quad = false;
 	else
-		quad = (self->client->quad_framenum > (level.framenum + 1 * (1 * SERVER_FPS)));
+		quad = (self->client->quad_framenum > (level.framenum + SECS_TO_FRAMES(1)));
 
 	if (item && quad)
 		spread = 22.5;
@@ -458,7 +458,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 
 	if (!self->deadflag)
 	{
-		self->client->respawn_framenum = level.time + g_respawn_time->value * (1 * SERVER_FPS);
+		self->client->respawn_framenum = level.framenum + SECS_TO_FRAMES(g_respawn_time->value);
 		LookAtKiller (self, inflictor, attacker);
 		self->client->ps.pmove.pm_type = PM_DEAD;
 		ClientObituary (self, inflictor, attacker);
@@ -1009,7 +1009,7 @@ void	SelectSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles)
 
 			if (!spot)
 			{
-				gi.dprintf ("WARNING: No info_player_start, using world");
+				gi.dprintf ("WARNING: No info_player_start, using world\n");
 				spot = world;
 			}
 		}
@@ -1076,6 +1076,8 @@ void CopyToBodyQue (edict_t *ent)
 	body->s = ent->s;
 	body->s.number = body - g_edicts;
 	body->s.event = EV_OTHER_TELEPORT;
+	VectorCopy (body->s.origin, body->s.old_origin);
+	VectorCopy (body->s.origin, body->old_origin);
 
 	body->svflags = ent->svflags;
 	VectorCopy (ent->mins, body->mins);
@@ -1120,7 +1122,7 @@ void respawn (edict_t *self)
 		self->client->ps.pmove.pm_time = 14;
 	}
 
-	self->client->respawn_framenum = level.time;
+	self->client->respawn_framenum = level.framenum;
 }
 
 
@@ -1185,7 +1187,7 @@ void PutClientInServer (edict_t *ent)
 	ent->mass = 200;
 	ent->solid = SOLID_BBOX;
 	ent->deadflag = DEAD_NO;
-	ent->air_finished = level.time + 12 * (1 * SERVER_FPS);
+	ent->air_finished_framenum = level.framenum + SECS_TO_FRAMES(12);
 	ent->clipmask = MASK_PLAYERSOLID;
 	ent->model = "players/male/tris.md2";
 	ent->pain = player_pain;
@@ -1311,6 +1313,7 @@ void PutClientInServer (edict_t *ent)
 		}
 
 		VectorCopy (ent->s.origin, ent->s.old_origin);
+		VectorCopy (ent->s.origin, ent->old_origin);
 
 		//we most link before killbox since it uses absmin/absmax
 		gi.linkentity (ent);
@@ -1711,7 +1714,7 @@ void ClientDisconnect (edict_t *ent)
 edict_t	*pm_passent;
 
 // pmove doesn't need to know about passent and contentmask
-trace_t	PM_trace (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end)
+trace_t EXPORT	PM_trace (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end)
 {
 	if (pm_passent->health > 0)
 		return gi.trace (start, mins, maxs, end, pm_passent, MASK_PLAYERSOLID);
@@ -2051,7 +2054,7 @@ void ClientBeginServerFrame (edict_t *ent)
 	else
 		client->weapon_thunk = false;
 
-	//gi.dprintf ("think_weapon: server frame %d, weapon frame %d\n", level.time, ent->client->ps.gunframe);
+	//gi.dprintf ("think_weapon: server frame %d, weapon frame %d\n", level.framenum, ent->client->ps.gunframe);
 
 	// only remove idle players in warmup!
 	if (ent->client->pers.team && tdm_match_status == MM_WARMUP && g_idle_time->value &&
@@ -2067,8 +2070,8 @@ void ClientBeginServerFrame (edict_t *ent)
 	{
 		// force spawn set by g_respawn_time
 		// spawn 1 sec after the death if player pressed attack button
-		if ((level.time > client->respawn_framenum && ((int)dmflags->value & DF_FORCE_RESPAWN)) ||
-			(level.time > client->respawn_framenum - ((g_respawn_time->value - 1) * (1 * SERVER_FPS)) && (client->latched_buttons & BUTTON_ATTACK)))
+		if ((level.framenum > client->respawn_framenum && ((int)dmflags->value & DF_FORCE_RESPAWN)) ||
+			(level.framenum > client->respawn_framenum - SECS_TO_FRAMES(g_respawn_time->value - 1) && (client->latched_buttons & BUTTON_ATTACK)))
 		{
 			respawn(ent);
 			client->latched_buttons = 0;

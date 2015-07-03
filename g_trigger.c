@@ -52,13 +52,13 @@ void multi_trigger (edict_t *ent)
 	if (ent->wait > 0)	
 	{
 		ent->think = multi_wait;
-		ent->nextthink = level.time + ent->wait * (1 * SERVER_FPS);
+		ent->nextthink = level.framenum + SECS_TO_FRAMES(ent->wait);
 	}
 	else
 	{	// we can't just remove (self) here, because this is a touch function
 		// called while looping through area links...
 		ent->touch = NULL;
-		ent->nextthink = level.time + 1;
+		ent->nextthink = level.framenum + 1;
 		ent->think = G_FreeEdict;
 	}
 }
@@ -295,9 +295,9 @@ void trigger_push_touch (edict_t *self, edict_t *other, cplane_t *plane, csurfac
 		{
 			// don't take falling damage immediately from this
 			VectorCopy (other->velocity, other->client->oldvelocity);
-			if (other->fly_sound_debounce_time < level.time)
+			if (other->fly_sound_debounce_framenum < level.framenum)
 			{
-				other->fly_sound_debounce_time = level.time + 1.5f * (1 * SERVER_FPS);
+				other->fly_sound_debounce_framenum = level.framenum + SECS_TO_FRAMES(1.5f);
 				gi.sound (other, CHAN_AUTO, windsound, 1, ATTN_NORM, 0);
 			}
 		}
@@ -362,13 +362,13 @@ void hurt_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *sur
 	if (!other->takedamage)
 		return;
 
-	if (self->timestamp > level.time)
+	if (self->touch_debounce_framenum > level.framenum)
 		return;
 
 	if (self->spawnflags & 16)
-		self->timestamp = level.time + 1 * (1 * SERVER_FPS);
+		self->touch_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
 	else
-		self->timestamp = level.time + 1;
+		self->touch_debounce_framenum = level.framenum + 1;
 
 	if (!(self->spawnflags & 4))
 	{

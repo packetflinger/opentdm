@@ -57,7 +57,7 @@ void MoveClientToIntermission (edict_t *ent)
 	ent->client->breather_framenum = 0;
 	ent->client->enviro_framenum = 0;
 	ent->client->grenade_state = GRENADE_NONE;
-	ent->client->grenade_time = 0;
+	ent->client->grenade_framenum = 0;
 
 	ent->waterlevel = 0;
 	ent->watertype = 0;
@@ -400,7 +400,7 @@ void G_SetStats (edict_t *ent)
 	}
 
 	index = ArmorIndex (ent);
-	if (power_armor_type && (!index || (level.framenum & 8) ) )
+	if (power_armor_type && (!index || ((level.framenum / SECS_TO_FRAMES(0.1f)) & 8)))
 	{	// flash between power armor and other armor icon
 		ent->client->ps.stats[STAT_ARMOR_ICON] = gi.imageindex ("i_powershield");
 		ent->client->ps.stats[STAT_ARMOR] = cells;
@@ -420,7 +420,7 @@ void G_SetStats (edict_t *ent)
 	//
 	// pickup message
 	//
-	if (level.time > ent->client->pickup_msg_time)
+	if (level.framenum > ent->client->pickup_msg_framenum)
 	{
 		ent->client->ps.stats[STAT_PICKUP_ICON] = 0;
 		ent->client->ps.stats[STAT_PICKUP_STRING] = 0;

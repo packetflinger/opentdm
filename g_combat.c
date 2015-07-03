@@ -215,7 +215,7 @@ static int CheckPowerArmor (edict_t *ent, vec3_t point, vec3_t normal, int damag
 		save = damage;
 
 	SpawnDamage (pa_te_type, point, normal, save);
-	ent->powerarmor_time = level.time + 0.2f * (1 * SERVER_FPS);
+	ent->powerarmor_framenum = level.framenum + SECS_TO_FRAMES(0.2f);
 
 	power_used = save / damagePerCell;
 
@@ -346,10 +346,10 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	// check for invincibility
 	if ((client && client->invincible_framenum > level.framenum ) && !(dflags & DAMAGE_NO_PROTECTION))
 	{
-		if (targ->pain_debounce_time < level.time)
+		if (targ->pain_debounce_framenum < level.framenum)
 		{
 			gi.sound(targ, CHAN_ITEM, gi.soundindex("items/protect4.wav"), 1, ATTN_NORM, 0);
-			targ->pain_debounce_time = level.time + 2 * (1 * SERVER_FPS);
+			targ->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(2);
 		}
 		take = 0;
 		save = damage;

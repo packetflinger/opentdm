@@ -1,6 +1,7 @@
 #ifndef _WIN32
 #include "g_local.h"
 #include <dirent.h>
+#include <signal.h>
 
 static	char	findbase[MAX_OSPATH];
 static	char	findpath[MAX_OSPATH];
@@ -205,7 +206,7 @@ void Sys_FindClose (void)
 
 void Sys_DebugBreak (void)
 {
-	asm ("int $3");
+	raise (SIGTRAP);
 }
 
 #endif

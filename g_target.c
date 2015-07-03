@@ -182,7 +182,7 @@ void use_target_explosion (edict_t *self, edict_t *other, edict_t *activator)
 	}
 
 	self->think = target_explosion_explode;
-	self->nextthink = level.time + self->delay * (1 * SERVER_FPS);
+	self->nextthink = level.framenum + SECS_TO_FRAMES(self->delay);
 }
 
 void SP_target_explosion (edict_t *ent)
@@ -305,6 +305,7 @@ void use_target_spawner (edict_t *self, edict_t *other, edict_t *activator)
 	ent = G_Spawn();
 	ent->classname = self->target;
 	VectorCopy (self->s.origin, ent->s.origin);
+	VectorCopy (self->s.origin, ent->old_origin);
 	VectorCopy (self->s.angles, ent->s.angles);
 	ED_CallSpawn (ent);
 	gi.linkentity (ent);
@@ -403,7 +404,7 @@ void SP_target_crosslevel_target (edict_t *self)
 	self->svflags = SVF_NOCLIENT;
 
 	self->think = target_crosslevel_target_think;
-	self->nextthink = level.time + self->delay * (1 * SERVER_FPS);
+	self->nextthink = level.framenum + SECS_TO_FRAMES(self->delay);
 }
 
 //==========================================================
@@ -475,7 +476,7 @@ void target_laser_think (edict_t *self)
 
 	VectorCopy (tr.endpos, self->s.old_origin);
 
-	self->nextthink = level.time + 1;
+	self->nextthink = level.framenum + SECS_TO_FRAMES(0.1f);
 }
 
 void target_laser_on (edict_t *self)
@@ -564,7 +565,7 @@ void SP_target_laser (edict_t *self)
 {
 	// let everything else get spawned before we start firing
 	self->think = target_laser_start;
-	self->nextthink = level.time + 1 * (1 * SERVER_FPS);
+	self->nextthink = level.framenum + SECS_TO_FRAMES(1);
 }
 
 //==========================================================
@@ -574,74 +575,8 @@ speed		How many seconds the ramping will take
 message		two letters; starting lightlevel and ending lightlevel
 */
 
-void target_lightramp_think (edict_t *self)
-{
-	char	style[2];
-
-	style[0] = 'a' + self->movedir[0] + level.time - (self->timestamp) * SERVER_FPS * self->movedir[2];
-	style[1] = 0;
-	gi.configstring (CS_LIGHTS+self->enemy->style, style);
-
-	if ((level.time - self->timestamp) < self->speed)
-	{
-		self->nextthink = level.time + 1;
-	}
-	else if (self->spawnflags & 1)
-	{
-		char	temp;
-
-		temp = self->movedir[0];
-		self->movedir[0] = self->movedir[1];
-		self->movedir[1] = temp;
-		self->movedir[2] *= -1;
-	}
-}
-
-void target_lightramp_use (edict_t *self, edict_t *other, edict_t *activator)
-{
-	if (!self->enemy)
-	{
-		edict_t		*e;
-
-		// check all the targets
-		e = NULL;
-		while (1)
-		{
-			e = G_Find (e, FOFS(targetname), self->target);
-			if (!e)
-				break;
-			if (strcmp(e->classname, "light") != 0)
-			{
-				gi.dprintf("%s at %s ", self->classname, vtos(self->s.origin));
-				gi.dprintf("target %s (%s at %s) is not a light\n", self->target, e->classname, vtos(e->s.origin));
-			}
-			else
-			{
-				self->enemy = e;
-			}
-		}
-
-		if (!self->enemy)
-		{
-			gi.dprintf("%s target %s not found at %s\n", self->classname, self->target, vtos(self->s.origin));
-			G_FreeEdict (self);
-			return;
-		}
-	}
-
-	self->timestamp = level.time;
-	target_lightramp_think (self);
-}
-
 void SP_target_lightramp (edict_t *self)
 {
-	if (!self->message || strlen(self->message) != 2 || self->message[0] < 'a' || self->message[0] > 'z' || self->message[1] < 'a' || self->message[1] > 'z' || self->message[0] == self->message[1])
-	{
-		gi.dprintf("target_lightramp has bad ramp (%s) at %s\n", self->message, vtos(self->s.origin));
-		G_FreeEdict (self);
-		return;
-	}
-
 	G_FreeEdict (self);
 	return;
 }
@@ -660,10 +595,10 @@ void target_earthquake_think (edict_t *self)
 	int		i;
 	edict_t	*e;
 
-	if (self->last_move_time < level.time)
+	if (self->pain_debounce_framenum < level.framenum)
 	{
 		gi.positioned_sound (self->s.origin, self, CHAN_AUTO, self->noise_index, 1.0, ATTN_NONE, 0);
-		self->last_move_time = level.time + 0.5 * (1 * SERVER_FPS);
+		self->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(0.5f);
 	}
 
 	for (i=1, e=g_edicts+i; i < globals.num_edicts; i++,e++)
@@ -681,16 +616,16 @@ void target_earthquake_think (edict_t *self)
 		e->velocity[2] = self->speed * (100.0 / e->mass);
 	}
 
-	if (level.time < self->timestamp)
-		self->nextthink = level.time + 1;
+	if (level.framenum < self->damage_debounce_framenum)
+		self->nextthink = level.framenum + SECS_TO_FRAMES(0.1f);
 }
 
 void target_earthquake_use (edict_t *self, edict_t *other, edict_t *activator)
 {
-	self->timestamp = level.time + self->count;
-	self->nextthink = level.time + 1;
+	self->damage_debounce_framenum = level.framenum + SECS_TO_FRAMES(self->count);
+	self->nextthink = level.framenum + SECS_TO_FRAMES(0.1f);
 	self->activator = activator;
-	self->last_move_time = 0;
+	self->pain_debounce_framenum = 0;
 }
 
 void SP_target_earthquake (edict_t *self)

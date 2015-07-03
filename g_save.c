@@ -218,8 +218,6 @@ void InitGame (void)
 	g_force_screenshot = gi.cvar ("g_force_screenshot", "0", 0);
 	g_force_record = gi.cvar ("g_force_record", "0", 0);
 
-	g_record_mvd = gi.cvar ("g_record_mvd", "0", 0);
-
 	g_tdmflags = gi.cvar ("g_tdmflags", "1040", 0);
 	g_itdmflags = gi.cvar ("g_itdmflags", "142427", 0);
 	g_1v1flags = gi.cvar ("g_1v1flags", "1040", 0);
@@ -254,6 +252,7 @@ void InitGame (void)
 	g_http_enabled = gi.cvar ("g_http_enabled", "1", 0);
 	g_http_bind = gi.cvar ("g_http_bind", "", 0);
 	g_http_proxy = gi.cvar ("g_http_proxy", "", 0);
+	g_http_debug = gi.cvar ("g_http_debug", "0", 0);
 
 	g_debug_spawns = gi.cvar ("g_debug_spawns", "0", 0);
 

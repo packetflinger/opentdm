@@ -54,7 +54,7 @@ void Sys_FindClose (void)
 
 void Sys_DebugBreak (void)
 {
-	__asm int 3;
+	DebugBreak ();
 }
 
 #endif

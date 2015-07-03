@@ -189,7 +189,7 @@ void TDM_Timelimit_f (edict_t *ent)
 	if (tdm_match_status >= MM_PLAYING && tdm_match_status < MM_SCOREBOARD)
 	{
 		current_matchinfo.timelimit = g_match_time->value / 60;
-		level.match_end_framenum = level.match_start_framenum + (int)(g_match_time->value * SERVER_FPS);
+		level.match_end_framenum = level.match_start_framenum + SECS_TO_FRAMES(g_match_time->value);
 	}
 
 	//wision: FIXME: remove _only_ timelimit vote (fix other commands too)

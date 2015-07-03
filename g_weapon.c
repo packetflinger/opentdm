@@ -335,7 +335,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 	// the object.  Right now trying to run into a firing hyperblaster
 	// is very jerky since you are predicted 'against' the shots.
 	VectorCopy (start, bolt->s.origin);
-	VectorCopy (start, bolt->s.old_origin);
+	VectorCopy (start, bolt->old_origin);
 	vectoangles (dir, bolt->s.angles);
 	VectorScale (dir, speed, bolt->velocity);
 	bolt->movetype = MOVETYPE_FLYMISSILE;
@@ -349,7 +349,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 	bolt->s.sound = gi.soundindex ("misc/lasfly.wav");
 	bolt->owner = self;
 	bolt->touch = blaster_touch;
-	bolt->nextthink = level.time + 2 * (1 * SERVER_FPS);
+	bolt->nextthink = level.framenum + SECS_TO_FRAMES(2);
 	bolt->think = G_FreeEdict;
 	bolt->dmg = damage;
 	bolt->classname = "bolt";
@@ -470,6 +470,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 
 	grenade = G_Spawn();
 	VectorCopy (start, grenade->s.origin);
+	VectorCopy (start, grenade->old_origin);
 	VectorScale (aimdir, speed, grenade->velocity);
 	VectorMA (grenade->velocity, 200 + crandom() * 10.0f, up, grenade->velocity);
 	VectorMA (grenade->velocity, crandom() * 10.0f, right, grenade->velocity);
@@ -484,7 +485,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
 	grenade->owner = self;
 	grenade->touch = Grenade_Touch;
-	grenade->nextthink = level.time + timer * (1 * SERVER_FPS);
+	grenade->nextthink = level.framenum + SECS_TO_FRAMES(timer);
 	grenade->think = Grenade_Explode;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
@@ -507,6 +508,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 
 	grenade = G_Spawn();
 	VectorCopy (start, grenade->s.origin);
+	VectorCopy (start, grenade->old_origin);
 	VectorScale (aimdir, speed, grenade->velocity);
 	VectorMA (grenade->velocity, 200 + crandom() * 10.0f, up, grenade->velocity);
 	VectorMA (grenade->velocity, crandom() * 10.0f, right, grenade->velocity);
@@ -521,7 +523,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
 	grenade->owner = self;
 	grenade->touch = Grenade_Touch;
-	grenade->nextthink = level.time + timer * (1 * SERVER_FPS);
+	grenade->nextthink = level.framenum + SECS_TO_FRAMES(timer);
 	grenade->think = Grenade_Explode;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
@@ -590,6 +592,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 
 	rocket = G_Spawn();
 	VectorCopy (start, rocket->s.origin);
+	VectorCopy (start, rocket->old_origin);
 	VectorCopy (dir, rocket->movedir);
 	vectoangles (dir, rocket->s.angles);
 	VectorScale (dir, speed, rocket->velocity);
@@ -603,7 +606,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
-	rocket->nextthink = level.time + (8000/speed) * (1 * SERVER_FPS);
+	rocket->nextthink = level.framenum + 8000*SERVER_FPS/speed;
 	rocket->think = G_FreeEdict;
 	rocket->dmg = damage;
 	rocket->radius_dmg = radius_damage;
@@ -724,7 +727,7 @@ void bfg_explode (edict_t *self)
 		}
 	}
 
-	self->nextthink = level.time + 0.1f * (1 * SERVER_FPS);
+	self->nextthink = level.framenum + SECS_TO_FRAMES(0.1f);
 	self->s.frame++;
 	if (self->s.frame == 5)
 		self->think = G_FreeEdict;
@@ -758,7 +761,7 @@ void bfg_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 	self->s.sound = 0;
 	self->s.effects &= ~EF_ANIM_ALLFAST;
 	self->think = bfg_explode;
-	self->nextthink = level.time + 1;
+	self->nextthink = level.framenum + 1;
 	self->enemy = other;
 
 	gi.linkentity (self);
@@ -843,7 +846,7 @@ void bfg_think (edict_t *self)
 		gi.multicast (self->s.origin, MULTICAST_PHS);
 	}
 
-	self->nextthink = level.time + 0.1f * SERVER_FPS;
+	self->nextthink = level.framenum + SECS_TO_FRAMES(0.1f);
 }
 
 
@@ -853,6 +856,7 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 
 	bfg = G_Spawn();
 	VectorCopy (start, bfg->s.origin);
+	VectorCopy (start, bfg->old_origin);
 	VectorCopy (dir, bfg->movedir);
 	vectoangles (dir, bfg->s.angles);
 	VectorScale (dir, speed, bfg->velocity);
@@ -866,7 +870,7 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg->s.modelindex = gi.modelindex ("sprites/s_bfg1.sp2");
 	bfg->owner = self;
 	bfg->touch = bfg_touch;
-	bfg->nextthink = level.time + (8000/speed) * (1 * SERVER_FPS);
+	bfg->nextthink = level.framenum + 8000*SERVER_FPS/speed;
 	bfg->think = G_FreeEdict;
 	bfg->radius_dmg = damage;
 	bfg->dmg_radius = damage_radius;
@@ -874,7 +878,7 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg->s.sound = gi.soundindex ("weapons/bfg__l1a.wav");
 
 	bfg->think = bfg_think;
-	bfg->nextthink = level.time + 1;
+	bfg->nextthink = level.framenum + 1;
 	bfg->teammaster = bfg;
 	bfg->teamchain = NULL;
 

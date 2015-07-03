@@ -441,7 +441,7 @@ void VoteMenuKick (edict_t *ent)
 		else
 			victim = ent->client->pers.votemenu_values.kick - 1;
 
-		while (victim > g_edicts && (!victim->inuse || victim == ent || victim->client->pers.admin))
+		while (victim > g_edicts && (!victim->inuse || victim == ent || victim->client->pers.admin || victim->client->pers.mvdclient))
 			victim--;
 	}
 	else
@@ -451,7 +451,7 @@ void VoteMenuKick (edict_t *ent)
 		else
 			victim = ent->client->pers.votemenu_values.kick + 1;
 
-		while (victim <= g_edicts + game.maxclients && (!victim->inuse || victim == ent || victim->client->pers.admin))
+		while (victim <= g_edicts + game.maxclients && (!victim->inuse || victim == ent || victim->client->pers.admin || victim->client->pers.mvdclient))
 			victim++;
 	}
 

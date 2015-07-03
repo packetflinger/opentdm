@@ -123,7 +123,7 @@ void SetRespawn (edict_t *ent, float delay)
 	ent->flags |= FL_RESPAWN;
 	ent->svflags |= SVF_NOCLIENT;
 	ent->solid = SOLID_NOT;
-	ent->nextthink = level.time + delay * (1 * SERVER_FPS);
+	ent->nextthink = level.framenum + SECS_TO_FRAMES(delay);
 	ent->think = DoRespawn;
 	gi.linkentity (ent);
 }
@@ -498,7 +498,7 @@ void MegaHealth_think (edict_t *self)
 {
 	if (self->owner->health > self->owner->max_health)
 	{
-		self->nextthink = level.time + 1 * (1 * SERVER_FPS);
+		self->nextthink = level.framenum + SECS_TO_FRAMES(1);
 		self->owner->health -= 1;
 		return;
 	}
@@ -526,7 +526,7 @@ qboolean Pickup_Health (edict_t *ent, edict_t *other)
 	if (ent->style & HEALTH_TIMED)
 	{
 		ent->think = MegaHealth_think;
-		ent->nextthink = level.time + 5 * (1 * SERVER_FPS);
+		ent->nextthink = level.framenum + SECS_TO_FRAMES(5);
 		ent->owner = other;
 		ent->flags |= FL_RESPAWN;
 		ent->svflags |= SVF_NOCLIENT;
@@ -735,7 +735,7 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 		// show icon and name on status bar
 		other->client->ps.stats[STAT_PICKUP_ICON] = gi.imageindex(ent->item->icon);
 		other->client->ps.stats[STAT_PICKUP_STRING] = CS_ITEMS+ITEM_INDEX(ent->item);
-		other->client->pickup_msg_time = level.time + 3 * (1 * SERVER_FPS);
+		other->client->pickup_msg_framenum = level.framenum + SECS_TO_FRAMES(3);
 
 		// change selected item
 
@@ -790,7 +790,7 @@ static void drop_temp_touch (edict_t *ent, edict_t *other, cplane_t *plane, csur
 static void drop_make_touchable (edict_t *ent)
 {
 	ent->touch = Touch_Item;
-	ent->nextthink = level.time + 29 * (1 * SERVER_FPS);
+	ent->nextthink = level.framenum + SECS_TO_FRAMES(29);
 	ent->think = G_FreeEdict;
 }
 
@@ -832,11 +832,13 @@ edict_t *Drop_Item (edict_t *ent, const gitem_t *item)
 		VectorCopy (ent->s.origin, dropped->s.origin);
 	}
 
+	VectorCopy (dropped->s.origin, dropped->old_origin);
+
 	VectorScale (forward, 100, dropped->velocity);
 	dropped->velocity[2] = 300;
 
 	dropped->think = drop_make_touchable;
-	dropped->nextthink = level.time + 1 * (1 * SERVER_FPS);
+	dropped->nextthink = level.framenum + SECS_TO_FRAMES(1);
 
 	gi.linkentity (dropped);
 
@@ -911,7 +913,7 @@ void droptofloor (edict_t *ent)
 		ent->solid = SOLID_NOT;
 		if (ent == ent->teammaster)
 		{
-			ent->nextthink = level.time + 1;
+			ent->nextthink = level.framenum + 1;
 			ent->think = DoRespawn;
 		}
 	}
@@ -1026,7 +1028,7 @@ void SpawnItem (edict_t *ent, const gitem_t *item)
 	}
 
 	ent->item = item;
-	ent->nextthink = level.time + 2 * 1;    // items start after other solids
+	ent->nextthink = level.framenum + 2;    // items start after other solids
 	ent->think = droptofloor;
 	ent->s.effects = item->world_model_flags;
 	ent->s.renderfx = RF_GLOW;

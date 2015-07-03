@@ -42,7 +42,7 @@ NULL will be returned if the end of the list is reached.
 
 =============
 */
-edict_t *G_Find (edict_t *from, int fieldofs, char *match)
+edict_t *G_Find (edict_t *from, size_t fieldofs, char *match)
 {
 	char	*s;
 
@@ -182,7 +182,7 @@ void G_UseTargets (edict_t *ent, edict_t *activator)
 	// create a temp object to fire at a later time
 		t = G_Spawn();
 		t->classname = "DelayedUse";
-		t->nextthink = level.time + ent->delay * (1 * SERVER_FPS);
+		t->nextthink = level.framenum + SECS_TO_FRAMES(ent->delay);
 		t->think = Think_Delay;
 		t->activator = activator;
 		if (!activator)
@@ -476,7 +476,7 @@ edict_t *G_Spawn (void)
 	{
 		// the first couple seconds of server time can involve a lot of
 		// freeing and allocating, so relax the replacement policy
-		if (!e->inuse && ( e->freetime < 2 || level.time - e->freetime > 0.5f * (1 * SERVER_FPS) ) )
+		if (!e->inuse && (e->freed_framenum < SECS_TO_FRAMES(2) || level.framenum - e->freed_framenum > SECS_TO_FRAMES(0.5f)))
 		{
 			G_InitEdict (e);
 			return e;
@@ -510,7 +510,7 @@ void G_FreeEdict (edict_t *ed)
 
 	memset (ed, 0, sizeof(*ed));
 	ed->classname = "freed";
-	ed->freetime = level.time;
+	ed->freed_framenum = level.framenum;
 	ed->inuse = false;
 }
 

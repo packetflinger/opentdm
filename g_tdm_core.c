@@ -410,7 +410,7 @@ void TDM_BeginMatch (void)
 	edict_t		*ent;
 
 	//level.match_start_framenum = 0;
-	level.match_end_framenum = level.framenum + (int)(g_match_time->value * SERVER_FPS);
+	level.match_end_framenum = level.framenum + SECS_TO_FRAMES(g_match_time->value);
 	tdm_match_status = MM_PLAYING;
 
 	//must setup teamplayers before level, or we lose item spawn stats
@@ -468,7 +468,6 @@ function.
 char *TDM_ScoreBoardString (edict_t *ent)
 {
 	char		entry[1024];
-	char		tmpstr[60];
 	static char	string[1024];
 	int			len;
 	int			i, j, k;
@@ -636,26 +635,26 @@ char *TDM_ScoreBoardString (edict_t *ent)
 		// ent is NULL only when we request the scoreboard for preserving
 		if (!ent)
 		{
-			sprintf (tmpstr, "oldscoreboard: %s", level.mapname);
+			sprintf (entry, "oldscoreboard: %s", level.mapname);
 			sprintf (string + strlen(string), "xv %d yv 24 string2 \"%s\" ",
-					(int)((36-strlen(tmpstr))/2)*8 + 8,
-					tmpstr
+					(int)((36-strlen(entry))/2)*8 + 8,
+					entry
 					);
 		}
 
 		// headers
-		sprintf (tmpstr, "%s:%.f(%s)", teaminfo[firstteam].name, averageping[firstteam-1], teaminfo[firstteam].skin);
+		sprintf (entry, "%s:%.f(%s)", teaminfo[firstteam].name, averageping[firstteam-1], teaminfo[firstteam].skin);
 		sprintf (string + strlen(string),
 			"xv %d yv 40 string \"%s\" ",
-			(int)((36-strlen(tmpstr))/2)*8 + 8,
-			tmpstr
+			(int)((36-strlen(entry))/2)*8 + 8,
+			entry
  			);
  
-		sprintf (tmpstr, "%s:%.f(%s)", teaminfo[secondteam].name, averageping[secondteam-1], teaminfo[secondteam].skin);
+		sprintf (entry, "%s:%.f(%s)", teaminfo[secondteam].name, averageping[secondteam-1], teaminfo[secondteam].skin);
  		sprintf (string + strlen(string),
 			"xv %d yv %d string \"%s\" ",
-			(int)((36-strlen(tmpstr))/2)*8 + 8,
-			offset + 40, tmpstr
+			(int)((36-strlen(entry))/2)*8 + 8,
+			offset + 40, entry
 			);
 
 		sprintf (string + strlen(string),
@@ -822,24 +821,24 @@ char *TDM_ScoreBoardString (edict_t *ent)
 		// headers
 		if (total[firstteam-1] > 0)
 		{
-			sprintf (tmpstr, "%s:%.f(%s)", teaminfo[firstteam].name, averageping[firstteam-1], teaminfo[firstteam].skin);
+			sprintf (entry, "%s:%.f(%s)", teaminfo[firstteam].name, averageping[firstteam-1], teaminfo[firstteam].skin);
 			sprintf (string + strlen(string),
 				"xv %d yv 40 string \"%s\" "
 				// draw name on X=0 later, so we don't have to set it for all the players below
 				"xv 264 yv 48 string2 \"Ping\" xv 8 string2 \" Name\" ",
-				(int)((36-strlen(tmpstr))/2)*8 + 8,
-				tmpstr
+				(int)((36-strlen(entry))/2)*8 + 8,
+				entry
 				);
 		}
 		if (total[secondteam-1] > 0)
 		{
-			sprintf (tmpstr, "%s:%.f(%s)", teaminfo[secondteam].name, averageping[secondteam-1], teaminfo[secondteam].skin);
+			sprintf (entry, "%s:%.f(%s)", teaminfo[secondteam].name, averageping[secondteam-1], teaminfo[secondteam].skin);
 			sprintf (string + strlen(string),
 				"xv %d yv %d string \"%s\" "
 				// draw name on X=0 later, so we don't have to set it for all the players below
 				"xv 264 yv %d string2 \"Ping\" xv 8 string2 \" Name\" ",
-				(int)((36-strlen(tmpstr))/2)*8 + 8, offset + 40,
-				tmpstr,	offset + 48
+				(int)((36-strlen(entry))/2)*8 + 8, offset + 40,
+				entry,	offset + 48
 				);
 		}
 
@@ -1032,78 +1031,6 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	return string;
 }
 
-// build a demo name string for server-side MVD
-const char *TDM_MakeMultiViewDemoName (void)
-{
-        int		i,j;
-        int		len;
-        struct tm       *ts;
-        time_t          t;
-        cvar_t          *hostname;
-        char            *servername;
-        static char     string[1400];
-	static char	string2[1400];
-
-        hostname = gi.cvar ("hostname", NULL, 0);
-
-        if (hostname)
-	{
-                servername = hostname->string;
-	}
-        else
-	{
-                servername = "unnamed_server";
-	}
-
-        t = time (NULL);
-        ts = localtime (&t);
-
-	Com_sprintf (string, sizeof(string), "%d%02d%02d%02d%02d%02d-%s-%s",
-                        ts->tm_year + 1900,
-                        ts->tm_mon + 1,
-                        ts->tm_mday,
-                        ts->tm_hour,
-                        ts->tm_min,
-                        ts->tm_sec,
-			level.mapname,
-			servername
-                        );
-	len = strlen(string);
-	
-	// filter out the crap while removing consecutive underscores. Probably a much
-	// better way of doing this, but I currently have a 4mo old and can't think straight
-        for (i=0, j=0; i < len; i++)
-        {
-                if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
-                                string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
-                                string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ')
-		{
-                        string[i] = '_';
-			if (i > 0)
-			{
-				if (string[i-1] != '_')
-				{
-					string2[j] = string[i];
-					j++;
-				}
-			}
-			else
-			{
-				string2[j] = string[i];
-				j++;
-			}
-		}
-		else
-		{
-			string2[j] = string[i];
-			j++;
-		}
-        }
-
-        return string2;
-}
-
-
 /*
 ==============
 TDM_BeginCountdown
@@ -1139,21 +1066,13 @@ void TDM_BeginCountdown (void)
 	//called to apply a temporary hack for people who do 1v1 on tdm mode
 	TDM_UpdateTeamNames ();
 	
-	level.match_start_framenum = level.framenum + (int)(g_match_countdown->value * SERVER_FPS);
+	level.match_start_framenum = level.framenum + SECS_TO_FRAMES(g_match_countdown->value);
 
 	// wision: force players to record
 	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
 	{
 		if (client->inuse && client->client->pers.team && (g_force_record->value == 1 || client->client->pers.config.auto_record))
 			G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName (client));
-	}
-
-	// record server demo
-	if (g_record_mvd->value == 1)
-	{
-		// record it
-		//gi.dprintf ("Trying to record a MVD...");
-		gi.AddCommandString (va("mvdrecord %s\n", TDM_MakeMultiViewDemoName ()));
 	}
 }
 
@@ -1169,7 +1088,7 @@ void TDM_EndIntermission (void)
 	int			i;
 
 	//for test server
-	//gi.bprintf (PRINT_CHAT, "Please report any bugs at www.opentdm.net.\n");
+	gi.bprintf (PRINT_CHAT, "Please report any bugs at www.opentdm.net.\n");
 
 	// wision: stop demo recording if we enforce it
 	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
@@ -1181,13 +1100,6 @@ void TDM_EndIntermission (void)
 			G_StuffCmd (client, "stop\n");
 	}
 
-	// stop server demo
-	if (g_record_mvd->value == 1)
-	{
-		// stop the recording
-		//gi.dprintf ("Trying to stop a MVD...");
-		gi.AddCommandString("mvdstop");
-	}
 
 	//shuffle current stats to old and cleanup any players who never reconnected
 	if (current_matchinfo.teamplayers)
@@ -1531,7 +1443,7 @@ void TDM_CheckTimes (void)
 
 		remaining = level.match_start_framenum - level.framenum;
 
-		if (remaining == (int)(10.4f * SERVER_FPS))
+		if (remaining == SECS_TO_FRAMES(10.4f))
 		{
 			gi.sound (world, 0, gi.soundindex ("world/10_0.wav"), 1, ATTN_NONE, 0);
 		}
@@ -1581,7 +1493,7 @@ void TDM_CheckTimes (void)
 		{
 			remaining = level.match_end_framenum - level.framenum;
 
-			if (remaining == (int)(10.4f * SERVER_FPS))
+			if (remaining == SECS_TO_FRAMES(10.4f))
 			{
 				gi.sound (world, 0, gi.soundindex ("world/10_0.wav"), 1, ATTN_NONE, 0);
 			}
@@ -2646,8 +2558,6 @@ Single time initialization stuff.
 void TDM_Init (void)
 {
 	cvar_t		*var;
-	const char	*p;
-	int			revision;
 
 	HTTP_Init ();
 
@@ -2661,7 +2571,21 @@ void TDM_Init (void)
 	var = gi.cvar ("sv_new_entflags", NULL, 0);
 	if (!var)
 	{
-		gi.dprintf ("Not running R1Q2...\n");
+		//if sv_features is set, server is assumed to be running Q2PRO
+		if (!game.server_features)
+		{
+			//super cheesy notice!
+			gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+			gi.dprintf ("               W A R N I N G !\n");
+			gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+			gi.dprintf ("\n");
+			gi.dprintf ("  OpenTDM is designed to use some of the new\n");
+			gi.dprintf ("  features in R1Q2. Your server does not\n");
+			gi.dprintf ("  appear to be running R1Q2, or is out of\n");
+			gi.dprintf ("  date. Some features may not work correctly.\n");
+			gi.dprintf ("\n");
+			gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+		}
 	}
 	else
 	{
@@ -2686,14 +2610,11 @@ void TDM_Init (void)
 	else if (g_gamemode->value == GAMEMODE_1V1)
 		dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
 
+#ifdef OPENTDM_REVISION
 	//show opentdm version to browsers
-	p = strchr (OPENTDM_VERSION, ':');
-	if (p)
-	{
-		p += 2;
-		revision = atoi (p);
-		gi.cvar ("revision", va("%d", revision), CVAR_SERVERINFO|CVAR_NOSET);
-	}
+	gi.cvar ("revision", va("%d", OPENTDM_REVISION), CVAR_SERVERINFO|CVAR_NOSET);
+	gi.cvar_set ("revision", va("%d", OPENTDM_REVISION));
+#endif
 
 	TDM_ResetGameState ();
 
@@ -2981,7 +2902,7 @@ void TDM_UpdateConfigStrings (qboolean forceUpdate)
 			break;
 		case MM_WARMUP:
 			timeout_remaining = 0;
-			time_remaining = g_match_time->value * (1 * SERVER_FPS) - 1;
+			time_remaining = SECS_TO_FRAMES(g_match_time->value) - 1;
 			break;
 		case MM_SUDDEN_DEATH:
 			timeout_remaining = 0;
@@ -3197,6 +3118,10 @@ void TDM_HandleDownload (tdm_download_t *download, char *buff, int len, int code
 	//handle went invalid (client->pers->download = zeroed), just ignore this download completely.
 	if (!download->inuse)
 		return;
+
+	//FIXME: observed a crash here due to NULL initiator
+	if (!download->initiator)
+		TDM_Error("TDM_HandleDownload: NULL initiator");
 
 	//player left before download finished, lame!
 	//note on an extremely poor connection it's possible another player since occupied their slot, but

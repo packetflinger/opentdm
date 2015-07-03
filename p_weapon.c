@@ -110,16 +110,16 @@ current
 void ChangeWeapon (edict_t *ent)
 {
 	//a grenade action is happening
-	if (ent->client->grenade_time)
+	if (ent->client->grenade_framenum)
 	{
 		//but it blew up in their hand or they threw it, allow bug to double explode
 		if ((ent->client->grenade_state == GRENADE_BLEW_UP && g_bugs->value >= 2) ||
 			(ent->client->grenade_state == GRENADE_THROWN && g_bugs->value >= 1) ||
 			ent->client->grenade_state == GRENADE_NONE)
 		{
-			ent->client->grenade_time = level.time;
+			ent->client->grenade_framenum = level.framenum;
 			weapon_grenade_fire (ent, false);
-			ent->client->grenade_time = 0;
+			ent->client->grenade_framenum = 0;
 			ent->client->grenade_state = GRENADE_NONE;
 		}
 	}
@@ -443,10 +443,10 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 			}
 			else
 			{
-				if (level.time >= ent->pain_debounce_time)
+				if (level.framenum >= ent->pain_debounce_framenum)
 				{
 					gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
-					ent->pain_debounce_time = level.time + 1 * (1 * SERVER_FPS);
+					ent->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
 				}
 				NoAmmoWeaponChange (ent);
 			}
@@ -550,7 +550,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
-	timer = (ent->client->grenade_time - level.time) * FRAMETIME;
+	timer = (ent->client->grenade_framenum - level.framenum) * FRAMETIME;
 	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
 	TDM_WeaponFired (ent);
@@ -558,7 +558,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->inventory[ent->client->ammo_index]--;
 
-	ent->client->grenade_time = level.time + 1.0 * (1 * SERVER_FPS);
+	ent->client->grenade_framenum = level.framenum + SECS_TO_FRAMES(1);
 
 	if(ent->deadflag || ent->s.modelindex != 255) // VWep animations screw up corpses
 	{
@@ -606,14 +606,14 @@ void Weapon_Grenade (edict_t *ent)
 			{
 				ent->client->ps.gunframe = 1;
 				ent->client->weaponstate = WEAPON_FIRING;
-				ent->client->grenade_time = 0;
+				ent->client->grenade_framenum = 0;
 			}
 			else
 			{
-				if (level.time >= ent->pain_debounce_time)
+				if (level.framenum >= ent->pain_debounce_framenum)
 				{
 					gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
-					ent->pain_debounce_time = level.time + 1 * (1 * SERVER_FPS);
+					ent->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
 				}
 				NoAmmoWeaponChange (ent);
 			}
@@ -638,14 +638,14 @@ void Weapon_Grenade (edict_t *ent)
 
 		if (ent->client->ps.gunframe == 11)
 		{
-			if (!ent->client->grenade_time)
+			if (!ent->client->grenade_framenum)
 			{
-				ent->client->grenade_time = level.time + (GRENADE_TIMER + 0.2) * (1 * SERVER_FPS);
+				ent->client->grenade_framenum = level.framenum + SECS_TO_FRAMES(GRENADE_TIMER + 0.2f);
 				ent->client->weapon_sound = gi.soundindex("weapons/hgrenc1b.wav");
 			}
 
 			// they waited too long, detonate it in their hand
-			if (ent->client->grenade_state != GRENADE_BLEW_UP && level.time >= ent->client->grenade_time)
+			if (ent->client->grenade_state != GRENADE_BLEW_UP && level.framenum >= ent->client->grenade_framenum)
 			{
 				ent->client->weapon_sound = 0;
 				weapon_grenade_fire (ent, true);
@@ -657,7 +657,7 @@ void Weapon_Grenade (edict_t *ent)
 
 			if (ent->client->grenade_state == GRENADE_BLEW_UP)
 			{
-				if (level.time >= ent->client->grenade_time)
+				if (level.framenum >= ent->client->grenade_framenum)
 				{
 					ent->client->ps.gunframe = 15;
 					ent->client->grenade_state = GRENADE_NONE;
@@ -676,14 +676,14 @@ void Weapon_Grenade (edict_t *ent)
 			ent->client->grenade_state = GRENADE_THROWN;
 		}
 
-		if ((ent->client->ps.gunframe == 15) && (level.time < ent->client->grenade_time))
+		if ((ent->client->ps.gunframe == 15) && (level.framenum < ent->client->grenade_framenum))
 			return;
 
 		ent->client->ps.gunframe++;
 
 		if (ent->client->ps.gunframe == 16)
 		{
-			ent->client->grenade_time = 0;
+			ent->client->grenade_framenum = 0;
 			ent->client->grenade_state = GRENADE_NONE;
 			ent->client->weaponstate = WEAPON_READY;
 		}
@@ -882,10 +882,10 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 	{
 		if (! ent->client->inventory[ent->client->ammo_index] )
 		{
-			if (level.time >= ent->pain_debounce_time)
+			if (level.framenum >= ent->pain_debounce_framenum)
 			{
 				gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
-				ent->pain_debounce_time = level.time + 1 * (1 * SERVER_FPS);
+				ent->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
 			}
 			NoAmmoWeaponChange (ent);
 		}
@@ -976,10 +976,10 @@ void Machinegun_Fire (edict_t *ent)
 	if (ent->client->inventory[ent->client->ammo_index] < 1)
 	{
 		ent->client->ps.gunframe = 6;
-		if (level.time >= ent->pain_debounce_time)
+		if (level.framenum >= ent->pain_debounce_framenum)
 		{
 			gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
-			ent->pain_debounce_time = level.time + 1 * (1 * SERVER_FPS);
+			ent->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
 		}
 		NoAmmoWeaponChange (ent);
 		return;
@@ -1110,10 +1110,10 @@ void Chaingun_Fire (edict_t *ent)
 
 	if (!shots)
 	{
-		if (level.time >= ent->pain_debounce_time)
+		if (level.framenum >= ent->pain_debounce_framenum)
 		{
 			gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
-			ent->pain_debounce_time = level.time + 1 * (1 * SERVER_FPS);
+			ent->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
 		}
 		NoAmmoWeaponChange (ent);
 		return;
@@ -1410,7 +1410,7 @@ void weapon_bfg_fire (edict_t *ent)
 	// make a big pitch kick with an inverse fall
 	ent->client->v_dmg_pitch = -40;
 	ent->client->v_dmg_roll = crandom()*8;
-	ent->client->v_dmg_time = level.time + DAMAGE_TIME;
+	ent->client->v_dmg_framenum = level.framenum + DAMAGE_FRAMES;
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
