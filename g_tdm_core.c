@@ -989,6 +989,7 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	struct tm	*ts;
 	time_t		t;
 	cvar_t		*hostname;
+	cvar_t		*demohostname;
 	char		*servername;
 	static char	string[1400];
 
@@ -999,15 +1000,17 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	else
 		servername = "unnamed_server";
 
+	demohostname = gi.cvar("g_demo_hostname", servername, 0);
+	
+
 	t = time (NULL);
 	ts = localtime (&t);
 
 	// current format: playername-team_a-team_b-servername-map-year-mon-day-hour-min-sec
-	Com_sprintf (string, sizeof(string), "%s-%s-%s-%s-%s_%d-%02d-%02d_%02d-%02d-%02d",
-			ent->client->pers.netname,
+	Com_sprintf (string, sizeof(string), "%s-%s-%s-%s_%d-%02d-%02d_%02d-%02d-%02d",
 			teaminfo[ent->client->pers.team].name,
 			teaminfo[(ent->client->pers.team%2)+1].name,
-			servername,
+			demohostname,
 			level.mapname,
 			ts->tm_year + 1900,
 			ts->tm_mon + 1,
