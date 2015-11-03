@@ -1010,7 +1010,7 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	Com_sprintf (string, sizeof(string), "%s-%s-%s-%s_%d-%02d-%02d_%02d-%02d-%02d",
 			teaminfo[ent->client->pers.team].name,
 			teaminfo[(ent->client->pers.team%2)+1].name,
-			demohostname,
+			demohostname->string,
 			level.mapname,
 			ts->tm_year + 1900,
 			ts->tm_mon + 1,
