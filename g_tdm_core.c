@@ -1006,25 +1006,24 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	t = time (NULL);
 	ts = localtime (&t);
 
-	// current format: playername-team_a-team_b-servername-map-year-mon-day-hour-min-sec
-	Com_sprintf (string, sizeof(string), "%s-%s-%s-%s_%d-%02d-%02d_%02d-%02d-%02d",
-			teaminfo[ent->client->pers.team].name,
-			teaminfo[(ent->client->pers.team%2)+1].name,
-			demohostname->string,
-			level.mapname,
-			ts->tm_year + 1900,
-			ts->tm_mon + 1,
-			ts->tm_mday,
-			ts->tm_hour,
-			ts->tm_min,
-			ts->tm_sec
-			);
+	// team1-team2_server_map_date-time
+	Com_sprintf (string, sizeof(string), "%s-%s_%s_%s_%d%02d%02d-%02d%02d%02d",
+		teaminfo[ent->client->pers.team].name,
+		teaminfo[(ent->client->pers.team%2)+1].name,
+		demohostname->string,
+		level.mapname,
+		ts->tm_year + 1900,
+		ts->tm_mon + 1,
+		ts->tm_mday,
+		ts->tm_hour,
+		ts->tm_min,
+		ts->tm_sec
+	);
 
 	// filter not allowed characters
 	len = strlen(string);
 
-	for (i = 0; i < len; i++)
-	{
+	for (i = 0; i < len; i++) {
 		if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' || 
 				string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
 				string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ')
