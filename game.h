@@ -240,7 +240,7 @@ typedef struct
 	// each new level entered will cause a call to SpawnEntities
 	void		(IMPORT *SpawnEntities) (const char *mapname, const char *entstring, const char *spawnpoint);
 
-	// Read/Write Game is for storing persistant cross level information
+	// Read/Write Game is for storing persistent cross level information
 	// about the world state and the clients.
 	// WriteGame is called every time a level is exited.
 	// ReadGame is called on a loadgame.

@@ -1145,7 +1145,7 @@ void PutClientInServer (edict_t *ent)
 	vec3_t	spawn_origin, spawn_angles;
 	gclient_t	*client;
 	int		i;
-	client_persistant_t	saved;
+	client_persistent_t	saved;
 	client_respawn_t	respsaved;
 	qboolean		rejoined;
 
@@ -1164,7 +1164,7 @@ void PutClientInServer (edict_t *ent)
 	//InitClientPersistant (client);
 	//ClientUserinfoChanged (ent, userinfo);
 
-	// clear everything but the persistant data
+	// clear everything but the persistent data
 	saved = client->pers;
 	respsaved = client->resp;
 	memset (client, 0, sizeof(*client));
@@ -1560,6 +1560,11 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	s = Info_ValueForKey (userinfo, "hand");
 	if (s[0])
 		ent->client->pers.hand = atoi(s);
+
+	// user flags
+	s = Info_ValueForKey(userinfo, "uf");
+	if (s[0])
+		ent->client->pers.userflags = atoi(s);
 
 	// save off the userinfo in case we want to check something later
 	strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);

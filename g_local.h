@@ -112,6 +112,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DF_QUAD_DROP		0x00004000	// 16384
 #define DF_FIXED_FOV		0x00008000	// 32768
 
+#define DF(x)       (((int)dmflags->value & DF_##x) != 0)
+
+// per-player flags, set in userinfo (extended from openffa for consistency)
+#define UF_AUTOSCREENSHOT   1		// stuff a screenshot
+#define UF_AUTORECORD       2		// force demo recording
+#define UF_LOCALFOV         4		// keep fov when chasing
+#define UF_MUTE_PLAYERS     8		// ignore player chat
+#define UF_MUTE_OBSERVERS   16		// ignore spec chat
+#define UF_MUTE_MISC        32		// unused
+#define UF_PLAYERFOV        64		// unused
+#define UF_EXTENDED_LAYOUT  128		// increase layout size (unused)
+#define UF_WEAPON_HUD		256		// show weapon/ammo totals in hud
+
+#define UF(ent, x)       ((ent->client->pers.userflags & UF_##x) != 0)
+
 #define GAMEMODE_TDM	0
 #define GAMEMODE_ITDM	1
 #define GAMEMODE_1V1	2
@@ -1466,7 +1481,8 @@ typedef struct
 	tdm_download_t	download;
 	playerconfig_t	config;
 	unsigned		uniqueid;
-} client_persistant_t;
+	int				userflags;
+} client_persistent_t;
 
 typedef struct
 {
@@ -1506,7 +1522,7 @@ struct gclient_s
 	int				clientNum;
 
 	// private to game
-	client_persistant_t	pers;
+	client_persistent_t	pers;
 	client_respawn_t	resp;
 
 	pmove_state_t		old_pmove;	// for detecting out-of-pmove changes
