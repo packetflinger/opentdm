@@ -59,7 +59,8 @@ ifdef CONFIG_WINDOWS
 else
     OBJS += sys_linux.o
     LIBS += -lm
-    TARGET := game$(CPU)-opentdm-$(VER).so
+    #TARGET := game$(CPU)-opentdm-$(VER).so
+    TARGET := game$(CPU).so
 endif
 
 ifdef CONFIG_32BIT
