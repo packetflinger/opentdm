@@ -1257,3 +1257,86 @@ int TDM_GetPlayerIdView (edict_t *ent)
 
 	return target - g_edicts;
 }
+
+/**
+ * Send the client a configstring with the weapon hud update if it's time to do so
+ *
+ */
+void TDM_UpdateWeaponHud(edict_t *ent) {
+
+	static char hud[MAX_STRING_CHARS];
+	gclient_t *cl;
+
+	if (!ent->client)
+		return;
+
+	cl = ent->client;
+
+	// not time yet
+	if (cl->next_weaponhud_update > level.framenum)
+		return;
+
+	// client doesn't want the hud
+	if (!UF(ent, WEAPON_HUD))
+		return;
+
+	hud[0] = 0;
+
+	// build the string
+	if (cl->inventory[ITEM_WEAPON_SHOTGUN] || cl->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
+		strcat(hud, va("%s%s%s:%d, ",
+				(cl->inventory[ITEM_WEAPON_SHOTGUN]) ? "SG" : "",
+				(cl->inventory[ITEM_WEAPON_SHOTGUN] && cl->inventory[ITEM_WEAPON_SUPERSHOTGUN]) ? "," : "",
+				(cl->inventory[ITEM_WEAPON_SUPERSHOTGUN]) ? "SSG" : "",
+				cl->inventory[ITEM_AMMO_SHELLS]
+		));
+	}
+
+	if (cl->inventory[ITEM_WEAPON_MACHINEGUN] || cl->inventory[ITEM_WEAPON_CHAINGUN]) {
+		strcat(hud, va("%s%s%s:%d, ",
+				(cl->inventory[ITEM_WEAPON_MACHINEGUN]) ? "MG" : "",
+				(cl->inventory[ITEM_WEAPON_MACHINEGUN] && cl->inventory[ITEM_WEAPON_CHAINGUN]) ? "," : "",
+				(cl->inventory[ITEM_WEAPON_CHAINGUN]) ? "CG" : "",
+				cl->inventory[ITEM_AMMO_BULLETS]
+		));
+	}
+
+	if (cl->inventory[ITEM_AMMO_GRENADES] || cl->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
+		strcat(hud, va("%s%s%s:%d, ",
+				(cl->inventory[ITEM_AMMO_GRENADES]) ? "HG" : "",
+				(cl->inventory[ITEM_AMMO_GRENADES] && cl->inventory[ITEM_WEAPON_GRENADELAUNCHER]) ? "," : "",
+				(cl->inventory[ITEM_WEAPON_GRENADELAUNCHER]) ? "GL" : "",
+				cl->inventory[ITEM_AMMO_GRENADES]
+		));
+	}
+
+	if (cl->inventory[ITEM_WEAPON_HYPERBLASTER] || cl->inventory[ITEM_WEAPON_BFG]) {
+		strcat(hud, va("%s%s%s:%d, ",
+				(cl->inventory[ITEM_WEAPON_HYPERBLASTER]) ? "HB" : "",
+				(cl->inventory[ITEM_WEAPON_HYPERBLASTER] && cl->inventory[ITEM_WEAPON_BFG]) ? "," : "",
+				(cl->inventory[ITEM_WEAPON_BFG]) ? "BFG" : "",
+				cl->inventory[ITEM_AMMO_CELLS]
+		));
+	}
+
+	if (cl->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
+		strcat(hud, va("RL:%d, ", cl->inventory[ITEM_AMMO_ROCKETS]));
+	}
+
+	if (cl->inventory[ITEM_WEAPON_RAILGUN]) {
+		strcat(hud, va("RG:%d, ", cl->inventory[ITEM_AMMO_SLUGS]));
+	}
+
+	// cut off the last comma and space
+	if (strlen(hud) > 0) {
+		hud[strlen(hud)-2] = 0;
+	}
+
+	// send it to the client
+	gi.WriteByte (svc_configstring);
+	gi.WriteShort (CS_WEAPON_HUD);
+	gi.WriteString (va("%s", hud));
+	gi.unicast (ent, false);
+
+	cl->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(3);
+}

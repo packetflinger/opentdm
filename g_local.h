@@ -150,6 +150,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define CS_TDM_VOTE_STRING		(CS_GENERAL + 8)
 
+#define CS_WEAPON_HUD			(CS_GENERAL + 9)
+
 //#define CS_TDM_TEAM_A_PIC		(CS_GENERAL + 5)
 //#define CS_TDM_TEAM_B_PIC		(CS_GENERAL + 6)
 
@@ -1625,6 +1627,8 @@ struct gclient_s
 	int			next_animation_frame;
 	unsigned	next_weapon_think;
 	vec3_t		saved_angles;
+
+	int			next_weaponhud_update;
 };
 
 typedef enum

@@ -357,11 +357,23 @@ void G_SetStats (edict_t *ent)
 
 	cells = 0;
 
+	TDM_UpdateWeaponHud(ent);
+
 	ent->client->ps.stats[STAT_ID_VIEW_INDEX] = 0;
 
-	if (!ent->client->pers.disable_id_view)
-		if (TDM_GetPlayerIdView (ent))
+	if (!ent->client->pers.disable_id_view) {
+		if (TDM_GetPlayerIdView (ent)) {
 			ent->client->ps.stats[STAT_ID_VIEW_INDEX] = CS_TDM_ID_VIEW;
+		} else {
+			if (UF(ent, WEAPON_HUD)) {
+				ent->client->ps.stats[STAT_ID_VIEW_INDEX] = CS_WEAPON_HUD;
+			}
+		}
+	} else {
+		if (UF(ent, WEAPON_HUD)) {
+			ent->client->ps.stats[STAT_ID_VIEW_INDEX] = CS_WEAPON_HUD;
+		}
+	}
 	
 	//
 	// health
