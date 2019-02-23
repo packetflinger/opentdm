@@ -1070,11 +1070,12 @@ void TDM_BeginCountdown (void)
 	
 	level.match_start_framenum = level.framenum + SECS_TO_FRAMES(g_match_countdown->value);
 
-	// wision: force players to record
-	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
-	{
-		if (client->inuse && client->client->pers.team && (g_force_record->value == 1 || client->client->pers.config.auto_record))
+	// force players to record
+	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
+		if (client->inuse && client->client->pers.team &&
+				(g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
 			G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName (client));
+		}
 	}
 }
 
@@ -1090,16 +1091,17 @@ void TDM_EndIntermission (void)
 	int			i;
 
 	//for test server
-	gi.bprintf (PRINT_CHAT, "Please report any bugs at www.opentdm.net.\n");
+	//gi.bprintf (PRINT_CHAT, "Please report any bugs at www.opentdm.net.\n");
 
-	// wision: stop demo recording if we enforce it
-	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
-	{
+	// stop demo recording if we enforce it
+	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
 		if (!client->inuse)
 			continue;
 
-		if (client->client->pers.team && (g_force_record->value == 1 || client->client->pers.config.auto_record))
+		if (client->client->pers.team &&
+				(g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
 			G_StuffCmd (client, "stop\n");
+		}
 	}
 
 
