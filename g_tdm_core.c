@@ -1571,7 +1571,8 @@ void TDM_CheckTimes (void)
 				if (!client->inuse)
 					continue;
 
-				if (client->client->pers.team && (g_force_screenshot->value == 1 || client->client->pers.config.auto_screenshot))
+				if (client->client->pers.team &&
+						(g_force_screenshot->value == 1 || client->client->pers.config.auto_screenshot || UF(client, AUTOSCREENSHOT)))
 					G_StuffCmd (client, "screenshot\n");
 			}
 		}
