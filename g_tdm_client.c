@@ -1338,5 +1338,5 @@ void TDM_UpdateWeaponHud(edict_t *ent) {
 	gi.WriteString (va("%s", hud));
 	gi.unicast (ent, false);
 
-	cl->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(3);
+	cl->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1.5f);
 }
