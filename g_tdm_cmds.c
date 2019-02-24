@@ -64,6 +64,40 @@ static void TDM_ForceReady_f (qboolean status)
 	TDM_CheckMatchStart ();
 }
 
+/**
+ * Toggle the weapon hud
+ *
+ */
+static void TDM_WeaponHud_f(edict_t *ent) {
+	if (!UF(ent, WEAPON_HUD)) {
+		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_WEAPON_HUD));
+		gi.cprintf(ent, PRINT_HIGH, "Weapon hud enabled\n");
+	} else {
+		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags & ~UF_WEAPON_HUD));
+		gi.cprintf(ent, PRINT_HIGH, "Weapon hud disabled\n");
+	}
+}
+
+
+static void TDM_AutoScreenshot_f(edict_t *ent) {
+	if (!UF(ent, AUTOSCREENSHOT)) {
+		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_AUTOSCREENSHOT));
+		gi.cprintf(ent, PRINT_HIGH, "Auto-screenshot enabled\n");
+	} else {
+		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags & ~UF_AUTOSCREENSHOT));
+		gi.cprintf(ent, PRINT_HIGH, "Auto-screenshot disabled\n");
+	}
+}
+
+static void TDM_AutoRecord_f(edict_t *ent) {
+	if (!UF(ent, AUTORECORD)) {
+		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_AUTORECORD));
+		gi.cprintf(ent, PRINT_HIGH, "Auto-record enabled\n");
+	} else {
+		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags & ~UF_AUTORECORD));
+		gi.cprintf(ent, PRINT_HIGH, "Auto-record disabled\n");
+	}
+}
 /*
 ==============
 TDM_StartMatch_f
@@ -107,6 +141,9 @@ void TDM_Commands_f (edict_t *ent)
 		"bfg            Show bfg settings\n"
 		"powerups       Show powerups settings\n"
 		"obsmode        Show obsmode settins\n"
+		"weaponhud      Toggle the weapon hud\n"
+		"autoscreenshot Toggle automatic screenshots\n"
+		"autorecord     Toggle automatic demo recording\n"
 		"\n"
 		"Team Captains\n"
 		"-------------\n"
@@ -2526,6 +2563,12 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_Admin_f (ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
+		else if (!Q_stricmp(cmd, "weaponhud"))
+			TDM_WeaponHud_f(ent);
+		else if (!Q_stricmp(cmd, "autoscreenshot"))
+			TDM_AutoScreenshot_f(ent);
+		else if (!Q_stricmp(cmd, "autorecord"))
+			TDM_AutoRecord_f(ent);
 		else
 			return true;	//don't print everything else as a text
 
@@ -2645,6 +2688,12 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_TeamEnemySkin_f (ent, true);
 		else if (!Q_stricmp (cmd, "eskin"))
 			TDM_TeamEnemySkin_f (ent, false);
+		else if (!Q_stricmp(cmd, "weaponhud"))
+			TDM_WeaponHud_f(ent);
+		else if (!Q_stricmp(cmd, "autoscreenshot"))
+			TDM_AutoScreenshot_f(ent);
+		else if (!Q_stricmp(cmd, "autorecord"))
+			TDM_AutoRecord_f(ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else
