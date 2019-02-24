@@ -55,19 +55,18 @@ ifdef CONFIG_WINDOWS
     ifdef CONFIG_HTTP
         LIBS += -lws2_32
     endif
-    TARGET := game$(CPU)-opentdm-$(VER).dll
+    TARGET ?= game$(CPU)-opentdm-$(VER).dll
 else
     OBJS += sys_linux.o
     LIBS += -lm
-    #TARGET := game$(CPU)-opentdm-$(VER).so
-    TARGET := game$(CPU).so
+    TARGET ?= game$(CPU)-opentdm-$(VER).so
 endif
 
 ifdef CONFIG_32BIT
 	CFLAGS += -m32
 	LDFLAGS += -m32
 	CPU = x86
-	TARGET := game$(CPU)-opentdm-$(VER).so
+	TARGET ?= game$(CPU)-opentdm-$(VER).so
 endif
 
 all: $(TARGET)
