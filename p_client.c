@@ -1837,6 +1837,12 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		return;
 	}
 
+	// lock player in place while vote it active until they vote (based on cvar)
+	if (vote.active && tdm_match_status == MM_WARMUP && (int)g_vote_attention->value == 2 && client->resp.vote == VOTE_HOLD) {
+		client->ps.pmove.pm_type = PM_FREEZE;
+		return;
+	}
+
 	pm_passent = ent;
 
 	if (ent->client->chase_target)
