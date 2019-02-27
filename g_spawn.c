@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "g_local.h"
+#include "g_tdm.h"
 
 typedef struct
 {
@@ -404,6 +405,41 @@ const char *ED_ParseEdict (const char *data, edict_t *ent)
 	return data;
 }
 
+// Should this entity be removed based on g_itemflags or g_powerupflags?
+qboolean G_RemovedItem(edict_t *ent)
+{
+	if (!ent->item) {
+		return false;
+	}
+
+	uint32_t index, i;
+	index = ITEM_INDEX(ent->item);
+
+	// weapons first
+	for (i = 0; i < (sizeof(weaponvotes) / sizeof(weaponinfo_t)); i++) {
+		if (!((int)g_itemflags->value & weaponvotes[i].value)) {
+			continue;
+		}
+
+		// this weapon has been removed
+		if (index == weaponvotes[i].itemindex) {
+			return true;
+		}
+	}
+
+	// powerups (quad, ps, etc) next
+	for (i = 0; i < sizeof(powerupvotes) / sizeof(powerupinfo_t); i++) {
+		if (!((int)g_powerupflags->value & powerupvotes[i].value)) {
+			continue;
+		}
+
+		if (index == powerupvotes[i].itemindex) {
+			return true;
+		}
+	}
+
+	return false;
+}
 
 /*
 ================
@@ -423,14 +459,25 @@ void G_FindTeams (void)
 
 	c = 0;
 	c2 = 0;
+
 	for (i=1, e=g_edicts+i ; i < globals.num_edicts ; i++,e++)
 	{
-		if (!e->inuse)
+		if (!e->inuse) {
 			continue;
-		if (!e->team)
+		}
+
+		if (!e->team) {
 			continue;
-		if (e->flags & FL_TEAMSLAVE)
+		}
+
+		if (G_RemovedItem(e)) {
+			e->team[0] = '_';
+		}
+
+		if (e->flags & FL_TEAMSLAVE) {
 			continue;
+		}
+
 		chain = e;
 		e->teammaster = e;
 		c++;
@@ -441,9 +488,14 @@ void G_FindTeams (void)
 				continue;
 			if (!e2->team)
 				continue;
+
+			if (G_RemovedItem(e2)) {
+				e2->team[0] = '_';
+			}
+
 			if (e2->flags & FL_TEAMSLAVE)
 				continue;
-			if (!strcmp(e->team, e2->team))
+			if (strcmp(e->team, e2->team) == 0)
 			{
 				c2++;
 				chain->teamchain = e2;
