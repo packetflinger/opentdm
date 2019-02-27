@@ -215,6 +215,8 @@ Think_Weapon
 Called by ClientBeginServerFrame and ClientThink
 =================
 */
+vote_t vote;
+
 void Think_Weapon (edict_t *ent)
 {
 	// if just died, put the weapon away
@@ -233,6 +235,16 @@ void Think_Weapon (edict_t *ent)
 	{
 		ent->client->buttons &= ~BUTTON_ATTACK;
 		ent->client->latched_buttons &= ~BUTTON_ATTACK;
+	}
+
+	// draw attention to the current vote
+	if (vote.active && (int)g_vote_attention > 0 && tdm_match_status == MM_WARMUP) {
+
+		// stop team players from shooting while vote is in active
+		if ((int)g_vote_attention->value == 1 && !ent->client->resp.vote) {
+			ent->client->buttons &= ~BUTTON_ATTACK;
+			ent->client->latched_buttons &= ~BUTTON_ATTACK;
+		}
 	}
 
 	// variable FPS support
