@@ -538,6 +538,10 @@ static void TDM_AnnounceVote (void)
 	vote.vote_string = what;
 
 	gi.bprintf (PRINT_HIGH, "%s%s\n", message, what);
+
+	if (g_vote_attention->value) {
+		gi.sound(world, 0, gi.soundindex (g_vote_attention_sound->string), 1, ATTN_NONE, 0);
+	}
 }
 
 /*

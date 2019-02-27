@@ -91,6 +91,7 @@ cvar_t	*g_match_countdown;
 cvar_t	*g_vote_time;
 cvar_t	*g_vote_mask;
 cvar_t	*g_vote_attention;
+cvar_t	*g_vote_attention_sound;
 cvar_t	*g_intermission_time;
 cvar_t	*g_force_screenshot;
 cvar_t	*g_force_record;

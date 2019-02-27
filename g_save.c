@@ -215,6 +215,7 @@ void InitGame (void)
 	g_vote_time = gi.cvar ("g_vote_time", "30", 0);
 	g_vote_mask = gi.cvar ("g_vote_mask", "-1", 0);
 	g_vote_attention = gi.cvar("g_vote_attention", "0", 0);
+	g_vote_attention_sound = gi.cvar("g_vote_attention_sound", "misc/pc_up.wav", CVAR_LATCH);
 	g_intermission_time = gi.cvar ("g_intermission_time", "5", 0);
 	g_force_screenshot = gi.cvar ("g_force_screenshot", "0", 0);
 	g_force_record = gi.cvar ("g_force_record", "0", 0);

@@ -1003,6 +1003,8 @@ void SP_worldspawn (edict_t *ent)
 	gi.modelindex ("models/objects/gibs/skull/tris.md2");
 	gi.modelindex ("models/objects/gibs/head2/tris.md2");
 
+	gi.soundindex (g_vote_attention_sound->string);
+
 	//this is to force precache of the opentdm 'invisible player' model so it
 	//is auto downloaded (hopefully!)
 	//gi.modelindex ("players/opentdm/tris.md2");
