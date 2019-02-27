@@ -237,14 +237,10 @@ void Think_Weapon (edict_t *ent)
 		ent->client->latched_buttons &= ~BUTTON_ATTACK;
 	}
 
-	// draw attention to the current vote
-	if (vote.active && (int)g_vote_attention->value > 0 && tdm_match_status == MM_WARMUP) {
-
-		// stop team players from shooting while vote is in active
-		if ((int)g_vote_attention->value == 1 && !ent->client->resp.vote) {
-			ent->client->buttons &= ~BUTTON_ATTACK;
-			ent->client->latched_buttons &= ~BUTTON_ATTACK;
-		}
+	// draw attention to the current vote by not letting weapon fire
+	if (vote.active && (int)g_vote_attention->value > 0 && tdm_match_status == MM_WARMUP && ent->client->resp.vote == VOTE_HOLD) {
+		ent->client->buttons &= ~BUTTON_ATTACK;
+		ent->client->latched_buttons &= ~BUTTON_ATTACK;
 	}
 
 	// variable FPS support
