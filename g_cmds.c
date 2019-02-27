@@ -951,8 +951,8 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 	if (gi.argc () < 2 && !arg0)
 		return;
 
-	// wision: don't allow spectators to talk during shutup mode
-	if (!ent->client->pers.team && !ent->client->pers.admin && g_chat_mode->value == 2)
+	// don't allow spectators to talk during shutup mode
+	if (!ent->client->pers.team && !ent->client->pers.admin && (int)g_chat_mode->value == 2)
 		return;
 	
 
@@ -1057,6 +1057,17 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 			if (!OnSameTeam(ent, other))
 				continue;
 		}
+
+		// client doesn't want to hear from players
+		if (UF(other, MUTE_PLAYERS) && ent->client->pers.team && ent != other) {
+			continue;
+		}
+
+		// client doesn't want to hear from specs
+		if (UF(other, MUTE_OBSERVERS) && !ent->client->pers.team && ent != other) {
+			continue;
+		}
+
 		gi.cprintf(other, PRINT_CHAT, "%s", text);
 	}
 }
