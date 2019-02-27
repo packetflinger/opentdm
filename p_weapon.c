@@ -238,7 +238,7 @@ void Think_Weapon (edict_t *ent)
 	}
 
 	// draw attention to the current vote
-	if (vote.active && (int)g_vote_attention > 0 && tdm_match_status == MM_WARMUP) {
+	if (vote.active && (int)g_vote_attention->value > 0 && tdm_match_status == MM_WARMUP) {
 
 		// stop team players from shooting while vote is in active
 		if ((int)g_vote_attention->value == 1 && !ent->client->resp.vote) {
