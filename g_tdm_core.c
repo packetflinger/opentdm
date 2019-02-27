@@ -1440,6 +1440,7 @@ Check miscellaneous timers, eg match start countdown
 void TDM_CheckTimes (void)
 {
 	edict_t		*ent;
+	int vote_yes, vote_no;
 
 	if (tdm_match_status < MM_PLAYING && level.match_start_framenum)
 	{
@@ -1540,7 +1541,7 @@ void TDM_CheckTimes (void)
 	}
 
 	//end of map intermission - same as regular dm style
-	if (level.intermissionframe && level.framenum - level.intermissionframe == 0)
+	if (level.intermissionframe && level.framenum - level.intermissionframe >= 0)
 	{
 		level.exitintermission = 1;
 	}
@@ -1588,8 +1589,28 @@ void TDM_CheckTimes (void)
 
 		if (level.framenum == vote.end_frame)
 		{
-			gi.bprintf (PRINT_HIGH, "Vote failed.\n");
-			TDM_RemoveVote ();
+			// end of vote, compare yes/no and ignore non-voters and ratio
+			vote_yes = vote_no = 0;
+			for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+				if (ent->client->resp.vote == VOTE_YES) {
+					vote_yes++;
+					continue;
+				}
+
+				if (ent->client->resp.vote == VOTE_NO) {
+					vote_no++;
+				}
+			}
+
+			if (vote_yes > vote_no) {
+				vote.success = VOTE_SUCCESS;
+				gi.bprintf (PRINT_HIGH, "Vote passed!\n");
+				TDM_ApplyVote ();
+			} else {
+				gi.bprintf (PRINT_HIGH, "Vote failed.\n");
+			}
+
+			TDM_RemoveVote();
 		}
 	}
 

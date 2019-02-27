@@ -72,7 +72,7 @@ TDM_ApplyVote
 Apply vote.
 */
 void EndDMLevel (void);
-static void TDM_ApplyVote (void)
+void TDM_ApplyVote (void)
 {
 	char value[16];
 
