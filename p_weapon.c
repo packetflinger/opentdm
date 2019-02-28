@@ -238,7 +238,7 @@ void Think_Weapon (edict_t *ent)
 	}
 
 	// draw attention to the current vote by not letting weapon fire
-	if (vote.active && (int)g_vote_attention->value > 0 && tdm_match_status == MM_WARMUP && ent->client->resp.vote == VOTE_HOLD) {
+	if (vote.active && (int)g_vote_attention->value >= 2 && tdm_match_status == MM_WARMUP && ent->client->resp.vote == VOTE_HOLD) {
 		ent->client->buttons &= ~BUTTON_ATTACK;
 		ent->client->latched_buttons &= ~BUTTON_ATTACK;
 	}
