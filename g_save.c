@@ -219,6 +219,7 @@ void InitGame (void)
 	g_intermission_time = gi.cvar ("g_intermission_time", "5", 0);
 	g_force_screenshot = gi.cvar ("g_force_screenshot", "0", 0);
 	g_force_record = gi.cvar ("g_force_record", "0", 0);
+	g_record_mvd = gi.cvar("g_record_mvd", "0", 0);
 
 	g_tdmflags = gi.cvar ("g_tdmflags", "1040", 0);
 	g_itdmflags = gi.cvar ("g_itdmflags", "142427", 0);

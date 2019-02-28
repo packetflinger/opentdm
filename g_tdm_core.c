@@ -1033,6 +1033,44 @@ const char *TDM_MakeDemoName (edict_t *ent)
 	return string;
 }
 
+
+const char *TDM_MakeServerDemoName(void)
+{
+	int			i;
+	size_t		len;
+	struct tm	*ts;
+	time_t		t;
+	cvar_t		*demohostname;
+	static char	string[1400];
+
+	demohostname = gi.cvar("g_demo_hostname", "noname", 0);
+
+	t = time (NULL);
+	ts = localtime (&t);
+
+	// team1-team2_server_map_date-time
+	Com_sprintf (string, sizeof(string), "%s_%d%02d%02d-%02d%02d%02d",
+		demohostname->string,
+		ts->tm_year + 1900,
+		ts->tm_mon + 1,
+		ts->tm_mday,
+		ts->tm_hour,
+		ts->tm_min,
+		ts->tm_sec
+	);
+
+	// filter not allowed characters
+	len = strlen(string);
+
+	for (i = 0; i < len; i++) {
+		if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
+				string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
+				string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ')
+			string[i] = '_';
+	}
+
+	return string;
+}
 /*
 ==============
 TDM_BeginCountdown
@@ -1067,15 +1105,21 @@ void TDM_BeginCountdown (void)
 
 	//called to apply a temporary hack for people who do 1v1 on tdm mode
 	TDM_UpdateTeamNames ();
-	
+
 	level.match_start_framenum = level.framenum + SECS_TO_FRAMES(g_match_countdown->value);
 
 	// force players to record
 	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
 		if (client->inuse && client->client->pers.team &&
 				(g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
-			G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName (client));
+			G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName(client));
 		}
+	}
+
+	// record multi-view demo on server
+	if (game.server_features && g_record_mvd->value && !game.recording) {
+		gi.AddCommandString(va("mvdrecord %s", TDM_MakeServerDemoName()));
+		game.recording = true;
 	}
 }
 
@@ -1102,6 +1146,12 @@ void TDM_EndIntermission (void)
 				(g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
 			G_StuffCmd (client, "stop\n");
 		}
+	}
+
+	// stop multi-view demo recording on server
+	if (game.recording) {
+		gi.AddCommandString("mvdstop");
+		game.recording = false;
 	}
 
 

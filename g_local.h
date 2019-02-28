@@ -510,7 +510,11 @@ typedef struct
 
 	char		gamedir[MAX_QPATH];
 
+	// greater than zero indicates we're running q2pro
 	int			server_features;
+
+	// are we currently recording a server demo?
+	qboolean	recording;
 } game_locals_t;
 
 
@@ -796,6 +800,7 @@ extern	cvar_t	*g_vote_attention_sound;
 extern	cvar_t	*g_intermission_time;
 extern	cvar_t	*g_force_screenshot;
 extern	cvar_t	*g_force_record;
+extern	cvar_t	*g_record_mvd;
 
 extern	cvar_t	*g_tdmflags;
 extern	cvar_t	*g_itdmflags;
