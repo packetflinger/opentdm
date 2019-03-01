@@ -487,6 +487,17 @@ typedef struct gitem_s
 	const char	*shortname;
 } gitem_t;
 
+/**
+ * this structure keeps track of the status of server-side multi-view demos.
+ * MVD can record through multiple gamemaps, so we need to keep track
+ * of the state.
+ */
+typedef struct
+{
+	qboolean 	recording;			// are we currently recording?
+	int			target_count;		// how many matches should we record?
+	int			current_count;		// how many have we already recorded?
+} server_demo_t;
 
 
 //
@@ -513,8 +524,12 @@ typedef struct
 	// greater than zero indicates we're running q2pro
 	int			server_features;
 
-	// are we currently recording a server demo?
-	qboolean	recording;
+	// the number of matches played since mod was loaded
+	int			match_count;
+
+	// auto server demo stuff
+	server_demo_t	mvd;
+
 } game_locals_t;
 
 

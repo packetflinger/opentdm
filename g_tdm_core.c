@@ -1117,9 +1117,10 @@ void TDM_BeginCountdown (void)
 	}
 
 	// record multi-view demo on server
-	if (game.server_features && g_record_mvd->value && !game.recording) {
+	if (game.server_features && g_record_mvd->value && !game.mvd.recording) {
+		game.mvd.target_count = (int) g_record_mvd->value;
 		gi.AddCommandString(va("mvdrecord %s", TDM_MakeServerDemoName()));
-		game.recording = true;
+		game.mvd.recording = true;
 	}
 }
 
@@ -1148,12 +1149,17 @@ void TDM_EndIntermission (void)
 		}
 	}
 
-	// stop multi-view demo recording on server
-	if (game.recording) {
-		gi.AddCommandString("mvdstop");
-		game.recording = false;
+	// stop multi-view demo recording on server if required
+	if (game.mvd.recording) {
+		game.mvd.current_count++;
+
+		if (game.mvd.current_count == game.mvd.target_count) {
+			gi.AddCommandString("mvdstop");
+			memset(&game.mvd, 0x0, sizeof(server_demo_t));
+		}
 	}
 
+	game.match_count++;
 
 	//shuffle current stats to old and cleanup any players who never reconnected
 	if (current_matchinfo.teamplayers)
