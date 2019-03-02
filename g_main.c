@@ -158,6 +158,7 @@ void DummyWrite (const char *filename, qboolean autosave);
 void DummyRead (const char *filename);
 void InitGame (void);
 void G_RunFrame (void);
+char *TDM_MakeServerDemoName(void);
 
 
 //===================================================================
@@ -478,6 +479,23 @@ void G_RunFrame (void)
 	//FIXME: shouldn't we increment framenum after the game has run, in preparation for the next frame?
 	//otherwise usercmds that arrive after we return will still use the old framenum, which seems wrong.
 	//level.realframenum++;
+
+	// see if we need to start/stop a server demo
+	if (g_record_mvd->modified && game.server_features) {
+		g_record_mvd->modified = false;
+
+		if (game.mvd.recording && game.mvd.matches >= (int) g_record_mvd->value) {
+			gi.AddCommandString("mvdstop\n");
+			memset(&game.mvd, 0x0, sizeof(server_demo_t));
+			return;
+		}
+
+		if (!game.mvd.recording && (tdm_match_status == MM_PLAYING || tdm_match_status == MM_TIMEOUT)) {
+			strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
+			gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
+			game.mvd.recording = true;
+		}
+	}
 
 	if (tdm_match_status != MM_TIMEOUT)
 	{

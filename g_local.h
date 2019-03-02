@@ -494,9 +494,8 @@ typedef struct gitem_s
  */
 typedef struct
 {
-	qboolean 	recording;			// are we currently recording?
-	int			target_count;		// how many matches should we record?
-	int			current_count;		// how many have we already recorded?
+	qboolean 	recording;					// are we currently recording?
+	int			matches;					// how many have we already recorded?
 	char 		filename[MAX_STRING_CHARS];	// demo name
 } server_demo_t;
 

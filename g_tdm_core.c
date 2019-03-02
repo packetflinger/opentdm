@@ -1034,7 +1034,7 @@ const char *TDM_MakeDemoName (edict_t *ent)
 }
 
 
-const char *TDM_MakeServerDemoName(void)
+char *TDM_MakeServerDemoName(void)
 {
 	int			i;
 	size_t		len;
@@ -1119,7 +1119,6 @@ void TDM_BeginCountdown (void)
 	// record multi-view demo on server
 	if (game.server_features && g_record_mvd->value && !game.mvd.recording) {
 		strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
-		game.mvd.target_count = (int) g_record_mvd->value;
 		gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
 		game.mvd.recording = true;
 	}
@@ -1152,9 +1151,9 @@ void TDM_EndIntermission (void)
 
 	// stop multi-view demo recording on server if required
 	if (game.mvd.recording) {
-		game.mvd.current_count++;
+		game.mvd.matches++;
 
-		if (game.mvd.current_count == game.mvd.target_count) {
+		if (game.mvd.matches >= (int) g_record_mvd->value) {
 			gi.AddCommandString("mvdstop");
 			memset(&game.mvd, 0x0, sizeof(server_demo_t));
 		}
@@ -3419,29 +3418,12 @@ void TDM_ServerDemoStatus(edict_t *ent)
 	}
 
 	if (game.mvd.recording) {
-		gi.cprintf(ent, PRINT_HIGH, "Currently recording %s (match %d/%d)\n", game.mvd.filename, game.mvd.current_count + 1, game.mvd.target_count);
+		gi.cprintf(ent, PRINT_HIGH, "Currently recording %s (match %d/%d)\n", game.mvd.filename, game.mvd.matches + 1, (int) g_record_mvd->value);
+		if (game.mvd.matches + 1 >= (int) g_record_mvd->value) {
+			gi.cprintf(ent, PRINT_HIGH, "MVD will stop after the current match\n");
+		}
 		return;
 	}
 
 	gi.cprintf(ent, PRINT_HIGH, "Not currently recording a server demo\n");
-}
-
-/**
- * Change the target number of matches to include in the MVD
- */
-void TDM_ServerDemoSetMatchTarget(edict_t *ent, size_t limit)
-{
-
-	if (!game.server_features) {
-		gi.cprintf(ent, PRINT_HIGH, "Multi-view demos not supported by this Q2 server\n");
-		return;
-	}
-
-	if (game.mvd.recording) {
-		gi.cprintf(ent, PRINT_HIGH, "Demo match record limit changed from %d to %d\n", game.mvd.target_count, limit);
-		game.mvd.target_count = limit;
-		return;
-	}
-
-	gi.cprintf(ent, PRINT_HIGH, "Not recording currently, set match target limit using 'g_record_mvd' cvar instead\n");
 }
