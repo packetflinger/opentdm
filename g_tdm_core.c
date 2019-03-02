@@ -1118,8 +1118,9 @@ void TDM_BeginCountdown (void)
 
 	// record multi-view demo on server
 	if (game.server_features && g_record_mvd->value && !game.mvd.recording) {
+		strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
 		game.mvd.target_count = (int) g_record_mvd->value;
-		gi.AddCommandString(va("mvdrecord %s", TDM_MakeServerDemoName()));
+		gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
 		game.mvd.recording = true;
 	}
 }
@@ -3403,4 +3404,44 @@ void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *kille
 		if (new_target)
 			SetChase (e, new_target);
 	}
+}
+
+
+/**
+ * Just display the mod's best guess at whether server is recording a multi-view demo.
+ *
+ */
+void TDM_ServerDemoStatus(edict_t *ent)
+{
+	if (!game.server_features) {
+		gi.cprintf(ent, PRINT_HIGH, "Multi-view demos not supported by this Q2 server\n");
+		return;
+	}
+
+	if (game.mvd.recording) {
+		gi.cprintf(ent, PRINT_HIGH, "Currently recording %s (match %d/%d)\n", game.mvd.filename, game.mvd.current_count + 1, game.mvd.target_count);
+		return;
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, "Not currently recording a server demo\n");
+}
+
+/**
+ * Change the target number of matches to include in the MVD
+ */
+void TDM_ServerDemoSetMatchTarget(edict_t *ent, size_t limit)
+{
+
+	if (!game.server_features) {
+		gi.cprintf(ent, PRINT_HIGH, "Multi-view demos not supported by this Q2 server\n");
+		return;
+	}
+
+	if (game.mvd.recording) {
+		gi.cprintf(ent, PRINT_HIGH, "Demo match record limit changed from %d to %d\n", game.mvd.target_count, limit);
+		game.mvd.target_count = limit;
+		return;
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, "Not recording currently, set match target limit using 'g_record_mvd' cvar instead\n");
 }

@@ -967,6 +967,23 @@ void TDM_SV_SaveDefaults_f (void)
 	gi.dprintf ("Default cvars saved.\n");
 }
 
+void TDM_SV_DemoStatus_f(void)
+{
+	TDM_ServerDemoStatus(NULL);
+}
+
+void TDM_SV_DemoSetMatchTarget_f(void)
+{
+	if (gi.argc() < 3) {
+		gi.cprintf(NULL, PRINT_HIGH, "Usage: %s <match limit>\n", gi.argv(0));
+		return;
+	}
+
+	size_t limit;
+	limit = atoi(gi.argv(2));
+	TDM_ServerDemoSetMatchTarget(NULL, limit);
+}
+
 /*
 ==============
 TDM_ServerCommand
@@ -981,6 +998,10 @@ qboolean TDM_ServerCommand (const char *cmd)
 		TDM_SV_SaveDefaults_f ();
 	else if (!Q_stricmp (cmd, "applysettings"))
 		TDM_SV_ApplySettings_f ();
+	else if (!Q_stricmp(cmd, "demostatus"))
+		TDM_SV_DemoStatus_f();
+	else if (!Q_stricmp(cmd, "demosetmatchtarget"))
+		TDM_SV_DemoSetMatchTarget_f();
 	else
 		return false;
 

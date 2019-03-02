@@ -41,6 +41,8 @@ void TDM_EndMatch (void);
 qboolean TDM_Checkmap (edict_t *ent, const char *mapname);
 void TDM_WriteMaplist (edict_t *ent);
 void TDM_CreateMaplist (void);
+void TDM_ServerDemoStatus(edict_t *ent);
+void TDM_ServerDemoSetMatchTarget(edict_t *ent, size_t limit);
 
 extern char		**tdm_maplist;
 
