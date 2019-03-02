@@ -1562,7 +1562,7 @@ void TDM_CheckTimes (void)
 			{
 				gi.bprintf (PRINT_HIGH, "%d\n", (int)(remaining * FRAMETIME));
 			}*/
-			else if (remaining == 0)
+			else if (remaining <= 0) // you can vote match time less than there is available
 			{
 				if (teaminfo[TEAM_A].score == teaminfo[TEAM_B].score)
 				{
