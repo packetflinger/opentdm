@@ -2465,11 +2465,6 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_ForceReady_f (true);
 			return true;
 		}
-		/*else if (!Q_stricmp (cmd, "startmatch"))
-		{
-			TDM_StartMatch_f (ent);
-			return true;
-		}*/
 		else if (!Q_stricmp (cmd, "kickplayer"))
 		{
 			TDM_KickPlayer_f (ent);
