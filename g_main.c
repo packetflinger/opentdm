@@ -490,7 +490,7 @@ void G_RunFrame (void)
 			return;
 		}
 
-		if (!game.mvd.recording && (tdm_match_status == MM_PLAYING || tdm_match_status == MM_TIMEOUT)) {
+		if (!game.mvd.recording && tdm_match_status > MM_WARMUP) {
 			strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
 			gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
 			game.mvd.recording = true;
