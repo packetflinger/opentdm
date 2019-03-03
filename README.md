@@ -126,6 +126,15 @@ Value | Description
 
 `notreadyall` For all players not ready
 
+## Server Commands
+
+`sv settings` Show current match settings
+
+`sv savedefaults` Set currently changed CVARs as the defaults
+
+`sv applysettings` Config has been changed, make sure it's applied in the gamestate
+
+`sv demostatus` See the current status of server demo
 
 ## Server CVARs
 `g_admin_password <string>` Admin/referee password
