@@ -350,3 +350,16 @@ Value | Description
 1 | speclock
  | *default -1 (all)*
 
+`g_vote_attention <0/1/2/3>` How aggressively we try to bring votes to the attention of otherwise obtuse players, values stack
+
+Value | Description
+------ | ------
+0 | Don't do anything special, no sounds, etc
+1 | Play sound specified by `g_vote_attention_sound`
+2 | Prevent players from shooting until they cast a vote
+3 | Freeze players in place until they vote
+
+`g_vote_attention_sound` The sound file played when vote is called and `g_vote_attention` value is greater or equal to 1, *default: misc/pc_up.wav*
+
+`g_record_mvd <integer>` Will record a multi-view server demo of <integer> matches. Only works with Q2Pro server, *default: 0*
+
