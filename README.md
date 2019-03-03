@@ -4,6 +4,7 @@ OpenTDM is an open source team deathmatch and duel mod for Quake II.
 
 ## Client Commands
 `commands` Show available commands
+
 `id` Enable player ID of whoever is closest to your crosshair
 `accept` Accept a team invite
 `admin/referee <password>` Become an admin
