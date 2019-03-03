@@ -359,7 +359,7 @@ Value | Description
 2 | Prevent players from shooting until they cast a vote
 3 | Freeze players in place until they vote
 
-`g_vote_attention_sound` The sound file played when vote is called and `g_vote_attention` value is greater or equal to 1, *default: misc/pc_up.wav*
+`g_vote_attention_sound <string>` The sound file played when vote is called and `g_vote_attention` value is greater or equal to 1, *default: misc/pc_up.wav*
 
-`g_record_mvd <integer>` Will record a multi-view server demo of <integer> matches. Only works with Q2Pro server, *default: 0*
+`g_record_mvd <integer>` Will record a multi-view server demo of &lt;integer&gt; matches. Only works with Q2Pro server, *default: 0*
 
