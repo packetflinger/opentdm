@@ -282,6 +282,8 @@ void InitGame (void)
 	g_http_path = gi.cvar ("g_http_path", "/api/", CVAR_NOSET);
 	g_http_domain = gi.cvar ("g_http_domain", "opentdm.net", CVAR_NOSET);
 
+	sv_mvd_enable = gi.cvar("sv_mvd_enable", "", CVAR_LATCH);
+
 	// items
 	InitItems ();	
 

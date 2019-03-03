@@ -146,6 +146,8 @@ cvar_t	*g_auto_rejoin_map;
 cvar_t	*g_1v1_spawn_mode;
 cvar_t	*g_tdm_spawn_mode;
 
+cvar_t	*sv_mvd_enable;
+
 void SpawnEntities (const char *mapname, const char *entities, const char *spawnpoint);
 void ClientThink (edict_t *ent, usercmd_t *cmd);
 qboolean ClientConnect (edict_t *ent, char *userinfo);

@@ -1117,7 +1117,7 @@ void TDM_BeginCountdown (void)
 	}
 
 	// record multi-view demo on server
-	if (game.server_features && g_record_mvd->value && !game.mvd.recording) {
+	if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
 		strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
 		gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
 		game.mvd.recording = true;
@@ -3412,8 +3412,8 @@ void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *kille
  */
 void TDM_ServerDemoStatus(edict_t *ent)
 {
-	if (!game.server_features) {
-		gi.cprintf(ent, PRINT_HIGH, "Multi-view demos not supported by this Q2 server\n");
+	if (!MVD_CAPABLE) {
+		gi.cprintf(ent, PRINT_HIGH, "Multi-view demos not supported or enabled by this Q2 server\n");
 		return;
 	}
 

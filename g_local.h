@@ -499,7 +499,7 @@ typedef struct
 	char 		filename[MAX_STRING_CHARS];	// demo name
 } server_demo_t;
 
-
+#define MVD_CAPABLE (game.server_features && sv_mvd_enable->value)
 //
 // this structure is left intact through an entire game
 // it should be initialized at dll load time, and read/written to
@@ -866,6 +866,8 @@ extern	cvar_t	*g_auto_rejoin_map;
 
 extern	cvar_t	*g_1v1_spawn_mode;
 extern	cvar_t	*g_tdm_spawn_mode;
+
+extern	cvar_t	*sv_mvd_enable;
 
 #define world	(&g_edicts[0])
 
