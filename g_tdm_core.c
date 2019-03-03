@@ -1135,8 +1135,8 @@ void TDM_EndIntermission (void)
 	edict_t		*client;
 	int			i;
 
-	//for test server
-	//gi.bprintf (PRINT_CHAT, "Please report any bugs at www.opentdm.net.\n");
+	//for bugs
+	gi.bprintf (PRINT_CHAT, "Please report issues at https://github.com/packetflinger/opentdm\n");
 
 	// stop demo recording if we enforce it
 	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
