@@ -886,7 +886,7 @@ qboolean TDM_SetupClient (edict_t *ent)
 		else
 		{
 			TDM_ShowTeamMenu (ent);
-			gi.cprintf (ent, PRINT_CHAT, "\nWelcome to OpenTDM, an open source OSP/Battle replacement. Please report any bugs at www.opentdm.net. Type 'commands' in the console for a brief command guide.\n\n");
+			gi.cprintf (ent, PRINT_CHAT, "\nWelcome to OpenTDM!\nType 'commands' in the console for a brief command guide.\n\n");
 		}
 	}
 	else

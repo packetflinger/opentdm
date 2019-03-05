@@ -489,10 +489,7 @@ void G_RunFrame (void)
 		if (game.mvd.recording && game.mvd.matches >= (int) g_record_mvd->value) {
 			gi.AddCommandString("mvdstop\n");
 			memset(&game.mvd, 0x0, sizeof(server_demo_t));
-			return;
-		}
-
-		if (!game.mvd.recording && tdm_match_status > MM_WARMUP) {
+		} else if (!game.mvd.recording && tdm_match_status > MM_WARMUP) {
 			strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
 			gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
 			game.mvd.recording = true;

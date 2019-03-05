@@ -3418,7 +3418,7 @@ void TDM_ServerDemoStatus(edict_t *ent)
 	}
 
 	if (game.mvd.recording) {
-		gi.cprintf(ent, PRINT_HIGH, "Currently recording %s (match %d/%d)\n", game.mvd.filename, game.mvd.matches + 1, (int) g_record_mvd->value);
+		gi.cprintf(ent, PRINT_HIGH, "Currently recording %s.mvd2 (match %d/%d)\n", game.mvd.filename, game.mvd.matches + 1, (int) g_record_mvd->value);
 		if (game.mvd.matches + 1 >= (int) g_record_mvd->value) {
 			gi.cprintf(ent, PRINT_HIGH, "MVD will stop after the current match\n");
 		}
