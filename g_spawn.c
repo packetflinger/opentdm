@@ -412,7 +412,7 @@ qboolean G_RemovedItem(edict_t *ent)
 		return false;
 	}
 
-	uint32_t index, i;
+	int index, i;
 	index = ITEM_INDEX(ent->item);
 
 	// weapons first
