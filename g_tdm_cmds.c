@@ -2582,7 +2582,7 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_Ready_f (ent);
 		else if (!Q_stricmp (cmd, "notready") || !Q_stricmp (cmd, "unready") || !Q_stricmp (cmd, "noready"))
 			TDM_NotReady_f (ent);
-		else if (!Q_stricmp (cmd, "kickplayer") || !Q_stricmp (cmd, "removeplayer") || !Q_stricmp (cmd, "remove"))
+		else if (!Q_stricmp (cmd, "kickplayer") || !Q_stricmp (cmd, "removeplayer") || !Q_stricmp (cmd, "remove") || !Q_stricmp (cmd, "k"))
 			TDM_KickPlayer_f (ent);
 		else if (!Q_stricmp (cmd, "admin") || !Q_stricmp (cmd, "referee"))
 			TDM_Admin_f (ent);
@@ -2598,7 +2598,7 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_Lockteam_f (ent, true);
 		else if (!Q_stricmp (cmd, "unlockteam") || !Q_stricmp (cmd, "unlock"))
 			TDM_Lockteam_f (ent, false);
-		else if (!Q_stricmp (cmd, "pickplayer") || !Q_stricmp (cmd, "pick"))
+		else if (!Q_stricmp (cmd, "pickplayer") || !Q_stricmp (cmd, "pick") || !Q_stricmp (cmd, "p"))
 			TDM_PickPlayer_f (ent);
 		else if (!Q_stricmp (cmd, "invite"))
 			TDM_Invite_f (ent);
