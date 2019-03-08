@@ -237,6 +237,12 @@ void Think_Weapon (edict_t *ent)
 		ent->client->latched_buttons &= ~BUTTON_ATTACK;
 	}
 
+	// draw attention to the ready status...
+	if (teaminfo[ent->client->pers.team].safety) {
+		ent->client->buttons &= ~BUTTON_ATTACK;
+		ent->client->latched_buttons &= ~BUTTON_ATTACK;
+	}
+
 	// draw attention to the current vote by not letting weapon fire
 	if (vote.active && (int)g_vote_attention->value >= 2 && tdm_match_status == MM_WARMUP && ent->client->resp.vote == VOTE_HOLD) {
 		ent->client->buttons &= ~BUTTON_ATTACK;

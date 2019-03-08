@@ -1383,6 +1383,7 @@ typedef struct
 	qboolean	speclocked;
 	qboolean	ready;
 	edict_t		*captain;
+	qboolean	safety;
 } teaminfo_t;
 
 extern int soundcache[MAX_SOUNDS];

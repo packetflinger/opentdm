@@ -1899,6 +1899,51 @@ void TDM_Teamskin_f (edict_t *ent)
 	TDM_UpdateConfigStrings (false);
 }
 
+/**
+ * When a team's safety is on, they can't shoot anymore. This gets toggled
+ * when 50% or more of the players are ready and the rest are just dicking around
+ * shooting. This way their either ready up or go observer.
+ */
+void TDM_CheckSafety(void) {
+
+	edict_t *ent;
+	uint8_t players, ready;
+	float percent;
+
+	players = ready = 0;
+
+	if (tdm_match_status > MM_WARMUP)
+		return;
+
+	// maybe don't bother in duel mode
+	if (TDM_Is1V1())
+		return;
+
+	for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
+	{
+		if (!ent->inuse)
+			continue;
+
+		if (!ent->client->pers.team)
+			continue;
+
+		if (ent->client->resp.ready)
+			ready++;
+
+		players++;
+	}
+
+	percent = (float) ready / players;
+
+	if (percent >= 0.5f) {
+		teaminfo[TEAM_A].safety = true;
+		teaminfo[TEAM_B].safety = true;
+	} else {
+		teaminfo[TEAM_A].safety = false;
+		teaminfo[TEAM_B].safety = false;
+	}
+}
+
 /*
 ==============
 TDM_NotReady_f
@@ -1927,6 +1972,7 @@ void TDM_NotReady_f (edict_t *ent)
 
 	gi.bprintf (PRINT_HIGH, "%s is not ready!\n", ent->client->pers.netname);
 
+	TDM_CheckSafety();
 	TDM_CheckMatchStart ();
 }
 
@@ -1958,6 +2004,7 @@ void TDM_Ready_f (edict_t *ent)
 
 	gi.bprintf (PRINT_HIGH, "%s is ready!\n", ent->client->pers.netname);
 
+	TDM_CheckSafety();
 	TDM_CheckMatchStart ();
 }
 

@@ -1760,6 +1760,8 @@ void TDM_CheckMatchStart (void)
 	if (teaminfo[TEAM_A].ready && teaminfo[TEAM_B].ready)
 	{
 		level.next_ready_nag_framenum = 0;
+		teaminfo[TEAM_A].safety = false;
+		teaminfo[TEAM_B].safety = false;
 
 		//wision: do NOT restart match during the match
 		//r1: under what conditions can/did this happen? late joining shouldn't be possible?
@@ -2264,6 +2266,7 @@ void TDM_TeamsChanged (void)
 	TDM_UpdateTeamNames ();
 	UpdateTeamMenu ();
 	UpdateMatchStatus ();
+	TDM_CheckSafety();
 	TDM_CheckMatchStart ();
 	TDM_CheckVote ();
 }
