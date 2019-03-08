@@ -2623,7 +2623,7 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 		else if (!Q_stricmp (cmd, "observer") || !Q_stricmp (cmd, "spectate") || !Q_stricmp (cmd, "chase") ||
 				!Q_stricmp (cmd, "spec") || !Q_stricmp (cmd, "obs"))
 			TDM_Spectate_f (ent);
-		else if (!Q_stricmp (cmd, "calltime") | !Q_stricmp (cmd, "pause") || !Q_stricmp (cmd, "ctime") ||
+		else if (!Q_stricmp (cmd, "calltime") || !Q_stricmp (cmd, "pause") || !Q_stricmp (cmd, "ctime") ||
 				!Q_stricmp (cmd, "time") || !Q_stricmp (cmd, "hold"))
 			TDM_Timeout_f (ent);
 		// stats.. this could use some cleanup
@@ -2659,7 +2659,7 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
  			TDM_TopBottomShots_f (ent, true, false);
 		else if (!Q_stricmp (cmd, "oldscores") || !Q_stricmp (cmd, "oldscore") || !Q_stricmp (cmd, "lastscores") || !Q_stricmp (cmd, "lastscore"))
 			TDM_OldScores_f (ent);
-		else if (!Q_stricmp (cmd, "ghost") || !Q_stricmp (cmd, "restore") || !Q_stricmp (cmd, "recover") | !Q_stricmp (cmd, "rejoin"))
+		else if (!Q_stricmp (cmd, "ghost") || !Q_stricmp (cmd, "restore") || !Q_stricmp (cmd, "recover") || !Q_stricmp (cmd, "rejoin"))
 			TDM_Ghost_f (ent);
 		else if (!Q_stricmp (cmd, "talk"))
 			TDM_Talk_f (ent);
