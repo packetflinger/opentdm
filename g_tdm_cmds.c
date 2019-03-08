@@ -2545,10 +2545,10 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_Commands_f (ent);
 		else if (!Q_stricmp (cmd, "settings") || !Q_stricmp (cmd, "matchinfo"))
 			TDM_Settings_f (ent);
-		else if (!Q_stricmp (cmd, "calltime") | !Q_stricmp (cmd, "pause") || !Q_stricmp (cmd, "ctime") ||
+		else if (!Q_stricmp (cmd, "calltime") || !Q_stricmp (cmd, "pause") || !Q_stricmp (cmd, "ctime") ||
 				!Q_stricmp (cmd, "time") || !Q_stricmp (cmd, "hold"))
 			TDM_Timeout_f (ent);
-		else if (!Q_stricmp (cmd, "ghost") || !Q_stricmp (cmd, "restore") || !Q_stricmp (cmd, "recover") | !Q_stricmp (cmd, "rejoin"))
+		else if (!Q_stricmp (cmd, "ghost") || !Q_stricmp (cmd, "restore") || !Q_stricmp (cmd, "recover") || !Q_stricmp (cmd, "rejoin"))
 			TDM_Ghost_f (ent);
 		else if (!Q_stricmp (cmd, "win"))
 			TDM_Win_f (ent);
