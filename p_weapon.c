@@ -238,7 +238,7 @@ void Think_Weapon (edict_t *ent)
 	}
 
 	// draw attention to the ready status...
-	if (teaminfo[ent->client->pers.team].safety) {
+	if ((int)g_ready_attention->value && teaminfo[ent->client->pers.team].safety) {
 		ent->client->buttons &= ~BUTTON_ATTACK;
 		ent->client->latched_buttons &= ~BUTTON_ATTACK;
 	}

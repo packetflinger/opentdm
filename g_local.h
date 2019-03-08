@@ -812,6 +812,7 @@ extern	cvar_t	*g_vote_time;
 extern	cvar_t	*g_vote_mask;
 extern	cvar_t	*g_vote_attention;
 extern	cvar_t	*g_vote_attention_sound;
+extern	cvar_t	*g_ready_attention;
 extern	cvar_t	*g_intermission_time;
 extern	cvar_t	*g_force_screenshot;
 extern	cvar_t	*g_force_record;
