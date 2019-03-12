@@ -3436,7 +3436,7 @@ void TDM_ServerDemoStatus(edict_t *ent)
  */
 void TDM_RandomizeTeams(void)
 {
-	int i, count, usec;
+	int i, count;
 	edict_t **players;
 	edict_t *e;
 	size_t j;
