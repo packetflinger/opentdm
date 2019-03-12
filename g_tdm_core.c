@@ -3437,17 +3437,12 @@ void TDM_ServerDemoStatus(edict_t *ent)
 void TDM_RandomizeTeams(void)
 {
 	int i, count, usec;
-	struct timeval tv;
 	edict_t **players;
 	edict_t *e;
 	size_t j;
 
 	count = 0;
 	players = malloc(game.maxclients * sizeof(edict_t));
-
-	gettimeofday(&tv, NULL);
-	usec = tv.tv_usec;
-	srand48(usec);
 
 	// build an array of just team players
 	for (i=0; i < game.maxclients; i++) {
@@ -3470,7 +3465,7 @@ void TDM_RandomizeTeams(void)
 
 	// Fisher-Yates shuffle
 	for (i = count - 1; i > 0; i--) {
-		j = (unsigned int) (drand48()*(i+1));
+		j = (unsigned int) (genrand_float32_full() * (i + 1));
 		e = players[j];
 		players[j] = players[i];
 		players[i] = e;
