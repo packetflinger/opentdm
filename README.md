@@ -126,6 +126,8 @@ Value | Description
 
 `notreadyall` For all players not ready
 
+`shuffle` Randomly shuffle team players
+
 ## Server Commands
 
 `sv settings` Show current match settings
@@ -350,6 +352,7 @@ Value | Description
 65536 | TDM spawn mode
 131072 | 1v1 spawn mode
 262144 | match abort
+524288 | shuffle
  | *default: -1 (all)*
 
 `g_command_mask <integer>` Enable particular commands
