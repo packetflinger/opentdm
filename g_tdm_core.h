@@ -43,6 +43,7 @@ void TDM_WriteMaplist (edict_t *ent);
 void TDM_CreateMaplist (void);
 void TDM_ServerDemoStatus(edict_t *ent);
 char *TDM_MakeServerDemoName(void);
+void TDM_RandomizeTeams(void);
 
 extern char		**tdm_maplist;
 

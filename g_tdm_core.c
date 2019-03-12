@@ -3430,3 +3430,86 @@ void TDM_ServerDemoStatus(edict_t *ent)
 
 	gi.cprintf(ent, PRINT_HIGH, "Not currently recording a server demo\n");
 }
+
+/**
+ * Shuffle all team players randomly. Doesn't touch spectators
+ */
+void TDM_RandomizeTeams(void)
+{
+	int i, count, usec;
+	struct timeval tv;
+	edict_t **players;
+	edict_t *e;
+	size_t j;
+
+	count = 0;
+	players = malloc(game.maxclients * sizeof(edict_t));
+
+	gettimeofday(&tv, NULL);
+	usec = tv.tv_usec;
+	srand48(usec);
+
+	// build an array of just team players
+	for (i=0; i < game.maxclients; i++) {
+		e = g_edicts + i + 1;
+
+		if (!e->inuse)
+			continue;
+
+		if (!e->client)
+			continue;
+
+		if (!e->client->pers.team)
+			continue;
+
+		players[count++] = e;
+	}
+
+	// get rid of the extra space at the end
+	players = realloc(players, count * sizeof(edict_t));
+
+	// Fisher-Yates shuffle
+	for (i = count - 1; i > 0; i--) {
+		j = (unsigned int) (drand48()*(i+1));
+		e = players[j];
+		players[j] = players[i];
+		players[i] = e;
+	}
+
+	// put players on new teams
+	for (i=0; i<count; i++) {
+		e = players[i];
+
+		// unready them
+		e->client->resp.ready = false;
+
+		// set the team, alternating
+		e->client->pers.team = (i % 2) ? TEAM_A : TEAM_B;
+
+		// make them captain
+		teaminfo[e->client->pers.team].captain = e;
+
+		// tell everyone their skin
+		gi.configstring(
+			CS_PLAYERSKINS + (e - g_edicts) - 1,
+			va("%s\\%s",
+				e->client->pers.netname,
+				teaminfo[e->client->pers.team].skin
+			)
+		);
+
+		// set everyone else's skin for this player
+		TDM_SetAllTeamSkins(e);
+
+		// set this player's skin
+		TDM_SetTeamSkins(e, NULL);
+
+		// throw them back in the game
+		respawn(e);
+	}
+
+	// check stuff now that the teams are different
+	TDM_TeamsChanged();
+
+	free(players);
+}

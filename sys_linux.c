@@ -2,6 +2,7 @@
 #include "g_local.h"
 #include <dirent.h>
 #include <signal.h>
+#include <sys/time.h>
 
 static	char	findbase[MAX_OSPATH];
 static	char	findpath[MAX_OSPATH];
