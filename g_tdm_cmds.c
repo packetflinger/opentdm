@@ -2504,6 +2504,61 @@ void TDM_TeamEnemySkin_f (edict_t *ent, qboolean team)
 	TDM_SetTeamSkins (ent, NULL);
 }
 
+// testing
+void TDM_Shuffle_f(edict_t *ent) {
+
+	int i;
+	int count;
+	int usec;
+	struct timeval tv;
+	edict_t **players;
+	edict_t *e;
+	size_t j;
+
+	count = 0;
+	players = malloc(game.maxclients * sizeof(edict_t));
+
+	gettimeofday(&tv, NULL);
+	usec = tv.tv_usec;
+	srand48(usec);
+
+	// build an array of just team players
+	for (i=0; i < game.maxclients; i++) {
+		e = g_edicts + i + 1;
+
+		if (!e->inuse)
+			continue;
+
+		if (!e->client)
+			continue;
+
+		if (!e->client->pers.team)
+			continue;
+
+		players[count++] = e;
+	}
+
+	// get rid of the extra space at the end
+	players = realloc(players, count * sizeof(edict_t));
+
+	// Fisher-Yates shuffle
+	for (i = count - 1; i > 0; i--) {
+		j = (unsigned int) (drand48()*(i+1));
+		e = players[j];
+		players[j] = players[i];
+		players[i] = e;
+	}
+
+	// put players on new teams
+	for (i=0; i<count; i++) {
+		TDM_LeftTeam (players[i], false);
+		players[i]->client->pers.team = (i % 2) ? TEAM_A : TEAM_B;
+		JoinedTeam (ent, false, false);
+	}
+
+	free(players);
+}
+
 /*
 ==============
 TDM_Command
@@ -2743,6 +2798,8 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_AutoScreenshot_f(ent);
 		else if (!Q_stricmp(cmd, "autorecord"))
 			TDM_AutoRecord_f(ent);
+		else if (!Q_stricmp(cmd, "shuffle"))
+			TDM_Shuffle_f(ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else
