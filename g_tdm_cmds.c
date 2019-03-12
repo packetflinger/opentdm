@@ -1907,7 +1907,7 @@ void TDM_Teamskin_f (edict_t *ent)
 void TDM_CheckSafety(void) {
 
 	edict_t *ent;
-	uint8_t players, ready;
+	int players, ready;
 	float percent;
 
 	players = ready = 0;
