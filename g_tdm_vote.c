@@ -250,6 +250,11 @@ void TDM_ApplyVote (void)
 		TDM_BeginCountdown ();
 	}
 
+	if (vote.flags & VOTE_SHUFFLE) {
+		gi.bprintf(PRINT_HIGH, "Teams have been randomly shuffled.\n");
+		TDM_RandomizeTeams();
+	}
+
 	if (vote.flags & VOTE_ABORT)
 	{
 abort:
@@ -534,6 +539,13 @@ static void TDM_AnnounceVote (void)
 
 	if (vote.flags & (VOTE_WEBCONFIG))
 		strcat (what, ")");
+
+	if (vote.flags & VOTE_SHUFFLE) {
+		if (what[0]) {
+			strcat (what, ", ");
+		}
+		strcat(what, "shuffle team players");
+	}
 
 	vote.vote_string = what;
 
@@ -1967,6 +1979,34 @@ void TDM_SetupVote (edict_t *ent)
 	ent->client->resp.vote = VOTE_YES;
 }
 
+/**
+ * Randomize (shuffle) team players
+ */
+qboolean TDM_VoteShuffle(edict_t *ent)
+{
+	if (!((int)g_vote_mask->value & VOTE_SHUFFLE) && !ent->client->pers.admin)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "Voting for player shuffling is not allowed on this server.\n");
+		return false;
+	}
+
+	if (tdm_match_status != MM_WARMUP)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "You can't shuffle players while a match is in progress\n");
+		return false;
+	}
+
+	if (!ent->client->pers.team && !ent->client->pers.admin)
+	{
+		gi.cprintf (ent, PRINT_HIGH, "Only team players can vote for a shuffle.\n");
+		return false;
+	}
+
+	vote.flags |= VOTE_SHUFFLE;
+
+	return true;
+}
+
 /*
 ==============
 TDM_Vote_f
@@ -2017,6 +2057,7 @@ void TDM_Vote_f (edict_t *ent)
 				"  chat <all/players>\n"
 				"  restart\n"
 				"  bugs <0/1/2>\n"
+				"  shuffle\n"
 				);
 			return;
 		}
@@ -2103,6 +2144,8 @@ void TDM_Vote_f (edict_t *ent)
 		started_new_vote = TDM_VoteAbort (ent);
 	else if (!Q_stricmp (cmd, "bugs"))
 		started_new_vote = TDM_VoteBugs (ent);
+	else if (!Q_stricmp (cmd, "shuffle") || !Q_stricmp (cmd, "randomize"))
+			started_new_vote = TDM_VoteShuffle (ent);
 	else if (!Q_stricmp (cmd, "yes"))
 		TDM_Vote_X (ent, VOTE_YES, "YES");
 	else if (!Q_stricmp (cmd, "no"))
