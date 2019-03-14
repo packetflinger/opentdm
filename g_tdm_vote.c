@@ -2065,6 +2065,20 @@ void TDM_Vote_f (edict_t *ent)
 		cmd = gi.argv(1);
 	}
 
+	// allow the initiator (or admin) to cancel the vote
+	if (vote.active && !Q_stricmp(cmd, "cancel")) {
+		if (ent == vote.initiator || ent->client->pers.admin) {
+			gi.bprintf(PRINT_HIGH, "%s cancelled the vote\n", ent->client->pers.netname);
+			TDM_RemoveVote();
+		} else {
+			gi.cprintf(ent, PRINT_HIGH,
+				"Only %s or an admin can cancel the current vote\n",
+				vote.initiator->client->pers.netname
+			);
+		}
+		return;
+	}
+
 	//global 'disallow voting' check
 	if (!(int)g_vote_mask->value && !ent->client->pers.admin && Q_stricmp (cmd, "yes") && Q_stricmp (cmd, "no"))
 	{
