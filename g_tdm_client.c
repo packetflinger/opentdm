@@ -561,25 +561,177 @@ void TDM_Disconnected (edict_t *ent)
 }
 
 
+const char *TDM_CreateSpectatorStatusBar (edict_t *player) {
+	static char *spec_statusbar;
+	int			id_x, id_y;
+
+	// opentdm default
+	id_x = -100;
+	id_y = -80;
+
+	id_x += player->client->pers.config.id_x;
+	id_y += player->client->pers.config.id_y;
+
+	spec_statusbar = va (
+
+	// First team name
+	"xr -250 "
+	"yb -96 "
+	"stat_string 18 "
+
+	// First team score / status
+	"xr -66 "
+	"yb -120 "
+	"num 4 23 "
+
+	// Second team name
+	"xr -250 "
+	"yb -48 "
+	"stat_string 19 "
+
+	// Second team score / status
+	"xr -66 "
+	"yb -72 "
+	"num 4 24 "
+
+	// Time
+	"xv 175 "
+	"yb -48 "
+	"stat_string 26 "
+
+	// Time value
+	"xv 175 "
+	"yb -39 "
+	"stat_string 22 "
+
+	// Timeout message
+	"if 25 "
+		"xr -58 "
+		"yt 50 "
+		"string \"Timeout\" "
+
+		// Timeout value
+		"xr -42 "
+		"yt 58 "
+		"stat_string 25 "
+	"endif "
+
+	//  frags
+	"xr	-50 "
+	"yt 2 "
+	"num 3 31 "
+
+	// spectator
+	"xv 0 "
+	"yb -58 "
+	"string2 \"SPECTATOR MODE\" "
+
+	// chase camera
+	"if 16 "
+	  "xv 0 "
+	  "yb -68 "
+	  "string \"Chasing\" "
+	  "xv 64 "
+	  "stat_string 16 "
+	"endif "
+
+	// player id view
+	"if 27 "
+	  "xv %d "
+	  "yb %d "
+	  "stat_string 27 "
+	"endif "
+
+	// vote notice
+	"if 28 "
+	  "xl 10 "
+	  "yb -180 "
+	  "stat_string 28 "
+	"endif ", id_x, id_y);
+
+	return spec_statusbar;
+}
+
 /*
 ==============
 TDM_CreatePlayerDmStatusBar
 ==============
 Create player's own customized dm_statusbar.
 */
-const char *TDM_CreatePlayerDmStatusBar (playerconfig_t *c)
+//const char *TDM_CreatePlayerDmStatusBar (playerconfig_t *c)
+const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 {
 	static char	*dm_statusbar;
+	static char *weaponhud;
 	int			id_x, id_y, id_highlight;
+	int			hud_y;
 
 	// opentdm default
 	id_highlight = 0;
 	id_x = -100;
 	id_y = -80;
+	hud_y = 0;
 
-	id_x += c->id_x;
-	id_y += c->id_y;
-	id_highlight = c->id_highlight;
+	id_x += player->client->pers.config.id_x;
+	id_y += player->client->pers.config.id_y;
+	id_highlight = player->client->pers.config.id_highlight;
+
+	weaponhud = "";
+
+	if (UF(player, WEAPON_HUD)) {
+
+		// super/shotgun
+		if (player->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
+			weaponhud = va("%sxr -25 yv %d picn w_sshotgun ", weaponhud, hud_y);
+			weaponhud = va("%sxr -80 yv %d anum ", weaponhud, hud_y);
+			hud_y += 25;
+		} else if (player->client->inventory[ITEM_WEAPON_SHOTGUN]) {
+			weaponhud = va("%sxr -25 yv %d picn w_shotgun ", weaponhud, hud_y);
+			hud_y += 25;
+		}
+
+		// chaingun/machinegun
+		if (player->client->inventory[ITEM_WEAPON_CHAINGUN]) {
+			weaponhud = va("%sxr -25 yv %d picn w_chaingun ", weaponhud, hud_y);
+			hud_y += 25;
+		} else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
+			weaponhud = va("%sxr -25 yv %d picn w_machinegun ", weaponhud, hud_y);
+			hud_y += 25;
+		}
+
+		// hand grenades/launcher
+		if (player->client->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
+			weaponhud = va("%sxr -25 yv %d picn w_glauncher ", weaponhud, hud_y);
+			hud_y += 25;
+		} else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
+			weaponhud = va("%sxr -25 yv %d picn w_hgrenade ", weaponhud, hud_y);
+			hud_y += 25;
+		}
+
+		// hyper blaster
+		if (player->client->inventory[ITEM_WEAPON_HYPERBLASTER]) {
+			weaponhud = va("%sxr -25 yv %d picn w_hyperblaster ", weaponhud, hud_y);
+			hud_y += 25;
+		}
+
+		// rocket launcher
+		if (player->client->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
+			weaponhud = va("%sxr -25 yv %d picn w_rlauncher ", weaponhud, hud_y);
+			hud_y += 25;
+		}
+
+		// railgun
+		if (player->client->inventory[ITEM_WEAPON_RAILGUN]) {
+			weaponhud = va("%sxr -25 yv %d picn w_railgun ", weaponhud, hud_y);
+			hud_y += 25;
+		}
+
+		// BFG
+		if (player->client->inventory[ITEM_WEAPON_BFG]) {
+			weaponhud = va("%sxr -25 yv %d picn w_bfg ", weaponhud, hud_y);
+			hud_y += 25;
+		}
+	}
 
 	dm_statusbar = va (
 "yb	-24 "
@@ -722,7 +874,10 @@ const char *TDM_CreatePlayerDmStatusBar (playerconfig_t *c)
   "xl 10 "
   "yb -180 "
   "stat_string 28 "
-"endif ", id_x, id_y);
+"endif "
+
+// weapon hud
+"%s ", id_x, id_y, weaponhud);
 
 	return dm_statusbar;
 }
@@ -737,7 +892,7 @@ void TDM_SendStatusBarCS (edict_t *ent)
 {
 	gi.WriteByte (svc_configstring);
 	gi.WriteShort (CS_STATUSBAR);
-	gi.WriteString (TDM_CreatePlayerDmStatusBar (&ent->client->pers.config));
+	gi.WriteString (TDM_CreatePlayerDmStatusBar (ent));
 	gi.unicast (ent, true);
 }
 

@@ -42,6 +42,8 @@ static void P_ProjectSource (gclient_t *client, vec3_t point, vec3_t distance, v
 	G_ProjectSource (point, _distance, forward, right, result);
 }
 
+void TDM_SendStatusBarCS (edict_t *ent);
+
 qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 {
 	int				index;
@@ -80,6 +82,11 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		(other->client->inventory[index] == 1) &&
 		other->client->weapon == GETITEM (ITEM_WEAPON_BLASTER))
 		other->client->newweapon = ent->item;
+
+	// update the weapon hud
+	if (UF(other, WEAPON_HUD)) {
+		TDM_SendStatusBarCS(other);
+	}
 
 	return true;
 }
@@ -334,6 +341,11 @@ void Drop_Weapon (edict_t *ent, const gitem_t *item)
 
 	Drop_Item (ent, item);
 	ent->client->inventory[index]--;
+
+	// update the weapon hud
+	if (UF(ent, WEAPON_HUD)) {
+		TDM_SendStatusBarCS(ent);
+	}
 }
 
 

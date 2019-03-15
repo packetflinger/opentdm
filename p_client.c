@@ -1123,6 +1123,11 @@ void respawn (edict_t *self)
 	}
 
 	self->client->respawn_framenum = level.framenum;
+
+	// update the weapon hud
+	if (UF(self, WEAPON_HUD)) {
+		TDM_SendStatusBarCS(self);
+	}
 }
 
 
