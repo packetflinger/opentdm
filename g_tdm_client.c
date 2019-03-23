@@ -658,11 +658,11 @@ TDM_CreatePlayerDmStatusBar
 ==============
 Create player's own customized dm_statusbar.
 */
-//const char *TDM_CreatePlayerDmStatusBar (playerconfig_t *c)
 const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 {
 	static char	*dm_statusbar;
-	static char *weaponhud;
+	static char *weaponhud;		// the weapon icons
+	static char *ammohud;		// the ammo counts
 	int			id_x, id_y, id_highlight;
 	int			hud_y;
 
@@ -676,127 +676,146 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	id_y += player->client->pers.config.id_y;
 	id_highlight = player->client->pers.config.id_highlight;
 
-	weaponhud = "";
+	weaponhud = 0;
+	ammohud = 0;
 
 	if (UF(player, WEAPON_HUD)) {
+		// set x position at first for all weapon icons, to save the chars since CS max is 1000
+		weaponhud = "xr -25 ";
+
+		// set x position for ammo quantities ^
+		ammohud = "xr -40 ";
 
 		// super/shotgun
 		if (player->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
-			weaponhud = va("%sxr -25 yv %d picn w_sshotgun ", weaponhud, hud_y);
-			weaponhud = va("%sxr -80 yv %d anum ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_sshotgun ", weaponhud, hud_y);
+			//weaponhud = va("%sxr -80 yv %d anum ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_SHELLS]);
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_SHOTGUN]) {
-			weaponhud = va("%sxr -25 yv %d picn w_shotgun ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_shotgun ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_SHELLS]);
 			hud_y += 25;
 		}
 
 		// chaingun/machinegun
 		if (player->client->inventory[ITEM_WEAPON_CHAINGUN]) {
-			weaponhud = va("%sxr -25 yv %d picn w_chaingun ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_chaingun ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_BULLETS]);
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
-			weaponhud = va("%sxr -25 yv %d picn w_machinegun ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_machinegun ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_BULLETS]);
 			hud_y += 25;
 		}
-
+/*
 		// hand grenades/launcher
 		if (player->client->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
-			weaponhud = va("%sxr -25 yv %d picn w_glauncher ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_glauncher ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_GRENADES]);
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
-			weaponhud = va("%sxr -25 yv %d picn w_hgrenade ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_hgrenade ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_GRENADES]);
 			hud_y += 25;
 		}
 
 		// hyper blaster
 		if (player->client->inventory[ITEM_WEAPON_HYPERBLASTER]) {
-			weaponhud = va("%sxr -25 yv %d picn w_hyperblaster ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_hyperblaster ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_CELLS]);
 			hud_y += 25;
 		}
 
 		// rocket launcher
 		if (player->client->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
-			weaponhud = va("%sxr -25 yv %d picn w_rlauncher ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_rlauncher ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_ROCKETS]);
 			hud_y += 25;
 		}
 
 		// railgun
 		if (player->client->inventory[ITEM_WEAPON_RAILGUN]) {
-			weaponhud = va("%sxr -25 yv %d picn w_railgun ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_railgun ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_SLUGS]);
 			hud_y += 25;
 		}
 
 		// BFG
 		if (player->client->inventory[ITEM_WEAPON_BFG]) {
-			weaponhud = va("%sxr -25 yv %d picn w_bfg ", weaponhud, hud_y);
+			weaponhud = va("%syv %d picn w_bfg ", weaponhud, hud_y);
+			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_CELLS]);
 			hud_y += 25;
 		}
+		*/
 	}
 
+	printf("%s\n", weaponhud);
+
 	dm_statusbar = va (
-"yb	-24 "
+"yb -24 "
 
 // health
-"xv	0 "
+"xv 0 "
 "hnum "
-"xv	50 "
+"xv 50 "
 "pic 0 "
 
 // ammo
 "if 2 "
-"	xv	100 "
-"	anum "
-"	xv	150 "
-"	pic 2 "
+" xv 100 "
+" anum "
+" xv 150 "
+" pic 2 "
 "endif "
 
 // armor
 "if 4 "
-"	xv	200 "
-"	rnum "
-"	xv	250 "
-"	pic 4 "
+" xv 200 "
+" rnum "
+" xv 250 "
+" pic 4 "
 "endif "
 
 // selected item
 "if 6 "
-"	xv	296 "
-"	pic 6 "
+" xv 296 "
+" pic 6 "
 "endif "
 
-"yb	-50 "
+"yb -50 "
 
 // picked up item
 "if 7 "
-"	xv	0 "
-"	pic 7 "
-"	xv	26 "
-"	yb	-42 "
-"	stat_string 8 "
-"	yb	-50 "
+" xv 0 "
+" pic 7 "
+" xv 26 "
+" yb -42 "
+" stat_string 8 "
+" yb -50 "
 "endif "
 
 // timer (quad, rebreather, envirosuit)
 "if 9 "
-"	xv	246 "
-"	num	2	10 "
-"	xv	296 "
-"	pic	9 "
+" xv 246 "
+" num 2 10 "
+" xv 296 "
+" pic 9 "
 "endif "
 
 //  help / weapon icon 
 "if 11 "
-"	xv	148 "
-"	pic	11 "
+" xv 148 "
+" pic 11 "
 "endif "
 
 // timer (pent)
 "if 29 "
-"   yb  -80 "
-"	xv	246 "
-"	num	2	30 "
-"	xv	296 "
-"	pic	29 "
+" yb -80 "
+" xv 246 "
+" num 2 30 "
+" xv 296 "
+" pic 29 "
 "endif "
 
 // First team name
@@ -842,7 +861,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 "endif "
 
 //  frags
-"xr	-50 "
+"xr -50 "
 "yt 2 "
 "num 3 31 "
 
@@ -877,8 +896,11 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 "endif "
 
 // weapon hud
-"%s ", id_x, id_y, weaponhud);
+//"%s %s", id_x, id_y, weaponhud, ammohud);
+"%s %s", id_x, id_y, weaponhud, ammohud);
 
+	//gi.dprintf("statusbar length: %ld\n", strlen(dm_statusbar));
+	//gi.dprintf("%s\n", weaponhud);
 	return dm_statusbar;
 }
 
