@@ -661,8 +661,8 @@ Create player's own customized dm_statusbar.
 const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 {
 	static char	*dm_statusbar;
-	static char *weaponhud;		// the weapon icons
-	static char *ammohud;		// the ammo counts
+	static char weaponhud[175];		// the weapon icons
+	static char ammohud[135];		// the ammo counts
 	int			id_x, id_y, id_highlight;
 	int			hud_y;
 
@@ -676,81 +676,78 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	id_y += player->client->pers.config.id_y;
 	id_highlight = player->client->pers.config.id_highlight;
 
-	weaponhud = 0;
-	ammohud = 0;
+	weaponhud[0] = 0;
+	ammohud[0] = 0;
 
 	if (UF(player, WEAPON_HUD)) {
 		// set x position at first for all weapon icons, to save the chars since CS max is 1000
-		weaponhud = "xr -25 ";
+		strcpy(weaponhud, "xr -25 ");
 
 		// set x position for ammo quantities ^
-		ammohud = "xr -40 ";
+		strcpy(ammohud, "xr -40 ");
 
 		// super/shotgun
 		if (player->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
-			weaponhud = va("%syv %d picn w_sshotgun ", weaponhud, hud_y);
+			strcat(weaponhud, va("yv %d picn w_sshotgun ", hud_y));
 			//weaponhud = va("%sxr -80 yv %d anum ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_SHELLS]);
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SHELLS]));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_SHOTGUN]) {
-			weaponhud = va("%syv %d picn w_shotgun ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_SHELLS]);
+			strcat(weaponhud, va("yv %d picn w_shotgun ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SHELLS]));
 			hud_y += 25;
 		}
 
 		// chaingun/machinegun
 		if (player->client->inventory[ITEM_WEAPON_CHAINGUN]) {
-			weaponhud = va("%syv %d picn w_chaingun ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_BULLETS]);
+			strcat(weaponhud, va("yv %d picn w_chaingun ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_BULLETS]));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
-			weaponhud = va("%syv %d picn w_machinegun ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_BULLETS]);
+			strcat(weaponhud, va("yv %d picn w_machinegun ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_BULLETS]));
 			hud_y += 25;
 		}
-/*
+
 		// hand grenades/launcher
 		if (player->client->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
-			weaponhud = va("%syv %d picn w_glauncher ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_GRENADES]);
+			strcat(weaponhud, va("yv %d picn w_glauncher ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_GRENADES]));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
-			weaponhud = va("%syv %d picn w_hgrenade ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_GRENADES]);
+			strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_GRENADES]));
 			hud_y += 25;
 		}
 
 		// hyper blaster
 		if (player->client->inventory[ITEM_WEAPON_HYPERBLASTER]) {
-			weaponhud = va("%syv %d picn w_hyperblaster ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_CELLS]);
+			strcat(weaponhud, va("yv %d picn w_hyperblaster ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_CELLS]));
 			hud_y += 25;
 		}
 
 		// rocket launcher
 		if (player->client->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
-			weaponhud = va("%syv %d picn w_rlauncher ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_ROCKETS]);
+			strcat(weaponhud, va("yv %d picn w_rlauncher ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_ROCKETS]));
 			hud_y += 25;
 		}
 
 		// railgun
 		if (player->client->inventory[ITEM_WEAPON_RAILGUN]) {
-			weaponhud = va("%syv %d picn w_railgun ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_SLUGS]);
+			strcat(weaponhud, va("yv %d picn w_railgun ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SLUGS]));
 			hud_y += 25;
 		}
 
 		// BFG
 		if (player->client->inventory[ITEM_WEAPON_BFG]) {
-			weaponhud = va("%syv %d picn w_bfg ", weaponhud, hud_y);
-			ammohud = va("%syv %d string %d ", ammohud, hud_y, player->client->inventory[ITEM_AMMO_CELLS]);
+			strcat(weaponhud, va("yv %d picn w_bfg ", hud_y));
+			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_CELLS]));
 			hud_y += 25;
 		}
-		*/
 	}
-
-	printf("%s\n", weaponhud);
 
 	dm_statusbar = va (
 "yb -24 "
@@ -865,22 +862,6 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 "yt 2 "
 "num 3 31 "
 
-// spectator
-"if 17 "
-  "xv 0 "
-  "yb -58 "
-  "string2 \"SPECTATOR MODE\" "
-"endif "
-
-// chase camera
-"if 16 "
-  "xv 0 "
-  "yb -68 "
-  "string \"Chasing\" "
-  "xv 64 "
-  "stat_string 16 "
-"endif "
-
 // player id view
 "if 27 "
   "xv %d "
@@ -896,11 +877,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 "endif "
 
 // weapon hud
-//"%s %s", id_x, id_y, weaponhud, ammohud);
 "%s %s", id_x, id_y, weaponhud, ammohud);
 
-	//gi.dprintf("statusbar length: %ld\n", strlen(dm_statusbar));
-	//gi.dprintf("%s\n", weaponhud);
 	return dm_statusbar;
 }
 
@@ -1441,7 +1419,6 @@ int TDM_GetPlayerIdView (edict_t *ent)
  */
 void TDM_UpdateWeaponHud(edict_t *ent) {
 
-	static char hud[MAX_STRING_CHARS];
 	gclient_t *cl;
 
 	if (!ent->client)
@@ -1457,63 +1434,7 @@ void TDM_UpdateWeaponHud(edict_t *ent) {
 	if (!UF(ent, WEAPON_HUD))
 		return;
 
-	hud[0] = 0;
+	TDM_SendStatusBarCS(ent);
 
-	// build the string
-	if (cl->inventory[ITEM_WEAPON_SHOTGUN] || cl->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
-		strcat(hud, va("%s%s%s:%d, ",
-				(cl->inventory[ITEM_WEAPON_SHOTGUN]) ? "SG" : "",
-				(cl->inventory[ITEM_WEAPON_SHOTGUN] && cl->inventory[ITEM_WEAPON_SUPERSHOTGUN]) ? "," : "",
-				(cl->inventory[ITEM_WEAPON_SUPERSHOTGUN]) ? "SSG" : "",
-				cl->inventory[ITEM_AMMO_SHELLS]
-		));
-	}
-
-	if (cl->inventory[ITEM_WEAPON_MACHINEGUN] || cl->inventory[ITEM_WEAPON_CHAINGUN]) {
-		strcat(hud, va("%s%s%s:%d, ",
-				(cl->inventory[ITEM_WEAPON_MACHINEGUN]) ? "MG" : "",
-				(cl->inventory[ITEM_WEAPON_MACHINEGUN] && cl->inventory[ITEM_WEAPON_CHAINGUN]) ? "," : "",
-				(cl->inventory[ITEM_WEAPON_CHAINGUN]) ? "CG" : "",
-				cl->inventory[ITEM_AMMO_BULLETS]
-		));
-	}
-
-	if (cl->inventory[ITEM_AMMO_GRENADES] || cl->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
-		strcat(hud, va("%s%s%s:%d, ",
-				(cl->inventory[ITEM_AMMO_GRENADES]) ? "HG" : "",
-				(cl->inventory[ITEM_AMMO_GRENADES] && cl->inventory[ITEM_WEAPON_GRENADELAUNCHER]) ? "," : "",
-				(cl->inventory[ITEM_WEAPON_GRENADELAUNCHER]) ? "GL" : "",
-				cl->inventory[ITEM_AMMO_GRENADES]
-		));
-	}
-
-	if (cl->inventory[ITEM_WEAPON_HYPERBLASTER] || cl->inventory[ITEM_WEAPON_BFG]) {
-		strcat(hud, va("%s%s%s:%d, ",
-				(cl->inventory[ITEM_WEAPON_HYPERBLASTER]) ? "HB" : "",
-				(cl->inventory[ITEM_WEAPON_HYPERBLASTER] && cl->inventory[ITEM_WEAPON_BFG]) ? "," : "",
-				(cl->inventory[ITEM_WEAPON_BFG]) ? "BFG" : "",
-				cl->inventory[ITEM_AMMO_CELLS]
-		));
-	}
-
-	if (cl->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
-		strcat(hud, va("RL:%d, ", cl->inventory[ITEM_AMMO_ROCKETS]));
-	}
-
-	if (cl->inventory[ITEM_WEAPON_RAILGUN]) {
-		strcat(hud, va("RG:%d, ", cl->inventory[ITEM_AMMO_SLUGS]));
-	}
-
-	// cut off the last comma and space
-	if (strlen(hud) > 0) {
-		hud[strlen(hud)-2] = 0;
-	}
-
-	// send it to the client
-	gi.WriteByte (svc_configstring);
-	gi.WriteShort (CS_WEAPON_HUD);
-	gi.WriteString (va("%s", hud));
-	gi.unicast (ent, false);
-
-	cl->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1.5f);
+	cl->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(2.0f);
 }
