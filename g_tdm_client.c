@@ -265,6 +265,7 @@ void ToggleChaseCam (edict_t *ent)
 	else
 		GetChaseTarget(ent);
 
+	TDM_SendSpecStatusBarCS(ent);
 	PMenu_Close (ent);
 }
 
@@ -896,6 +897,13 @@ void TDM_SendStatusBarCS (edict_t *ent)
 	gi.unicast (ent, true);
 }
 
+void TDM_SendSpecStatusBarCS(edict_t *ent) {
+	gi.WriteByte(svc_configstring);
+	gi.WriteShort(CS_STATUSBAR);
+	gi.WriteString(TDM_CreateSpectatorStatusBar(ent));
+	gi.unicast(ent, true);
+}
+
 qboolean TDM_ParsePlayerConfigLine (char *line, int line_number, void *param)
 {
 	playerconfig_t	*c;
@@ -1414,27 +1422,34 @@ int TDM_GetPlayerIdView (edict_t *ent)
 }
 
 /**
- * Send the client a configstring with the weapon hud update if it's time to do so
+ * Resend the entire statusbar string to update the hud. This solution is disgusting,
+ * but I can't figure out a way of doing it without burning 6+ stat indexes which
+ * there are currently zero free.
  *
  */
-void TDM_UpdateWeaponHud(edict_t *ent) {
-
-	gclient_t *cl;
+void TDM_UpdateWeaponHud(edict_t *ent, qboolean force) {
 
 	if (!ent->client)
 		return;
 
-	cl = ent->client;
+	if (!force) {
+		// client doesn't want the hud
+		if (!UF(ent, WEAPON_HUD))
+			return;
 
-	// not time yet
-	if (cl->next_weaponhud_update > level.framenum)
-		return;
+		// too soon, can only send statusbar at most once every 2 seconds
+		if ((level.framenum - ent->client->last_weaponhud_update) < SECS_TO_FRAMES(2.0F)) {
+			return;
+		}
 
-	// client doesn't want the hud
-	if (!UF(ent, WEAPON_HUD))
-		return;
+		// not time yet
+		if (ent->client->next_weaponhud_update > level.framenum) {
+			return;
+		}
+	}
 
 	TDM_SendStatusBarCS(ent);
 
-	cl->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(2.0f);
+	ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(30.0f);
+	ent->client->last_weaponhud_update = level.framenum;
 }

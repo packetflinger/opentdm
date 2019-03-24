@@ -85,7 +85,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 
 	// update the weapon hud
 	if (UF(other, WEAPON_HUD)) {
-		TDM_SendStatusBarCS(other);
+		other->client->next_weaponhud_update = level.framenum + 10;
 	}
 
 	return true;
@@ -275,6 +275,13 @@ void Think_Weapon (edict_t *ent)
 		else
 			is_silenced = 0;
 		ent->client->weapon->weaponthink (ent);
+
+		if (ent->client->buttons & BUTTON_ATTACK) {
+			// update the weapon hud
+			if (UF(ent, WEAPON_HUD)) {
+				ent->client->next_weaponhud_update = level.framenum + 10;
+			}
+		}
 	}
 }
 
@@ -344,7 +351,7 @@ void Drop_Weapon (edict_t *ent, const gitem_t *item)
 
 	// update the weapon hud
 	if (UF(ent, WEAPON_HUD)) {
-		TDM_SendStatusBarCS(ent);
+		ent->client->next_weaponhud_update = level.framenum + 10;
 	}
 }
 

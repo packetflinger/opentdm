@@ -357,7 +357,7 @@ void G_SetStats (edict_t *ent)
 
 	cells = 0;
 
-	TDM_UpdateWeaponHud(ent);
+	TDM_UpdateWeaponHud(ent, false);
 
 	ent->client->ps.stats[STAT_ID_VIEW_INDEX] = 0;
 
