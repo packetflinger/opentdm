@@ -2628,7 +2628,7 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_Admin_f (ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
-		else if (!Q_stricmp(cmd, "weaponhud"))
+		else if (!Q_stricmp(cmd, "weaponhud") || !Q_stricmp(cmd, "hud"))
 			TDM_WeaponHud_f(ent);
 		else if (!Q_stricmp(cmd, "autoscreenshot"))
 			TDM_AutoScreenshot_f(ent);
@@ -2753,7 +2753,7 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_TeamEnemySkin_f (ent, true);
 		else if (!Q_stricmp (cmd, "eskin"))
 			TDM_TeamEnemySkin_f (ent, false);
-		else if (!Q_stricmp(cmd, "weaponhud"))
+		else if (!Q_stricmp(cmd, "weaponhud") || !Q_stricmp(cmd, "hud"))
 			TDM_WeaponHud_f(ent);
 		else if (!Q_stricmp(cmd, "autoscreenshot"))
 			TDM_AutoScreenshot_f(ent);
