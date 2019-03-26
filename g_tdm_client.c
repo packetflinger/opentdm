@@ -867,12 +867,12 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	"endif "
 
 	// timer (pent)
-	"if 29 "
+	"if 30 "
 		"yb -80 "
 		"xv 246 "
 		"num 2 30 "
 		"xv 296 "
-		"pic 29 "
+		"picn p_invulnerability "
 	"endif "
 
 	// First team name
