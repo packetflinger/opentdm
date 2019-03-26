@@ -312,15 +312,18 @@ void Cmd_Help_f (edict_t *ent)
 //=======================================================================
 
 //displays either current or previous team scores depending on which scoreboard is up
+/**
+ * Team names are now hardcoded in the statusbar, so A is always first, then B
+ */
 static void G_SetTeamScoreStats (edict_t *ent)
 {
 	int		first_team;
 
 	if (ent->client->showoldscores)
 	{
-		if (old_matchinfo.scores[TEAM_A] < old_matchinfo.scores[TEAM_B])
+		/*if (old_matchinfo.scores[TEAM_A] < old_matchinfo.scores[TEAM_B])
 			first_team = TEAM_B;
-		else
+		else*/
 			first_team = TEAM_A;
 
 		ent->client->ps.stats[STAT_FIRST_TEAM_SCORE] = old_matchinfo.scores[first_team];
@@ -328,9 +331,9 @@ static void G_SetTeamScoreStats (edict_t *ent)
 	}
 	else
 	{
-		if (teaminfo[TEAM_A].score < teaminfo[TEAM_B].score)
+		/*if (teaminfo[TEAM_A].score < teaminfo[TEAM_B].score)
 			first_team = TEAM_B;
-		else
+		else*/
 			first_team = TEAM_A;
 
 		ent->client->ps.stats[STAT_FIRST_TEAM_SCORE] = teaminfo[first_team].score;
@@ -460,7 +463,7 @@ void G_SetStats (edict_t *ent)
 		if (ent->client->ps.stats[STAT_TIMER])
 		{
 			//yes, show new timer for invuln
-			ent->client->ps.stats[STAT_TIMER_PENT_ICON] = gi.imageindex ("p_invulnerability");
+			//ent->client->ps.stats[STAT_TIMER_PENT_ICON] = gi.imageindex ("p_invulnerability");
 			ent->client->ps.stats[STAT_TIMER_PENT] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
 		}
 		else
@@ -471,7 +474,7 @@ void G_SetStats (edict_t *ent)
 			// clear previous timer if there was something
 			if (ent->client->ps.stats[STAT_TIMER_PENT])
 			{
-				ent->client->ps.stats[STAT_TIMER_PENT_ICON] = 0;
+				//ent->client->ps.stats[STAT_TIMER_PENT_ICON] = 0;
 				ent->client->ps.stats[STAT_TIMER_PENT] = 0;
 			}
 		}
@@ -536,7 +539,16 @@ void G_SetStats (edict_t *ent)
 	else
 		ent->client->ps.stats[STAT_HELPICON] = 0;
 
-	ent->client->ps.stats[STAT_SPECTATOR] = 0;
+	//ent->client->ps.stats[STAT_SPECTATOR] = 0;
+
+	if (UF(ent, WEAPON_HUD)) {
+		ent->client->ps.stats[STAT_WEAPHUD_BULLETS] = ent->client->inventory[ITEM_AMMO_BULLETS];
+		ent->client->ps.stats[STAT_WEAPHUD_SHELLS] = ent->client->inventory[ITEM_AMMO_SHELLS];
+		ent->client->ps.stats[STAT_WEAPHUD_GRENADES] = ent->client->inventory[ITEM_AMMO_GRENADES];
+		ent->client->ps.stats[STAT_WEAPHUD_CELLS] = ent->client->inventory[ITEM_AMMO_CELLS];
+		ent->client->ps.stats[STAT_WEAPHUD_ROCKETS] = ent->client->inventory[ITEM_AMMO_ROCKETS];
+		ent->client->ps.stats[STAT_WEAPHUD_SLUGS] = ent->client->inventory[ITEM_AMMO_SLUGS];
+	}
 }
 
 /*

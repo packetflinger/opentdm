@@ -750,67 +750,73 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		strcpy(weaponhud, "xr -25 ");
 
 		// set x position for ammo quantities ^
-		strcpy(ammohud, "xr -40 ");
+		strcpy(ammohud, "xr -75 ");
 
 		// super/shotgun
 		if (player->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
 			strcat(weaponhud, va("yv %d picn w_sshotgun ", hud_y));
 			//weaponhud = va("%sxr -80 yv %d anum ", weaponhud, hud_y);
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SHELLS]));
+			//strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SHELLS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_SHOTGUN]) {
 			strcat(weaponhud, va("yv %d picn w_shotgun ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SHELLS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
 			hud_y += 25;
 		}
 
 		// chaingun/machinegun
 		if (player->client->inventory[ITEM_WEAPON_CHAINGUN]) {
 			strcat(weaponhud, va("yv %d picn w_chaingun ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_BULLETS]));
+			//strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_BULLETS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
 			strcat(weaponhud, va("yv %d picn w_machinegun ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_BULLETS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
 			hud_y += 25;
 		}
 
 		// hand grenades/launcher
 		if (player->client->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
 			strcat(weaponhud, va("yv %d picn w_glauncher ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_GRENADES]));
+			//strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_GRENADES]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
 			strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_GRENADES]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
 			hud_y += 25;
 		}
 
 		// hyper blaster
 		if (player->client->inventory[ITEM_WEAPON_HYPERBLASTER]) {
 			strcat(weaponhud, va("yv %d picn w_hyperblaster ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_CELLS]));
+			//strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_CELLS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
 			hud_y += 25;
 		}
 
 		// rocket launcher
 		if (player->client->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
 			strcat(weaponhud, va("yv %d picn w_rlauncher ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_ROCKETS]));
+			//strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_ROCKETS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_ROCKETS));
 			hud_y += 25;
 		}
 
 		// railgun
 		if (player->client->inventory[ITEM_WEAPON_RAILGUN]) {
 			strcat(weaponhud, va("yv %d picn w_railgun ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SLUGS]));
+			//strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_SLUGS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SLUGS));
 			hud_y += 25;
 		}
 
 		// BFG
 		if (player->client->inventory[ITEM_WEAPON_BFG]) {
 			strcat(weaponhud, va("yv %d picn w_bfg ", hud_y));
-			strcat(ammohud, va("yv %d string %d ", hud_y, player->client->inventory[ITEM_AMMO_CELLS]));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
 			hud_y += 25;
 		}
 	}
@@ -876,14 +882,16 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	"endif "
 
 	// First team name
-	"xr -250 "
+	"xr -%ld "
 	"yb -96 "
-	"stat_string 18 "
+//	"stat_string 18 "
+	"string \"%s\" "
 
 	// Second team name
-//	"xr -250 "
+	"xr -%ld "
 	"yb -48 "
-	"stat_string 19 "
+//	"stat_string 19 "
+	"string \"%s\" "
 
 	// First team score / status
 	"xr -66 "
@@ -937,9 +945,17 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"stat_string 28 "
 	"endif "
 
-	// weapon hud
-	"%s %s", id_x, id_y, weaponhud, ammohud);
+	"%s%s",
+	strlen(teaminfo[TEAM_A].name) * 8,
+	teaminfo[TEAM_A].name,
+	strlen(teaminfo[TEAM_B].name) * 8,
+	teaminfo[TEAM_B].name,
+	id_x,
+	id_y,
+	weaponhud,
+	ammohud);
 
+	gi.dprintf("size: %ld\n%s\n", strlen(dm_statusbar), dm_statusbar);
 	return dm_statusbar;
 }
 

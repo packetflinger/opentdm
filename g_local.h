@@ -86,8 +86,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define STAT_WEAPHUD_BULLETS			29
 #define STAT_WEAPHUD_GRENADES			20
 #define STAT_WEAPHUD_CELLS				21
-// #define STAT_WEAPHUD_ROCKETS			??
-// #define STAT_WEAPHUD_SLUGS				??
+#define STAT_WEAPHUD_ROCKETS			18
+#define STAT_WEAPHUD_SLUGS				19
 
 
 
