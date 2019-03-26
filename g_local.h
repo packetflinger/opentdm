@@ -82,6 +82,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	STAT_SCORE						31		// possibly reclaim, use STAT_FRAGS instead
 // maximum 31!
 
+#define STAT_WEAPHUD_SHELLS				17
+#define STAT_WEAPHUD_BULLETS			29
+#define STAT_WEAPHUD_GRENADES			20
+#define STAT_WEAPHUD_CELLS				21
+// #define STAT_WEAPHUD_ROCKETS			??
+// #define STAT_WEAPHUD_SLUGS				??
+
+
+
+
 // dmflags->value flags
 #define	DF_NO_HEALTH		0x00000001	// 1
 #define	DF_NO_ITEMS			0x00000002	// 2
