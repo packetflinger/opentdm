@@ -518,7 +518,7 @@ void G_SetStats (edict_t *ent)
 	// frags for server browser
 	ent->client->ps.stats[STAT_FRAGS] = ent->client->resp.score;
 	// frags for ingame hud
-	ent->client->ps.stats[STAT_SCORE] = ent->client->resp.score;
+	//ent->client->ps.stats[STAT_SCORE] = ent->client->resp.score;
 
 	ent->client->ps.stats[STAT_TIME_REMAINING] = CS_TDM_TIMELIMIT_STRING;
 

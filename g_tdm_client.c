@@ -840,12 +840,6 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"pic 4 "
 	"endif "
 
-	// selected item
-	"if 6 "
-		"xv 296 "
-		"pic 6 "
-	"endif "
-
 	"yb -50 "
 
 	// picked up item
@@ -926,7 +920,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	//  frags
 	"xr -50 "
 	"yt 2 "
-	"num 3 31 "
+//	"num 3 31 "
+	"num 3 14 "
 
 	// player id view
 	"if 27 "
