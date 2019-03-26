@@ -360,8 +360,6 @@ void G_SetStats (edict_t *ent)
 
 	cells = 0;
 
-	TDM_UpdateWeaponHud(ent, false);
-
 	ent->client->ps.stats[STAT_ID_VIEW_INDEX] = 0;
 
 	if (!ent->client->pers.disable_id_view) {
@@ -463,7 +461,6 @@ void G_SetStats (edict_t *ent)
 		if (ent->client->ps.stats[STAT_TIMER])
 		{
 			//yes, show new timer for invuln
-			//ent->client->ps.stats[STAT_TIMER_PENT_ICON] = gi.imageindex ("p_invulnerability");
 			ent->client->ps.stats[STAT_TIMER_PENT] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
 		}
 		else
@@ -481,66 +478,68 @@ void G_SetStats (edict_t *ent)
 	}
 	else
 	{
-		ent->client->ps.stats[STAT_TIMER_PENT_ICON] = 0;
 		ent->client->ps.stats[STAT_TIMER_PENT] = 0;
 	}
 
-	//
+
 	// selected item
-	//
-	if (ent->client->selected_item == -1 || itemlist[ent->client->selected_item].icon == NULL)
+	if (ent->client->selected_item == -1 || itemlist[ent->client->selected_item].icon == NULL) {
 		ent->client->ps.stats[STAT_SELECTED_ICON] = 0;
-	else
+	} else {
 		ent->client->ps.stats[STAT_SELECTED_ICON] = gi.imageindex (itemlist[ent->client->selected_item].icon);
+	}
+
 
 	ent->client->ps.stats[STAT_SELECTED_ITEM] = ent->client->selected_item;
 
-	//
+
 	// layouts
-	//
 	ent->client->ps.stats[STAT_LAYOUTS] = 0;
 
 	if (ent->health <= 0 || tdm_match_status == MM_SCOREBOARD || ent->client->showscores ||
-			ent->client->pers.menu.active || ent->client->showoldscores || ent->client->showmotd)
+			ent->client->pers.menu.active || ent->client->showoldscores || ent->client->showmotd) {
 		ent->client->ps.stats[STAT_LAYOUTS] |= 1;
+	}
 
+	// current match status
 	ent->client->ps.stats[STAT_GAME_STATUS_STRING_INDEX] = CS_TDM_GAME_STATUS;
 
-	if (vote.active)
+	// vote proposal
+	if (vote.active) {
 		ent->client->ps.stats[STAT_VOTE_STRING_INDEX] = CS_TDM_VOTE_STRING;
-	else
+	} else {
 		ent->client->ps.stats[STAT_VOTE_STRING_INDEX] = 0;
-	//if (ent->client->showinventory && ent->health > 0)
-	//	ent->client->ps.stats[STAT_LAYOUTS] |= 2;
+	}
 
 	//
 	// frags
 	//
 	G_SetTeamScoreStats (ent);
 
-	// frags for server browser
+	// frags for server browser and in-game hud
 	ent->client->ps.stats[STAT_FRAGS] = ent->client->resp.score;
-	// frags for ingame hud
-	//ent->client->ps.stats[STAT_SCORE] = ent->client->resp.score;
 
+	// match timer
 	ent->client->ps.stats[STAT_TIME_REMAINING] = CS_TDM_TIMELIMIT_STRING;
 
-	if (tdm_match_status == MM_TIMEOUT)
+	// timeout timer
+	if (tdm_match_status == MM_TIMEOUT) {
 		ent->client->ps.stats[STAT_TIMEOUT_STRING_INDEX] = CS_TDM_TIMEOUT_STRING;
-	else
+	} else {
 		ent->client->ps.stats[STAT_TIMEOUT_STRING_INDEX] = 0;
+	}
 
 	//
 	// help icon / current weapon if not shown
 	//
 	if ( (ent->client->pers.hand == CENTER_HANDED || ent->client->ps.fov > 90)
-		&& ent->client->weapon)
+		&& ent->client->weapon) {
 		ent->client->ps.stats[STAT_HELPICON] = gi.imageindex (ent->client->weapon->icon);
-	else
+	} else {
 		ent->client->ps.stats[STAT_HELPICON] = 0;
+	}
 
-	//ent->client->ps.stats[STAT_SPECTATOR] = 0;
-
+	// update ammo counts if HUD is enabled
 	if (UF(ent, WEAPON_HUD)) {
 		ent->client->ps.stats[STAT_WEAPHUD_BULLETS] = ent->client->inventory[ITEM_AMMO_BULLETS];
 		ent->client->ps.stats[STAT_WEAPHUD_SHELLS] = ent->client->inventory[ITEM_AMMO_SHELLS];
@@ -548,6 +547,9 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_WEAPHUD_CELLS] = ent->client->inventory[ITEM_AMMO_CELLS];
 		ent->client->ps.stats[STAT_WEAPHUD_ROCKETS] = ent->client->inventory[ITEM_AMMO_ROCKETS];
 		ent->client->ps.stats[STAT_WEAPHUD_SLUGS] = ent->client->inventory[ITEM_AMMO_SLUGS];
+
+		// if the time is right...
+		TDM_UpdateWeaponHud(ent, false);
 	}
 }
 

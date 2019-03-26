@@ -83,9 +83,9 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		other->client->weapon == GETITEM (ITEM_WEAPON_BLASTER))
 		other->client->newweapon = ent->item;
 
-	// update the weapon hud
-	if (UF(other, WEAPON_HUD)) {
-		other->client->next_weaponhud_update = level.framenum + 10;
+	// update the weapon hud if we just picked up our only one of this weapon
+	if (UF(other, WEAPON_HUD) && other->client->inventory[index] == 1) {
+		other->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 
 	return true;
@@ -275,13 +275,6 @@ void Think_Weapon (edict_t *ent)
 		else
 			is_silenced = 0;
 		ent->client->weapon->weaponthink (ent);
-
-		if (ent->client->buttons & BUTTON_ATTACK) {
-			// update the weapon hud
-			if (UF(ent, WEAPON_HUD)) {
-				ent->client->next_weaponhud_update = level.framenum + 10;
-			}
-		}
 	}
 }
 
@@ -349,9 +342,9 @@ void Drop_Weapon (edict_t *ent, const gitem_t *item)
 	Drop_Item (ent, item);
 	ent->client->inventory[index]--;
 
-	// update the weapon hud
-	if (UF(ent, WEAPON_HUD)) {
-		ent->client->next_weaponhud_update = level.framenum + 10;
+	// update the weapon hud if we just dropped our last one of these weapons
+	if (UF(ent, WEAPON_HUD) && ent->client->inventory[index] == 0) {
+		ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 }
 

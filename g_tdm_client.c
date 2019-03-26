@@ -1498,10 +1498,8 @@ int TDM_GetPlayerIdView (edict_t *ent)
 }
 
 /**
- * Resend the entire statusbar string to update the hud. This solution is disgusting,
- * but I can't figure out a way of doing it without burning 6+ stat indexes which
- * there are currently zero free.
- *
+ * Resend the entire statusbar string to update the hud. I dislike this,
+ * but it seems to be necessary.
  */
 void TDM_UpdateWeaponHud(edict_t *ent, qboolean force) {
 
@@ -1526,6 +1524,7 @@ void TDM_UpdateWeaponHud(edict_t *ent, qboolean force) {
 
 	TDM_SendStatusBarCS(ent);
 
-	ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(30.0f);
+	// set next update to way in the future so it's basically never automatically updated.
+	ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(3600.0f);
 	ent->client->last_weaponhud_update = level.framenum;
 }

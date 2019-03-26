@@ -219,12 +219,6 @@ qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 	if (!(ent->spawnflags & DROPPED_ITEM))
 		SetRespawn (ent, ent->item->quantity);
 
-	// update the weapon hud
-	if (UF(other, WEAPON_HUD)) {
-		other->client->next_weaponhud_update = level.framenum + 10;
-	}
-
-
 	return true;
 }
 
@@ -302,11 +296,6 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 
 	if (!(ent->spawnflags & DROPPED_ITEM))
 		SetRespawn (ent, ent->item->quantity);
-
-	// update the weapon hud
-	if (UF(other, WEAPON_HUD)) {
-		other->client->next_weaponhud_update = level.framenum + 10;
-	}
 
 	return true;
 }
@@ -475,11 +464,6 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))
 		SetRespawn (ent, 30);
 
-	// update the weapon hud
-	if (UF(other, WEAPON_HUD)) {
-		other->client->next_weaponhud_update = level.framenum + 10;
-	}
-
 	return true;
 }
 
@@ -506,11 +490,6 @@ void Drop_Ammo (edict_t *ent, const gitem_t *item)
 
 	ent->client->inventory[index] -= dropped->count;
 	ValidateSelectedItem (ent);
-
-	// update the weapon hud
-	if (UF(ent, WEAPON_HUD)) {
-		ent->client->next_weaponhud_update = level.framenum + 10;
-	}
 }
 
 
