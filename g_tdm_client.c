@@ -602,7 +602,7 @@ const char *TDM_CreateSpectatorStatusBar (edict_t *player) {
 		// Time value
 		"xv 175 "
 		"yb -39 "
-		"stat_string 22 "
+		"stat_string 31 "
 
 		// Timeout message
 		"if 25 "
@@ -901,7 +901,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 
 		// Time value
 		"yb -39 "
-		"stat_string 22 "
+		"stat_string 31 "
 
 		// Timeout message
 		"if 25 "

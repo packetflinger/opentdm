@@ -317,34 +317,13 @@ void Cmd_Help_f (edict_t *ent)
  */
 static void G_SetTeamScoreStats (edict_t *ent)
 {
-	int		first_team;
-
-	if (ent->client->showoldscores)
-	{
-		/*if (old_matchinfo.scores[TEAM_A] < old_matchinfo.scores[TEAM_B])
-			first_team = TEAM_B;
-		else*/
-			first_team = TEAM_A;
-
-		ent->client->ps.stats[STAT_FIRST_TEAM_SCORE] = old_matchinfo.scores[first_team];
-		ent->client->ps.stats[STAT_SECOND_TEAM_SCORE] = old_matchinfo.scores[(first_team % 2) + 1];
+	if (ent->client->showoldscores) {
+		ent->client->ps.stats[STAT_FIRST_TEAM_SCORE] = old_matchinfo.scores[TEAM_A];
+		ent->client->ps.stats[STAT_SECOND_TEAM_SCORE] = old_matchinfo.scores[(TEAM_A % 2) + 1];
+	} else {
+		ent->client->ps.stats[STAT_FIRST_TEAM_SCORE] = teaminfo[TEAM_A].score;
+		ent->client->ps.stats[STAT_SECOND_TEAM_SCORE] = teaminfo[(TEAM_A % 2) + 1].score;
 	}
-	else
-	{
-		/*if (teaminfo[TEAM_A].score < teaminfo[TEAM_B].score)
-			first_team = TEAM_B;
-		else*/
-			first_team = TEAM_A;
-
-		ent->client->ps.stats[STAT_FIRST_TEAM_SCORE] = teaminfo[first_team].score;
-		ent->client->ps.stats[STAT_SECOND_TEAM_SCORE] = teaminfo[(first_team % 2) + 1].score;
-	}
-
-	ent->client->ps.stats[STAT_FIRST_TEAM_NAME_INDEX] = CS_TDM_TEAM_A_NAME + first_team - 1;
-	ent->client->ps.stats[STAT_SECOND_TEAM_NAME_INDEX] = CS_TDM_TEAM_A_NAME + (first_team % 2);
-
-	ent->client->ps.stats[STAT_FIRST_TEAM_STATUS_INDEX] = CS_TDM_TEAM_A_STATUS + first_team - 1;
-	ent->client->ps.stats[STAT_SECOND_TEAM_STATUS_INDEX] = CS_TDM_TEAM_A_STATUS + (first_team % 2);
 }
 
 /*
@@ -562,15 +541,13 @@ void G_SetSpectatorStats (edict_t *ent)
 {
 	gclient_t *cl = ent->client;
 
-	if (!cl->chase_target)
+	if (!cl->chase_target) {
 		G_SetStats (ent);
-	else
-	{
+	} else {
 		memcpy (cl->ps.stats, cl->chase_target->client->ps.stats, sizeof(cl->ps.stats));
 
 		//copy gun if in-eyes mode
-		if (cl->chase_mode == CHASE_EYES)
-		{
+		if (cl->chase_mode == CHASE_EYES) {
 			cl->ps.gunindex = cl->chase_target->client->ps.gunindex;
 			cl->ps.gunframe = cl->chase_target->client->ps.gunframe;
 			VectorCopy (cl->chase_target->client->ps.gunangles, cl->ps.gunangles);
@@ -580,8 +557,9 @@ void G_SetSpectatorStats (edict_t *ent)
 		}
 
 		//if our target player has the id stat up, we need to set configstrings for ourself.
-		if (cl->ps.stats[STAT_ID_VIEW_INDEX])
+		if (cl->ps.stats[STAT_ID_VIEW_INDEX]) {
 			TDM_GetPlayerIdView (ent);
+		}
 
 		//team scores are independent in spectator
 		G_SetTeamScoreStats (ent);
@@ -590,22 +568,19 @@ void G_SetSpectatorStats (edict_t *ent)
 		cl->ps.stats[STAT_FRAGS] = 0;
 	}
 
-	cl->ps.stats[STAT_SPECTATOR] = 1;
-
 	// layouts are independent in spectator
 	cl->ps.stats[STAT_LAYOUTS] = 0;
 
 	if (tdm_match_status == MM_SCOREBOARD || cl->pers.menu.active || ent->client->showscores ||
-			ent->client->showoldscores || ent->client->showmotd)
+			ent->client->showoldscores || ent->client->showmotd) {
 		cl->ps.stats[STAT_LAYOUTS] |= 1;
+	}
 
-	//if (cl->showinventory && ent->health > 0)
-	//	cl->ps.stats[STAT_LAYOUTS] |= 2;
-
-	if (cl->chase_target && cl->chase_target->inuse)
+	if (cl->chase_target && cl->chase_target->inuse) {
 		cl->ps.stats[STAT_CHASE] = CS_TDM_SPECTATOR_STRINGS + 
 			(cl->chase_target - g_edicts) - 1;
-	else
+	} else {
 		cl->ps.stats[STAT_CHASE] = 0;
+	}
 }
 

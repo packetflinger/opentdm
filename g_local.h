@@ -45,52 +45,38 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	svc_configstring	13
 
 // player_state->stats[] indexes
-#define STAT_HEALTH_ICON		0
-#define	STAT_HEALTH				1		// used by client, server
-#define	STAT_AMMO_ICON			2
-#define	STAT_AMMO				3		// used by client
-#define	STAT_ARMOR_ICON			4
-#define	STAT_ARMOR				5		// used by client
-#define	STAT_SELECTED_ICON		6
-#define	STAT_PICKUP_ICON		7
-#define	STAT_PICKUP_STRING		8
-#define	STAT_TIMER_ICON			9
-#define	STAT_TIMER				10
-#define	STAT_HELPICON			11
-#define	STAT_SELECTED_ITEM		12		// used by client
-#define	STAT_LAYOUTS			13		// used by client
-// frag count for server browsers
-#define	STAT_FRAGS				14		// used by server
-#define	STAT_FLASHES			15		// used by client; cleared each frame, 1 = health, 2 = armor
-#define STAT_CHASE				16
-#define STAT_SPECTATOR			17			// reclaimed for weaponhud
-#define STAT_FIRST_TEAM_NAME_INDEX		18	// reclaim for weaponhud
-#define STAT_SECOND_TEAM_NAME_INDEX		19	// reclaim for weaponhud
-#define STAT_FIRST_TEAM_STATUS_INDEX	20	// unused reclaim for hud
-#define STAT_SECOND_TEAM_STATUS_INDEX	21	// unused reclaim for hud
-#define STAT_TIME_REMAINING				22
+#define STAT_HEALTH_ICON				0
+#define	STAT_HEALTH						1		// used by client, server
+#define	STAT_AMMO_ICON					2
+#define	STAT_AMMO						3		// used by client
+#define	STAT_ARMOR_ICON					4
+#define	STAT_ARMOR						5		// used by client
+#define	STAT_SELECTED_ICON				6
+#define	STAT_PICKUP_ICON				7
+#define	STAT_PICKUP_STRING				8
+#define	STAT_TIMER_ICON					9
+#define	STAT_TIMER						10
+#define	STAT_HELPICON					11
+#define	STAT_SELECTED_ITEM				12		// used by client
+#define	STAT_LAYOUTS					13		// used by client
+#define	STAT_FRAGS						14		// used by server
+#define	STAT_FLASHES					15		// used by client; cleared each frame, 1 = health, 2 = armor
+#define STAT_CHASE						16
+#define STAT_WEAPHUD_SHELLS				17
+#define STAT_WEAPHUD_BULLETS			18
+#define STAT_WEAPHUD_GRENADES			19
+#define STAT_WEAPHUD_CELLS				20
+#define STAT_WEAPHUD_ROCKETS			21
+#define STAT_WEAPHUD_SLUGS				22
 #define STAT_FIRST_TEAM_SCORE			23
 #define STAT_SECOND_TEAM_SCORE			24
 #define	STAT_TIMEOUT_STRING_INDEX		25
 #define	STAT_GAME_STATUS_STRING_INDEX	26
 #define	STAT_ID_VIEW_INDEX				27
 #define	STAT_VOTE_STRING_INDEX			28
-// another timer for pent so it doesn't overwrite quad
-#define	STAT_TIMER_PENT_ICON			29	// reclaim for hud
 #define	STAT_TIMER_PENT					30
-// frags showed in the hud
-#define	STAT_SCORE						31		// possibly reclaim, use STAT_FRAGS instead
+#define STAT_TIME_REMAINING				31
 // maximum 31!
-
-#define STAT_WEAPHUD_SHELLS				17
-#define STAT_WEAPHUD_BULLETS			29
-#define STAT_WEAPHUD_GRENADES			20
-#define STAT_WEAPHUD_CELLS				21
-#define STAT_WEAPHUD_ROCKETS			18
-#define STAT_WEAPHUD_SLUGS				19
-
-
-
 
 // dmflags->value flags
 #define	DF_NO_HEALTH		0x00000001	// 1
