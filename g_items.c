@@ -443,26 +443,38 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 
 	weapon = (ent->item->flags & IT_WEAPON);
 
-	if ( (weapon) && ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if ((weapon) && ((int) dmflags->value & DF_INFINITE_AMMO)) {
 		count = 1000;
-	else if (ent->count)
+	} else if (ent->count) {
 		count = ent->count;
-	else
+	} else {
 		count = ent->item->quantity;
+	}
 
 	oldcount = other->client->inventory[ITEM_INDEX(ent->item)];
 
-	if (!Add_Ammo (other, ent->item, count))
+	if (!Add_Ammo (other, ent->item, count)) {
 		return false;
-
-	if (weapon && !oldcount)
-	{
-		if (other->client->weapon != ent->item && other->client->weapon == GETITEM (ITEM_WEAPON_BLASTER))
-			other->client->newweapon = ent->item;
 	}
 
-	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))
-		SetRespawn (ent, 30);
+	if (weapon && !oldcount) {
+		if (other->client->weapon != ent->item && other->client->weapon == GETITEM (ITEM_WEAPON_BLASTER)) {
+			other->client->newweapon = ent->item;
+		}
+	}
+
+	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM))) {
+		SetRespawn(ent, 30);
+	}
+
+	// special case, grenades are ammo and their own weapon,
+	// don't update if we already have a grenade launcher
+	if (UF(other, WEAPON_HUD) &&
+			ITEM_INDEX(ent->item) == ITEM_AMMO_GRENADES &&
+			oldcount == 0 &&
+			other->client->inventory[ITEM_WEAPON_GRENADELAUNCHER] == 0) {
+		other->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
+	}
 
 	return true;
 }
@@ -474,21 +486,30 @@ void Drop_Ammo (edict_t *ent, const gitem_t *item)
 
 	index = ITEM_INDEX(item);
 	dropped = Drop_Item (ent, item);
-	if (ent->client->inventory[index] >= item->quantity)
+	if (ent->client->inventory[index] >= item->quantity) {
 		dropped->count = item->quantity;
-	else
+	} else {
 		dropped->count = ent->client->inventory[index];
+	}
 
 	if (ent->client->weapon && 
-		ent->client->weapon->tag == AMMO_GRENADES &&
-		item->tag == AMMO_GRENADES &&
-		ent->client->inventory[index] - dropped->count <= 0) {
+			ent->client->weapon->tag == AMMO_GRENADES &&
+			item->tag == AMMO_GRENADES &&
+			ent->client->inventory[index] - dropped->count <= 0) {
 		gi.cprintf (ent, PRINT_HIGH, "Can't drop current weapon\n");
 		G_FreeEdict(dropped);
 		return;
 	}
 
 	ent->client->inventory[index] -= dropped->count;
+
+	// special case, grenades are ammo and their own weapon
+	if (index == ITEM_AMMO_GRENADES &&
+			ent->client->inventory[index] == 0 &&
+			ent->client->inventory[ITEM_WEAPON_GRENADELAUNCHER] == 0) {
+		ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
+	}
+
 	ValidateSelectedItem (ent);
 }
 

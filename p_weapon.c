@@ -51,17 +51,15 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 
 	index = ITEM_INDEX(ent->item);
 
-	if ( ( ((int)(dmflags->value) & DF_WEAPONS_STAY)) 
-		&& other->client->inventory[index])
-	{
+	if (((((int) dmflags->value) & DF_WEAPONS_STAY))
+			&& other->client->inventory[index]) {
 		if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM) ) )
 			return false;	// leave the weapon for others to pickup
 	}
 
 	other->client->inventory[index]++;
 
-	if (!(ent->spawnflags & DROPPED_ITEM) )
-	{
+	if (!(ent->spawnflags & DROPPED_ITEM)) {
 		// give them some ammo with it
 		ammo = GETITEM (ent->item->ammoindex);
 		if ( (int)dmflags->value & DF_INFINITE_AMMO )
@@ -69,22 +67,31 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		else
 			Add_Ammo (other, ammo, ammo->quantity);
 
-		if (! (ent->spawnflags & DROPPED_PLAYER_ITEM) )
-		{
-			if ((int)(dmflags->value) & DF_WEAPONS_STAY)
+		if (!(ent->spawnflags & DROPPED_PLAYER_ITEM)) {
+			if ((int)(dmflags->value) & DF_WEAPONS_STAY) {
 				ent->flags |= FL_RESPAWN;
-			else
-				SetRespawn (ent, 30);
+			} else {
+				SetRespawn(ent, 30);
+			}
 		}
 	}
 
 	if (other->client->weapon != ent->item && 
-		(other->client->inventory[index] == 1) &&
-		other->client->weapon == GETITEM (ITEM_WEAPON_BLASTER))
+			other->client->inventory[index] == 1 &&
+			other->client->weapon == GETITEM(ITEM_WEAPON_BLASTER)) {
 		other->client->newweapon = ent->item;
+	}
 
 	// update the weapon hud if we just picked up our only one of this weapon
 	if (UF(other, WEAPON_HUD) && other->client->inventory[index] == 1) {
+
+		// ssg/cg/gl overtakes sg/mg/hg icon, don't update if we pick up lesser weap and have better
+		if (index == ITEM_WEAPON_SHOTGUN && other->client->inventory[ITEM_WEAPON_SUPERSHOTGUN] > 0) {
+			return true;
+		} else if (index == ITEM_WEAPON_MACHINEGUN && other->client->inventory[ITEM_WEAPON_CHAINGUN] > 0) {
+			return true;
+		}
+
 		other->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 
@@ -344,6 +351,11 @@ void Drop_Weapon (edict_t *ent, const gitem_t *item)
 
 	// update the weapon hud if we just dropped our last one of these weapons
 	if (UF(ent, WEAPON_HUD) && ent->client->inventory[index] == 0) {
+		if (index == ITEM_WEAPON_SHOTGUN && ent->client->inventory[ITEM_WEAPON_SUPERSHOTGUN] > 0) {
+			return;
+		} else if (index == ITEM_WEAPON_MACHINEGUN && ent->client->inventory[ITEM_WEAPON_CHAINGUN] > 0) {
+			return;
+		}
 		ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 }
