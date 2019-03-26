@@ -629,11 +629,11 @@ const char *TDM_CreateSpectatorStatusBar (edict_t *player) {
 
 	// chase camera
 	"if 16 "
-	  "xv 0 "
-	  "yb -68 "
-	  "string \"Chasing\" "
-	  "xv 64 "
-	  "stat_string 16 "
+		"xv 0 "
+		"yb -68 "
+		"string \"Chasing\" "
+		"xv 64 "
+		"stat_string 16 "
 
 		"yb -24 "
 
@@ -645,74 +645,74 @@ const char *TDM_CreateSpectatorStatusBar (edict_t *player) {
 
 		// ammo
 		"if 2 "
-		" xv 100 "
-		" anum "
-		" xv 150 "
-		" pic 2 "
+			"xv 100 "
+			"anum "
+			"xv 150 "
+			"pic 2 "
 		"endif "
 
 		// armor
 		"if 4 "
-		" xv 200 "
-		" rnum "
-		" xv 250 "
-		" pic 4 "
+			"xv 200 "
+			"rnum "
+			"xv 250 "
+			"pic 4 "
 		"endif "
 
 		// selected item
 		"if 6 "
-		" xv 296 "
-		" pic 6 "
+			"xv 296 "
+			"pic 6 "
 		"endif "
 
 		"yb -50 "
 
 		// picked up item
 		"if 7 "
-		" xv 0 "
-		" pic 7 "
-		" xv 26 "
-		" yb -42 "
-		" stat_string 8 "
-		" yb -50 "
+			"xv 0 "
+			"pic 7 "
+			"xv 26 "
+			"yb -42 "
+			"stat_string 8 "
+			"yb -50 "
 		"endif "
 
 		// timer (quad, rebreather, envirosuit)
 		"if 9 "
-		" xv 246 "
-		" num 2 10 "
-		" xv 296 "
-		" pic 9 "
+			"xv 246 "
+			"num 2 10 "
+			"xv 296 "
+			"pic 9 "
 		"endif "
 
 		//  help / weapon icon
 		"if 11 "
-		" xv 148 "
-		" pic 11 "
+			"xv 148 "
+			"pic 11 "
 		"endif "
 
 		// timer (pent)
 		"if 29 "
-		" yb -80 "
-		" xv 246 "
-		" num 2 30 "
-		" xv 296 "
-		" pic 29 "
+			"yb -80 "
+			"xv 246 "
+			"num 2 30 "
+			"xv 296 "
+			"pic 29 "
 		"endif "
 	"endif "
 
 	// player id view
 	"if 27 "
-	  "xv %d "
-	  "yb %d "
-	  "stat_string 27 "
+		"xv %d "
+		"yb %d "
+		"stat_string 27 "
 	"endif "
 
 	// vote notice
 	"if 28 "
-	  "xl 10 "
-	  "yb -180 "
-	  "stat_string 28 "
+		"xl 10 "
+		"yb -180 "
+		"stat_string 28 "
 	"endif ", id_x, id_y);
 
 	return spec_statusbar;
@@ -816,134 +816,134 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	}
 
 	dm_statusbar = va (
-"yb -24 "
+	"yb -24 "
 
-// health
-"xv 0 "
-"hnum "
-"xv 50 "
-"pic 0 "
+	// health
+	"xv 0 "
+	"hnum "
+	"xv 50 "
+	"pic 0 "
 
-// ammo
-"if 2 "
-" xv 100 "
-" anum "
-" xv 150 "
-" pic 2 "
-"endif "
+	// ammo
+	"if 2 "
+		"xv 100 "
+		"anum "
+		"xv 150 "
+		"pic 2 "
+	"endif "
 
-// armor
-"if 4 "
-" xv 200 "
-" rnum "
-" xv 250 "
-" pic 4 "
-"endif "
+	// armor
+	"if 4 "
+		"xv 200 "
+		"rnum "
+		"xv 250 "
+		"pic 4 "
+	"endif "
 
-// selected item
-"if 6 "
-" xv 296 "
-" pic 6 "
-"endif "
+	// selected item
+	"if 6 "
+		"xv 296 "
+		"pic 6 "
+	"endif "
 
-"yb -50 "
+	"yb -50 "
 
-// picked up item
-"if 7 "
-" xv 0 "
-" pic 7 "
-" xv 26 "
-" yb -42 "
-" stat_string 8 "
-" yb -50 "
-"endif "
+	// picked up item
+	"if 7 "
+		"xv 0 "
+		"pic 7 "
+		"xv 26 "
+		"yb -42 "
+		"stat_string 8 "
+		"yb -50 "
+	"endif "
 
-// timer (quad, rebreather, envirosuit)
-"if 9 "
-" xv 246 "
-" num 2 10 "
-" xv 296 "
-" pic 9 "
-"endif "
+	// timer (quad, rebreather, envirosuit)
+	"if 9 "
+		"xv 246 "
+		"num 2 10 "
+		"xv 296 "
+		"pic 9 "
+	"endif "
 
-//  help / weapon icon 
-"if 11 "
-" xv 148 "
-" pic 11 "
-"endif "
+	//  help / weapon icon
+	"if 11 "
+		"xv 148 "
+		"pic 11 "
+	"endif "
 
-// timer (pent)
-"if 29 "
-" yb -80 "
-" xv 246 "
-" num 2 30 "
-" xv 296 "
-" pic 29 "
-"endif "
+	// timer (pent)
+	"if 29 "
+		"yb -80 "
+		"xv 246 "
+		"num 2 30 "
+		"xv 296 "
+		"pic 29 "
+	"endif "
 
-// First team name
-"xr -250 "
-"yb -96 "
-"stat_string 18 "
+	// First team name
+	"xr -250 "
+	"yb -96 "
+	"stat_string 18 "
 
-// First team score / status
-"xr -66 "
-"yb -120 "
-"num 4 23 "
+	// Second team name
+//	"xr -250 "
+	"yb -48 "
+	"stat_string 19 "
 
-// Second team name
-"xr -250 "
-"yb -48 "
-"stat_string 19 "
+	// First team score / status
+	"xr -66 "
+	"yb -120 "
+	"num 4 23 "
 
-// Second team score / status
-"xr -66 "
-"yb -72 "
-"num 4 24 "
+	// Second team score / status
+//	"xr -66 "
+	"yb -72 "
+	"num 4 24 "
 
-// Time
-"xv 175 "
-"yb -48 "
-"stat_string 26 "
+	// Time
+	"xv 175 "
+	"yb -48 "
+	"stat_string 26 "
 
-// Time value
-"xv 175 "
-"yb -39 "
-"stat_string 22 "
+	// Time value
+//	"xv 175 "
+	"yb -39 "
+	"stat_string 22 "
 
-// Timeout message
-"if 25 "
-	"xr -58 "
-	"yt 50 "
-	"string \"Timeout\" "
+	// Timeout message
+	"if 25 "
+		"xr -58 "
+		"yt 50 "
+		"string \"Timeout\" "
 
-	// Timeout value
-	"xr -42 "
-	"yt 58 "
-	"stat_string 25 "
-"endif "
+		// Timeout value
+		"xr -42 "
+		"yt 58 "
+		"stat_string 25 "
+	"endif "
 
-//  frags
-"xr -50 "
-"yt 2 "
-"num 3 31 "
+	//  frags
+	"xr -50 "
+	"yt 2 "
+	"num 3 31 "
 
-// player id view
-"if 27 "
-  "xv %d "
-  "yb %d "
-  "stat_string 27 "
-"endif "
+	// player id view
+	"if 27 "
+		"xv %d "
+		"yb %d "
+		"stat_string 27 "
+	"endif "
 
-// vote notice
-"if 28 "
-  "xl 10 "
-  "yb -180 "
-  "stat_string 28 "
-"endif "
+	// vote notice
+	"if 28 "
+		"xl 10 "
+		"yb -180 "
+		"stat_string 28 "
+	"endif "
 
-// weapon hud
-"%s %s", id_x, id_y, weaponhud, ammohud);
+	// weapon hud
+	"%s %s", id_x, id_y, weaponhud, ammohud);
 
 	return dm_statusbar;
 }
