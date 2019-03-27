@@ -528,7 +528,7 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_WEAPHUD_SLUGS] = ent->client->inventory[ITEM_AMMO_SLUGS];
 
 		// if the time is right...
-		TDM_UpdateWeaponHud(ent, false);
+		TDM_UpdateHud(ent, false);
 	}
 }
 

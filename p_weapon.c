@@ -42,8 +42,6 @@ static void P_ProjectSource (gclient_t *client, vec3_t point, vec3_t distance, v
 	G_ProjectSource (point, _distance, forward, right, result);
 }
 
-void TDM_SendStatusBarCS (edict_t *ent);
-
 qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 {
 	int				index;

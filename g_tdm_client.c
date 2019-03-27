@@ -119,6 +119,7 @@ void JoinedTeam (edict_t *ent, qboolean reconnected, qboolean notify)
 	else
 		gi.configstring (CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1, ent->client->pers.netname);
 
+	TDM_UpdateHud(ent, false);
 	TDM_TeamsChanged ();
 	respawn (ent);
 }
@@ -265,7 +266,7 @@ void ToggleChaseCam (edict_t *ent)
 	else
 		GetChaseTarget(ent);
 
-	TDM_SendSpecStatusBarCS(ent);
+	TDM_SendSpectatorStatusBar(ent);
 	PMenu_Close (ent);
 }
 
@@ -618,11 +619,6 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 			"stat_string 25 "
 		"endif "
 
-		//  frags
-		"xr	-50 "
-		"yt 2 "
-		"num 3 31 "
-
 		// spectator
 		"xv 0 "
 		"yb -58 "
@@ -693,13 +689,18 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 			"endif "
 
 			// timer (pent)
-			"if 29 "
+			"if 30 "
 				"yb -80 "
 				"xv 246 "
 				"num 2 30 "
 				"xv 296 "
-				"pic 29 "
+				"picn p_invulnerability "
 			"endif "
+
+			//  frags
+			"xr	-50 "
+			"yt 2 "
+			"num 3 14 "
 		"endif "
 
 		// player id view
@@ -948,11 +949,11 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 
 /*
 ==============
-TDM_SendStatusBarCS
+TDM_SendPlayerStatusBar
 ==============
 Send status bar config string.
 */
-void TDM_SendStatusBarCS (edict_t *ent)
+void TDM_SendPlayerStatusBar(edict_t *ent)
 {
 	gi.WriteByte (svc_configstring);
 	gi.WriteShort (CS_STATUSBAR);
@@ -960,7 +961,7 @@ void TDM_SendStatusBarCS (edict_t *ent)
 	gi.unicast (ent, true);
 }
 
-void TDM_SendSpecStatusBarCS(edict_t *ent) {
+void TDM_SendSpectatorStatusBar(edict_t *ent) {
 	gi.WriteByte(svc_configstring);
 	gi.WriteShort(CS_STATUSBAR);
 	gi.WriteString(TDM_CreateSpectatorStatusBar(ent));
@@ -1043,7 +1044,7 @@ void TDM_PlayerConfigDownloaded (tdm_download_t *download, int code, byte *buff,
 	}
 
 	//wision: set up the dm_statusbar according the config and send it to the client
-	TDM_SendStatusBarCS (download->initiator);
+	TDM_UpdateHud(download->initiator, true);
 
 	download->inuse = false;
 }
@@ -1065,7 +1066,7 @@ void TDM_DownloadPlayerConfig (edict_t *ent)
 	if (!stats_id[0])
 	{
 		//FIXME: is this necessary with the global CS back in place?
-		TDM_SendStatusBarCS (ent);
+		TDM_UpdateHud(ent, false);
 		return;
 	}
 
@@ -1485,18 +1486,15 @@ int TDM_GetPlayerIdView (edict_t *ent)
 }
 
 /**
- * Resend the entire statusbar string to update the hud. I dislike this,
- * but it seems to be necessary.
+ * Resend the entire statusbar string to update the hud.
+ *
  */
-void TDM_UpdateWeaponHud(edict_t *ent, qboolean force) {
+void TDM_UpdateHud(edict_t *ent, qboolean force) {
 
 	if (!ent->client)
 		return;
 
 	if (!force) {
-		// client doesn't want the hud
-		if (!UF(ent, WEAPON_HUD))
-			return;
 
 		// too soon, can only send statusbar at most once every 2 seconds
 		if ((level.framenum - ent->client->last_weaponhud_update) < SECS_TO_FRAMES(2.0F)) {
@@ -1504,14 +1502,20 @@ void TDM_UpdateWeaponHud(edict_t *ent, qboolean force) {
 		}
 
 		// not time yet
-		if (ent->client->next_weaponhud_update > level.framenum) {
+		if (ent->client->next_weaponhud_update && ent->client->next_weaponhud_update > level.framenum) {
 			return;
 		}
 	}
 
-	TDM_SendStatusBarCS(ent);
+	switch (ent->client->pers.team) {
+	case TEAM_SPEC:
+		TDM_SendSpectatorStatusBar(ent);
+		break;
+	default:
+		TDM_SendPlayerStatusBar(ent);
+	}
 
 	// set next update to way in the future so it's basically never automatically updated.
-	ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(3600.0f);
+	ent->client->next_weaponhud_update = 0;
 	ent->client->last_weaponhud_update = level.framenum;
 }

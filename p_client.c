@@ -1123,11 +1123,6 @@ void respawn (edict_t *self)
 	}
 
 	self->client->respawn_framenum = level.framenum;
-
-	// update the weapon hud
-	if (UF(self, WEAPON_HUD)) {
-		TDM_SendStatusBarCS(self);
-	}
 }
 
 
@@ -1393,7 +1388,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 	else
 	{
 		//wision: set up the dm_statusbar according the config and send it to the client
-		TDM_SendStatusBarCS (ent);
+		TDM_UpdateHud(ent, false);
 	}
 
 	//no cross-level menus!
