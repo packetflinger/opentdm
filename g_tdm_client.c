@@ -562,7 +562,7 @@ void TDM_Disconnected (edict_t *ent)
 }
 
 
-const char *TDM_CreateSpectatorStatusBar (edict_t *player) {
+const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 	static char *spec_statusbar;
 	int			id_x, id_y;
 
@@ -570,8 +570,10 @@ const char *TDM_CreateSpectatorStatusBar (edict_t *player) {
 	id_x = -100;
 	id_y = -80;
 
-	id_x += player->client->pers.config.id_x;
-	id_y += player->client->pers.config.id_y;
+	if (player) {
+		id_x += player->client->pers.config.id_x;
+		id_y += player->client->pers.config.id_y;
+	}
 
 	spec_statusbar = va (
 		// First team name
