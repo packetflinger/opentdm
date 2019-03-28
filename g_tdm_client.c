@@ -119,7 +119,7 @@ void JoinedTeam (edict_t *ent, qboolean reconnected, qboolean notify)
 	else
 		gi.configstring (CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1, ent->client->pers.netname);
 
-	TDM_UpdateHud(ent, false);
+	TDM_UpdateHud(ent, true);
 	TDM_TeamsChanged ();
 	respawn (ent);
 }
@@ -266,7 +266,7 @@ void ToggleChaseCam (edict_t *ent)
 	else
 		GetChaseTarget(ent);
 
-	TDM_SendSpectatorStatusBar(ent);
+	TDM_UpdateHud(ent, true);
 	PMenu_Close (ent);
 }
 
@@ -593,7 +593,7 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 		"num 4 23 "
 
 		// Second team score / status
-		"xr -66 "
+//		"xr -66 "
 		"yb -72 "
 		"num 4 24 "
 
@@ -620,7 +620,7 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 		"endif "
 
 		// spectator
-		"xv 0 "
+		"xv 98 "
 		"yb -58 "
 		"string2 \"SPECTATOR MODE\" "
 
@@ -696,8 +696,10 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 				"xv 296 "
 				"picn p_invulnerability "
 			"endif "
+		"endif "
 
-			//  frags
+		// frags
+		"if 14 "
 			"xr	-50 "
 			"yt 2 "
 			"num 3 14 "
@@ -1495,27 +1497,28 @@ void TDM_UpdateHud(edict_t *ent, qboolean force) {
 		return;
 
 	if (!force) {
+		if (!ent->client->next_hud_update) {
+			return;
+		}
 
 		// too soon, can only send statusbar at most once every 2 seconds
-		if ((level.framenum - ent->client->last_weaponhud_update) < SECS_TO_FRAMES(2.0F)) {
+		if ((level.framenum - ent->client->last_hud_update) < SECS_TO_FRAMES(2.0F)) {
 			return;
 		}
 
 		// not time yet
-		if (ent->client->next_weaponhud_update && ent->client->next_weaponhud_update > level.framenum) {
+		if (ent->client->next_hud_update > level.framenum) {
 			return;
 		}
 	}
 
-	switch (ent->client->pers.team) {
-	case TEAM_SPEC:
+	if (ent->client->pers.team == TEAM_SPEC) {
 		TDM_SendSpectatorStatusBar(ent);
-		break;
-	default:
+	} else if (ent->client->pers.team > TEAM_SPEC) {
 		TDM_SendPlayerStatusBar(ent);
 	}
 
 	// set next update to way in the future so it's basically never automatically updated.
-	ent->client->next_weaponhud_update = 0;
-	ent->client->last_weaponhud_update = level.framenum;
+	ent->client->next_hud_update = 0;
+	ent->client->last_hud_update = level.framenum;
 }

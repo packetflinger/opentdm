@@ -1641,8 +1641,8 @@ struct gclient_s
 	unsigned	next_weapon_think;
 	vec3_t		saved_angles;
 
-	int			last_weaponhud_update;
-	int			next_weaponhud_update;
+	int			last_hud_update;
+	int			next_hud_update;
 };
 
 typedef enum

@@ -473,7 +473,7 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 			ITEM_INDEX(ent->item) == ITEM_AMMO_GRENADES &&
 			oldcount == 0 &&
 			other->client->inventory[ITEM_WEAPON_GRENADELAUNCHER] == 0) {
-		other->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
+		other->client->next_hud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 
 	return true;
@@ -507,7 +507,7 @@ void Drop_Ammo (edict_t *ent, const gitem_t *item)
 	if (index == ITEM_AMMO_GRENADES &&
 			ent->client->inventory[index] == 0 &&
 			ent->client->inventory[ITEM_WEAPON_GRENADELAUNCHER] == 0) {
-		ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
+		ent->client->next_hud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 
 	ValidateSelectedItem (ent);

@@ -90,7 +90,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 			return true;
 		}
 
-		other->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
+		other->client->next_hud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 
 	return true;
@@ -354,7 +354,7 @@ void Drop_Weapon (edict_t *ent, const gitem_t *item)
 		} else if (index == ITEM_WEAPON_MACHINEGUN && ent->client->inventory[ITEM_WEAPON_CHAINGUN] > 0) {
 			return;
 		}
-		ent->client->next_weaponhud_update = level.framenum + SECS_TO_FRAMES(1);
+		ent->client->next_hud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 }
 
