@@ -119,9 +119,11 @@ void JoinedTeam (edict_t *ent, qboolean reconnected, qboolean notify)
 	else
 		gi.configstring (CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1, ent->client->pers.netname);
 
-	TDM_UpdateHud(ent, true);
 	TDM_TeamsChanged ();
 	respawn (ent);
+
+	// respawn first to load player's inventory
+	TDM_UpdateHud(ent, true);
 }
 
 /*
@@ -752,6 +754,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	ammohud[0] = 0;
 
 	if (UF(player, WEAPON_HUD)) {
+
 		// set x position at first for all weapon icons, to save the chars since CS max is 1000
 		strcpy(weaponhud, "xr -25 ");
 
