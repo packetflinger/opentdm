@@ -452,11 +452,6 @@ void TDM_BeginMatch (void)
 		if (ent->client->pers.team)
 		{
 			respawn (ent);
-
-			// refresh the statusbar to remove weapons from hud
-			if (UF(ent, WEAPON_HUD)) {
-				TDM_UpdateHud(ent, true);
-			}
 		}
 	}
 

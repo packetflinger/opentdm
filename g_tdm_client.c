@@ -121,9 +121,6 @@ void JoinedTeam (edict_t *ent, qboolean reconnected, qboolean notify)
 
 	TDM_TeamsChanged ();
 	respawn (ent);
-
-	// respawn first to load player's inventory
-	TDM_UpdateHud(ent, true);
 }
 
 /*

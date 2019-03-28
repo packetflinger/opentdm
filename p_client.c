@@ -1122,6 +1122,11 @@ void respawn (edict_t *self)
 		self->client->ps.pmove.pm_time = 14;
 	}
 
+	// refresh the statusbar to remove weapons from hud
+	if (self->client->pers.team && UF(self, WEAPON_HUD)) {
+		TDM_UpdateHud(self, true);
+	}
+
 	self->client->respawn_framenum = level.framenum;
 }
 
