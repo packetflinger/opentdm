@@ -440,6 +440,11 @@ void TDM_BeginMatch (void)
 			//if they were on one during warmup
 			ent->health = 0;
 			gi.unlinkentity (ent);
+
+			// refresh the statusbar to remove weapons from hud
+			if (UF(ent, WEAPON_HUD)) {
+				TDM_UpdateHud(ent, true);
+			}
 		}
 	}
 
