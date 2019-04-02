@@ -2071,7 +2071,7 @@ void TDM_Motd_f (edict_t *ent)
 
 	ent->client->showmotd = true;
 
-	gi.WriteByte (svc_layout);
+	gi.WriteByte (SVC_LAYOUT);
 	gi.WriteString (string);
 	gi.unicast (ent, true);
 }
@@ -2142,7 +2142,7 @@ void TDM_OldScores_f (edict_t *ent)
 	ent->client->showscores = false;
 	ent->client->showoldscores = true;
 
-	gi.WriteByte (svc_layout);
+	gi.WriteByte (SVC_LAYOUT);
 	gi.WriteString (old_matchinfo.scoreboard_string);
 	gi.unicast (ent, true);
 }

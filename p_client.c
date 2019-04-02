@@ -797,7 +797,7 @@ edict_t *SelectRandomDeathmatchSpawnPointAvoidingTwoClosest (void)
 	{
 		if (spot1)
 		{
-			gi.WriteByte (svc_temp_entity);
+			gi.WriteByte (SVC_TEMP_ENTITY);
 			gi.WriteByte (TE_DEBUGTRAIL);
 			gi.WritePosition (spot1->s.origin);
 			gi.WritePosition (player1->s.origin);
@@ -806,7 +806,7 @@ edict_t *SelectRandomDeathmatchSpawnPointAvoidingTwoClosest (void)
 
 		if (spot2)
 		{
-			gi.WriteByte (svc_temp_entity);
+			gi.WriteByte (SVC_TEMP_ENTITY);
 			gi.WriteByte (TE_DEBUGTRAIL);
 			gi.WritePosition (spot2->s.origin);
 			gi.WritePosition (player2->s.origin);
@@ -870,7 +870,7 @@ edict_t *SelectRandomDeathmatchSpawnPointAvoidingTwoClosestBugged (void)
 	{
 		if (spot1)
 		{
-			gi.WriteByte (svc_temp_entity);
+			gi.WriteByte (SVC_TEMP_ENTITY);
 			gi.WriteByte (TE_DEBUGTRAIL);
 			gi.WritePosition (spot1->s.origin);
 			gi.WritePosition (player1->s.origin);
@@ -879,7 +879,7 @@ edict_t *SelectRandomDeathmatchSpawnPointAvoidingTwoClosestBugged (void)
 
 		if (spot2)
 		{
-			gi.WriteByte (svc_temp_entity);
+			gi.WriteByte (SVC_TEMP_ENTITY);
 			gi.WriteByte (TE_DEBUGTRAIL);
 			gi.WritePosition (spot2->s.origin);
 			gi.WritePosition (player2->s.origin);
@@ -1063,7 +1063,7 @@ void CopyToBodyQue (edict_t *ent)
 	// send an effect on the removed body
 	if (body->s.modelindex)
 	{
-		gi.WriteByte (svc_temp_entity);
+		gi.WriteByte (SVC_TEMP_ENTITY);
 		gi.WriteByte (TE_BLOOD);
 		gi.WritePosition (body->s.origin);
 		gi.WriteDir (vec3_origin);
@@ -1413,7 +1413,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 		PutClientInServer (ent);
 
 		// send effect (only to local client)
-		gi.WriteByte (svc_muzzleflash);
+		gi.WriteByte (SVC_MUZZLEFLASH);
 		gi.WriteShort (ent-g_edicts);
 		gi.WriteByte (MZ_LOGIN);
 		gi.unicast (ent, false);
@@ -1680,7 +1680,7 @@ void ClientDisconnect (edict_t *ent)
 	// send effect (only if they were in game)
 	if (ent->client->pers.team && ent->inuse)
 	{
-		gi.WriteByte (svc_muzzleflash);
+		gi.WriteByte (SVC_MUZZLEFLASH);
 		gi.WriteShort (ent-g_edicts);
 		gi.WriteByte (MZ_LOGOUT);
 		gi.multicast (ent->s.origin, MULTICAST_PVS);

@@ -2754,7 +2754,7 @@ void TDM_SetTeamSkins (edict_t *cl, edict_t *target_to_set_skins_for)
 
 		if (ent->client->pers.team)
 		{
-			gi.WriteByte (svc_configstring);
+			gi.WriteByte (SVC_CONFIGSTRING);
 			gi.WriteShort (CS_PLAYERSKINS + (ent - g_edicts) -1);
 
 			//spectators get team A as teamskin, team B as enemyskin

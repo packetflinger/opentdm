@@ -419,7 +419,7 @@ void G_StuffCmd (edict_t *e, const char *fmt, ...)
 	va_end (argptr);
 	text[sizeof(text)-1] = 0;
 
-	gi.WriteByte (svc_stufftext);
+	gi.WriteByte (SVC_STUFFTEXT);
 	gi.WriteString (text);
 
 	if (e)
@@ -430,7 +430,7 @@ void G_StuffCmd (edict_t *e, const char *fmt, ...)
 
 void G_UnicastSound (edict_t *ent, int index, qboolean reliable)
 {
-	gi.WriteByte (svc_sound);
+	gi.WriteByte (SVC_SOUND);
 	gi.WriteByte (SND_ATTENUATION);
 	gi.WriteByte (index);
 	gi.WriteByte (0);

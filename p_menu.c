@@ -109,7 +109,7 @@ void PMenu_Update(edict_t *ent)
 		alt = false;
 	}
 
-	gi.WriteByte (svc_layout);
+	gi.WriteByte (SVC_LAYOUT);
 	gi.WriteString (string);
 }
 

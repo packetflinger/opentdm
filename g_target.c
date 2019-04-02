@@ -25,7 +25,7 @@ Fire an origin based temp entity event to the clients.
 */
 void Use_Target_Tent (edict_t *ent, edict_t *other, edict_t *activator)
 {
-	gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (SVC_TEMP_ENTITY);
 	gi.WriteByte (ent->style);
 	gi.WritePosition (ent->s.origin);
 	gi.multicast (ent->s.origin, MULTICAST_PVS);
@@ -158,7 +158,7 @@ void target_explosion_explode (edict_t *self)
 {
 	float		save;
 
-	gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (SVC_TEMP_ENTITY);
 	gi.WriteByte (TE_EXPLOSION1);
 	gi.WritePosition (self->s.origin);
 	gi.multicast (self->s.origin, MULTICAST_PHS);
@@ -258,7 +258,7 @@ Set "sounds" to one of the following:
 
 void use_target_splash (edict_t *self, edict_t *other, edict_t *activator)
 {
-	gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (SVC_TEMP_ENTITY);
 	gi.WriteByte (TE_SPLASH);
 	gi.WriteByte (self->count);
 	gi.WritePosition (self->s.origin);
@@ -459,7 +459,7 @@ void target_laser_think (edict_t *self)
 			if (self->spawnflags & 0x80000000)
 			{
 				self->spawnflags &= ~0x80000000;
-				gi.WriteByte (svc_temp_entity);
+				gi.WriteByte (SVC_TEMP_ENTITY);
 				gi.WriteByte (TE_LASER_SPARKS);
 				gi.WriteByte (count);
 				gi.WritePosition (tr.endpos);

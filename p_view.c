@@ -1152,7 +1152,7 @@ void ClientEndServerFrame (edict_t *ent)
 			(!(level.realframenum % SECS_TO_FRAMES(1.5f)) && (tdm_match_status == MM_WARMUP || tdm_match_status == MM_TIMEOUT))))
 	{
 		//DeathmatchScoreboardMessage (ent, ent->enemy);
-		gi.WriteByte (svc_layout);
+		gi.WriteByte (SVC_LAYOUT);
 		gi.WriteString (TDM_ScoreBoardString (ent));
 		gi.unicast (ent, false);
 	}

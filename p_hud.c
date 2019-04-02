@@ -77,7 +77,7 @@ void MoveClientToIntermission (edict_t *ent)
 	ent->client->weapon_sound = 0;
 
 	// add the layout
-	gi.WriteByte (svc_layout);
+	gi.WriteByte (SVC_LAYOUT);
 	gi.WriteString (TDM_ScoreBoardString (ent));
 	gi.unicast (ent, true);
 }
@@ -145,7 +145,7 @@ DeathmatchScoreboardMessage
 
 ==================
 */
-void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
+void ScoreboardMessage (edict_t *ent, edict_t *killer)
 {
 	char	entry[1024];
 	char	string[1400];
@@ -230,7 +230,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		stringlength += j;
 	}
 
-	gi.WriteByte (svc_layout);
+	gi.WriteByte (SVC_LAYOUT);
 	gi.WriteString (string);
 }
 
@@ -246,7 +246,7 @@ Note that it isn't that hard to overflow the 1400 byte message limit!
 void DeathmatchScoreboard (edict_t *ent)
 {
 	//DeathmatchScoreboardMessage (ent, ent->enemy);
-	gi.WriteByte (svc_layout);
+	gi.WriteByte (SVC_LAYOUT);
 	gi.WriteString (TDM_ScoreBoardString (ent));
 	gi.unicast (ent, true);
 }

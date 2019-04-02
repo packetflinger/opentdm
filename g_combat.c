@@ -115,7 +115,7 @@ void SpawnDamage (int type, vec3_t origin, vec3_t normal, int damage)
 {
 	if (damage > 255)
 		damage = 255;
-	gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (SVC_TEMP_ENTITY);
 	gi.WriteByte (type);
 //	gi.WriteByte (damage);
 	gi.WritePosition (origin);

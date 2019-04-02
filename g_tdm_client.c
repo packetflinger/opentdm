@@ -957,14 +957,14 @@ Send status bar config string.
 */
 void TDM_SendPlayerStatusBar(edict_t *ent)
 {
-	gi.WriteByte (svc_configstring);
+	gi.WriteByte (SVC_CONFIGSTRING);
 	gi.WriteShort (CS_STATUSBAR);
 	gi.WriteString (TDM_CreatePlayerDmStatusBar (ent));
 	gi.unicast (ent, true);
 }
 
 void TDM_SendSpectatorStatusBar(edict_t *ent) {
-	gi.WriteByte(svc_configstring);
+	gi.WriteByte(SVC_CONFIGSTRING);
 	gi.WriteShort(CS_STATUSBAR);
 	gi.WriteString(TDM_CreateSpectatorStatusBar(ent));
 	gi.unicast(ent, true);
@@ -1478,7 +1478,7 @@ int TDM_GetPlayerIdView (edict_t *ent)
 				string = va ("%16s", target->client->pers.netname);
 		}
 
-		gi.WriteByte (svc_configstring);
+		gi.WriteByte (SVC_CONFIGSTRING);
 		gi.WriteShort (CS_TDM_ID_VIEW);
 		gi.WriteString (string);
 		gi.unicast (ent, false);
