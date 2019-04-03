@@ -1392,7 +1392,6 @@ void ClientBeginDeathmatch (edict_t *ent)
 	}
 	else
 	{
-		//wision: set up the dm_statusbar according the config and send it to the client
 		TDM_UpdateHud(ent, false);
 	}
 

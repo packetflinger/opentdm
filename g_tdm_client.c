@@ -121,6 +121,11 @@ void JoinedTeam (edict_t *ent, qboolean reconnected, qboolean notify)
 
 	TDM_TeamsChanged ();
 	respawn (ent);
+
+	// switch from spec to player statusbar, if weapon hud is enabled, that'll happen in respawn()
+	if (!UF(ent, WEAPON_HUD)) {
+		TDM_UpdateHud(ent, true);
+	}
 }
 
 /*
