@@ -2079,6 +2079,11 @@ void ClientBeginServerFrame (edict_t *ent)
 		TDM_LeftTeam (ent, false);
 		TDM_TeamsChanged ();
 		respawn (ent);
+
+		// replace the statusbar if weaponhud is disabled
+		if (!UF(ent, WEAPON_HUD)) {
+			TDM_UpdateHud(ent, true);
+		}
 	}
 
 	if (ent->deadflag)
