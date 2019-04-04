@@ -595,18 +595,6 @@ char *TDM_ScoreBoardString (edict_t *ent)
 		if (total[1] > 0)
 			averageping[1] = averageping[1] / (float)total[1];
 
-		// wision: set which team should be on the top
-		if (teaminfo[TEAM_A].score < teaminfo[TEAM_B].score)
-		{
-			firstteam = TEAM_B;
-			secondteam = TEAM_A;
-		}
-		else if (teaminfo[TEAM_A].score > teaminfo[TEAM_B].score)
-		{
-			firstteam = TEAM_A;
-			secondteam = TEAM_B;
-		}
-
 		maxplayers = total[firstteam-1];
 
 		for (i = 0; i < MAX_TEAMS - 1; i++)
@@ -785,14 +773,10 @@ char *TDM_ScoreBoardString (edict_t *ent)
 		// set TEAM_B as 1st team if TEAM_A is without players
 		if (total[0] < total[1])
 		{
-			firstteam = TEAM_B;
-			secondteam = TEAM_A;
 			maxplayers = total[1];
 		}
 		else
 		{
-			firstteam = TEAM_A;
-			secondteam = TEAM_B;
 			maxplayers = total[0];
 		}
 	
