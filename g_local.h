@@ -45,59 +45,59 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SVC_CONFIGSTRING   13
 
 // player_state->stats[] indexes
-#define STAT_HEALTH_ICON				0
-#define	STAT_HEALTH						1		// used by client, server
-#define	STAT_AMMO_ICON					2
-#define	STAT_AMMO						3		// used by client
-#define	STAT_ARMOR_ICON					4
-#define	STAT_ARMOR						5		// used by client
-#define	STAT_SELECTED_ICON				6
-#define	STAT_PICKUP_ICON				7
-#define	STAT_PICKUP_STRING				8
-#define	STAT_TIMER_ICON					9
-#define	STAT_TIMER						10
-#define	STAT_HELPICON					11
-#define	STAT_SELECTED_ITEM				12		// used by client
-#define	STAT_LAYOUTS					13		// used by client
-#define	STAT_FRAGS						14		// used by server
-#define	STAT_FLASHES					15		// used by client; cleared each frame, 1 = health, 2 = armor
-#define STAT_CHASE						16
-#define STAT_WEAPHUD_SHELLS				17
-#define STAT_WEAPHUD_BULLETS			18
-#define STAT_WEAPHUD_GRENADES			19
-#define STAT_WEAPHUD_CELLS				20
-#define STAT_WEAPHUD_ROCKETS			21
-#define STAT_WEAPHUD_SLUGS				22
-#define STAT_FIRST_TEAM_SCORE			23
-#define STAT_SECOND_TEAM_SCORE			24
-#define	STAT_TIMEOUT_STRING_INDEX		25
-#define	STAT_GAME_STATUS_STRING_INDEX	26
-#define	STAT_ID_VIEW_INDEX				27
-#define	STAT_VOTE_STRING_INDEX			28
-#define	STAT_TIMER_PENT					30
-#define STAT_TIME_REMAINING				31
+#define STAT_HEALTH_ICON                0
+#define STAT_HEALTH                     1		// used by client, server
+#define STAT_AMMO_ICON                  2
+#define STAT_AMMO                       3		// used by client
+#define STAT_ARMOR_ICON                 4
+#define STAT_ARMOR                      5		// used by client
+#define STAT_SELECTED_ICON              6
+#define STAT_PICKUP_ICON                7
+#define STAT_PICKUP_STRING              8
+#define STAT_TIMER_ICON                 9
+#define STAT_TIMER                      10
+#define STAT_HELPICON                   11
+#define STAT_SELECTED_ITEM              12		// used by client
+#define STAT_LAYOUTS                    13		// used by client
+#define STAT_FRAGS                      14		// used by server
+#define STAT_FLASHES                    15		// used by client; cleared each frame, 1 = health, 2 = armor
+#define STAT_CHASE                      16
+#define STAT_WEAPHUD_SHELLS             17
+#define STAT_WEAPHUD_BULLETS            18
+#define STAT_WEAPHUD_GRENADES           19
+#define STAT_WEAPHUD_CELLS              20
+#define STAT_WEAPHUD_ROCKETS            21
+#define STAT_WEAPHUD_SLUGS              22
+#define STAT_FIRST_TEAM_SCORE           23
+#define STAT_SECOND_TEAM_SCORE          24
+#define STAT_TIMEOUT_STRING_INDEX       25
+#define STAT_GAME_STATUS_STRING_INDEX   26
+#define STAT_ID_VIEW_INDEX              27
+#define STAT_VOTE_STRING_INDEX          28
+#define STAT_TIMER_PENT                 30
+#define STAT_TIME_REMAINING             31
 // maximum 31!
 
 // dmflags->value flags
-#define	DF_NO_HEALTH		0x00000001	// 1
-#define	DF_NO_ITEMS			0x00000002	// 2
-#define	DF_WEAPONS_STAY		0x00000004	// 4
-#define	DF_NO_FALLING		0x00000008	// 8
-#define	DF_INSTANT_ITEMS	0x00000010	// 16
-#define	DF_SAME_LEVEL		0x00000020	// 32
+#define	DF_NO_HEALTH        0x00000001	// 1
+#define	DF_NO_ITEMS         0x00000002	// 2
+#define	DF_WEAPONS_STAY     0x00000004	// 4
+#define	DF_NO_FALLING       0x00000008	// 8
+#define	DF_INSTANT_ITEMS    0x00000010	// 16
+#define	DF_SAME_LEVEL       0x00000020	// 32
 
 //teams handled specially in opentdm, don't need this
-//#define DF_SKINTEAMS		0x00000040	// 64
-//#define DF_MODELTEAMS		0x00000080	// 128
+//#define DF_SKINTEAMS      0x00000040	// 64
+//#define DF_MODELTEAMS     0x00000080	// 128
 
-#define DF_NO_FRIENDLY_FIRE	0x00000100	// 256
-#define	DF_SPAWN_FARTHEST	0x00000200	// 512
-#define DF_FORCE_RESPAWN	0x00000400	// 1024
-#define DF_NO_ARMOR			0x00000800	// 2048
-#define DF_ALLOW_EXIT		0x00001000	// 4096
-#define DF_INFINITE_AMMO	0x00002000	// 8192
-#define DF_QUAD_DROP		0x00004000	// 16384
-#define DF_FIXED_FOV		0x00008000	// 32768
+#define DF_NO_FRIENDLY_FIRE 0x00000100	// 256
+#define	DF_SPAWN_FARTHEST   0x00000200	// 512
+#define DF_FORCE_RESPAWN    0x00000400	// 1024
+#define DF_NO_ARMOR         0x00000800	// 2048
+#define DF_ALLOW_EXIT       0x00001000	// 4096
+#define DF_INFINITE_AMMO    0x00002000	// 8192
+#define DF_QUAD_DROP        0x00004000	// 16384
+#define DF_FIXED_FOV        0x00008000	// 32768
 
 #define DF(x)       (((int)dmflags->value & DF_##x) != 0)
 
@@ -110,54 +110,44 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define UF_MUTE_MISC        32		// unused
 #define UF_PLAYERFOV        64		// unused
 #define UF_EXTENDED_LAYOUT  128		// increase layout size (unused)
-#define UF_WEAPON_HUD		256		// show weapon/ammo totals in hud
+#define UF_WEAPON_HUD       256		// show weapon/ammo totals in hud
 
 #define UF(ent, x)       ((ent->client->pers.userflags & UF_##x) != 0)
 
-#define GAMEMODE_TDM	0
-#define GAMEMODE_ITDM	1
-#define GAMEMODE_1V1	2
+#define GAMEMODE_TDM   0
+#define GAMEMODE_ITDM  1
+#define GAMEMODE_1V1   2
 
-#define CS_TDM_SPECTATOR_STRINGS (CS_GENERAL + MAX_CLIENTS)
-
-#define CS_TDM_TEAM_A_NAME	(CS_GENERAL + 0)
-#define CS_TDM_TEAM_B_NAME	(CS_GENERAL + 1)
-
-#define CS_TDM_TEAM_A_STATUS	(CS_GENERAL + 2)
-#define CS_TDM_TEAM_B_STATUS	(CS_GENERAL + 3)
-
-#define	CS_TDM_TIMELIMIT_STRING	(CS_GENERAL + 4)
-
-#define CS_TDM_TIMEOUT_STRING	(CS_GENERAL + 5)
-
-#define CS_TDM_GAME_STATUS		(CS_GENERAL + 6)
-
-//per client!
-#define CS_TDM_ID_VIEW			(CS_GENERAL + 7)
-
-#define CS_TDM_VOTE_STRING		(CS_GENERAL + 8)
-
-#define CS_WEAPON_HUD			(CS_GENERAL + 9)
-
-//#define CS_TDM_TEAM_A_PIC		(CS_GENERAL + 5)
-//#define CS_TDM_TEAM_B_PIC		(CS_GENERAL + 6)
+#define CS_TDM_SPECTATOR_STRINGS    (CS_GENERAL + MAX_CLIENTS)
+#define CS_TDM_TEAM_A_NAME          (CS_GENERAL + 0)
+#define CS_TDM_TEAM_B_NAME          (CS_GENERAL + 1)
+#define CS_TDM_TEAM_A_STATUS        (CS_GENERAL + 2)
+#define CS_TDM_TEAM_B_STATUS        (CS_GENERAL + 3)
+#define CS_TDM_TIMELIMIT_STRING     (CS_GENERAL + 4)
+#define CS_TDM_TIMEOUT_STRING       (CS_GENERAL + 5)
+#define CS_TDM_GAME_STATUS          (CS_GENERAL + 6)
+#define CS_TDM_ID_VIEW              (CS_GENERAL + 7) //per client
+#define CS_TDM_VOTE_STRING          (CS_GENERAL + 8)
+#define CS_WEAPON_HUD               (CS_GENERAL + 9)
+//#define CS_TDM_TEAM_A_PIC         (CS_GENERAL + 5)
+//#define CS_TDM_TEAM_B_PIC         (CS_GENERAL + 6)
 
 
 // otdm flags
 //i don't like the way this is done, gametype should be global, not a flag
-//#define DF_MODE_TDM			0x00010000	// 65536
-//#define DF_MODE_ITDM		0x00020000	// 131072
-//#define DF_MODE_1V1			0x00040000	// 262144
+//#define DF_MODE_TDM       0x00010000	// 65536
+//#define DF_MODE_ITDM      0x00020000	// 131072
+//#define DF_MODE_1V1       0x00040000	// 262144
 
 // RAFAEL
 /*
 #define	DF_QUADFIRE_DROP	0x00010000	// 65536
 
 //ROGUE
-#define DF_NO_MINES			0x00020000
-#define DF_NO_STACK_DOUBLE	0x00040000
-#define DF_NO_NUKES			0x00080000
-#define DF_NO_SPHERES		0x00100000
+#define DF_NO_MINES         0x00020000
+#define DF_NO_STACK_DOUBLE  0x00040000
+#define DF_NO_NUKES         0x00080000
+#define DF_NO_SPHERES       0x00100000
 */
 //ROGUE
 
@@ -195,56 +185,55 @@ void PMenu_Select(edict_t *ent);
 //==================================================================
 
 // view pitching times
-#define	DAMAGE_FRAMES		SECS_TO_FRAMES(0.5f)
-#define	FALL_FRAMES			SECS_TO_FRAMES(0.3f)
+#define	DAMAGE_FRAMES    SECS_TO_FRAMES(0.5f)
+#define	FALL_FRAMES      SECS_TO_FRAMES(0.3f)
 
 // edict->spawnflags
 // these are set with checkboxes on each entity in the map editor
-#define	SPAWNFLAG_NOT_EASY			0x00000100
-#define	SPAWNFLAG_NOT_MEDIUM		0x00000200
-#define	SPAWNFLAG_NOT_HARD			0x00000400
-#define	SPAWNFLAG_NOT_DEATHMATCH	0x00000800
-#define	SPAWNFLAG_NOT_COOP			0x00001000
+#define	SPAWNFLAG_NOT_EASY          0x00000100
+#define	SPAWNFLAG_NOT_MEDIUM        0x00000200
+#define	SPAWNFLAG_NOT_HARD          0x00000400
+#define	SPAWNFLAG_NOT_DEATHMATCH    0x00000800
+#define	SPAWNFLAG_NOT_COOP          0x00001000
 
 // edict->flags
-#define	FL_FLY					0x00000001
-#define	FL_SWIM					0x00000002	// implied immunity to drowining
-#define FL_IMMUNE_LASER			0x00000004
-#define	FL_INWATER				0x00000008
-#define	FL_GODMODE				0x00000010
-#define	FL_NOTARGET				0x00000020
-#define FL_IMMUNE_SLIME			0x00000040
-#define FL_IMMUNE_LAVA			0x00000080
-#define	FL_PARTIALGROUND		0x00000100	// not all corners are valid
-#define	FL_WATERJUMP			0x00000200	// player jumping out of water
-#define	FL_TEAMSLAVE			0x00000400	// not the first on the team
-#define FL_NO_KNOCKBACK			0x00000800
-#define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
-#define	FL_NOCLIP_PROJECTILE	0x00002000	// projectile hack
-#define FL_RESPAWN				0x80000000	// used for item respawning
+#define FL_FLY                  0x00000001
+#define FL_SWIM                 0x00000002  // implied immunity to drowining
+#define FL_IMMUNE_LASER         0x00000004
+#define FL_INWATER              0x00000008
+#define FL_GODMODE              0x00000010
+#define FL_NOTARGET             0x00000020
+#define FL_IMMUNE_SLIME         0x00000040
+#define FL_IMMUNE_LAVA          0x00000080
+#define FL_PARTIALGROUND        0x00000100  // not all corners are valid
+#define FL_WATERJUMP            0x00000200  // player jumping out of water
+#define FL_TEAMSLAVE            0x00000400  // not the first on the team
+#define FL_NO_KNOCKBACK         0x00000800
+#define FL_POWER_ARMOR          0x00001000  // power armor (if any) is active
+#define FL_NOCLIP_PROJECTILE    0x00002000  // projectile hack
+#define FL_RESPAWN              0x80000000  // used for item respawning
 
 //#define	FRAMETIME		0.05f
-extern float	FRAMETIME;
-extern int		SERVER_FPS;
+extern float    FRAMETIME;
+extern int      SERVER_FPS;
 
 //define for variable frametime support
 #define SECS_TO_FRAMES(seconds)	(int)((seconds)* SERVER_FPS)
 #define FRAMES_TO_SECS(frames)	(int)((frames) * FRAMETIME)
 
 // memory tags to allow dynamic memory to be cleaned up
-#define	TAG_GAME	765		// clear when unloading the dll
-#define	TAG_LEVEL	766		// clear when loading a new level
+#define TAG_GAME            765  // clear when unloading the dll
+#define TAG_LEVEL           766  // clear when loading a new level
 
+#define MELEE_DISTANCE      80
 
-#define MELEE_DISTANCE	80
-
-#define BODY_QUEUE_SIZE		8
+#define BODY_QUEUE_SIZE     8
 
 typedef enum
 {
 	DAMAGE_NO,
-	DAMAGE_YES,			// will take damage if hit
-	DAMAGE_AIM			// auto targeting recognizes this
+	DAMAGE_YES,       // will take damage if hit
+	DAMAGE_AIM        // auto targeting recognizes this
 } damage_t;
 
 typedef enum 
@@ -266,12 +255,12 @@ typedef enum
 } ammo_t;*/
 
 //r1: this is kind of ugly.. but meh
-#define AMMO_SHELLS	(1<<11)
-#define	AMMO_BULLETS	(1<<12)
-#define AMMO_GRENADES			(1<<13)
-#define AMMO_ROCKETS			(1<<14)
-#define	AMMO_CELLS		(1<<15)
-#define	AMMO_SLUGS		(1<<16)
+#define AMMO_SHELLS    (1<<11)
+#define AMMO_BULLETS   (1<<12)
+#define AMMO_GRENADES  (1<<13)
+#define AMMO_ROCKETS   (1<<14)
+#define AMMO_CELLS     (1<<15)
+#define AMMO_SLUGS     (1<<16)
 
 typedef enum
 {
@@ -313,78 +302,78 @@ typedef enum
 #define GETITEM(x) (itemlist + (x))
 
 //deadflag
-#define DEAD_NO					0
-#define DEAD_DYING				1
-#define DEAD_DEAD				2
-#define DEAD_RESPAWNABLE		3
+#define DEAD_NO                 0
+#define DEAD_DYING              1
+#define DEAD_DEAD               2
+#define DEAD_RESPAWNABLE        3
 
 //range
-#define RANGE_MELEE				0
-#define RANGE_NEAR				1
-#define RANGE_MID				2
-#define RANGE_FAR				3
+#define RANGE_MELEE             0
+#define RANGE_NEAR              1
+#define RANGE_MID               2
+#define RANGE_FAR               3
 
 //gib types
-#define GIB_ORGANIC				0
-#define GIB_METALLIC			1
+#define GIB_ORGANIC             0
+#define GIB_METALLIC            1
 
 //monster ai flags
-#define AI_STAND_GROUND			0x00000001
-#define AI_TEMP_STAND_GROUND	0x00000002
-#define AI_SOUND_TARGET			0x00000004
-#define AI_LOST_SIGHT			0x00000008
-#define AI_PURSUIT_LAST_SEEN	0x00000010
-#define AI_PURSUE_NEXT			0x00000020
-#define AI_PURSUE_TEMP			0x00000040
-#define AI_HOLD_FRAME			0x00000080
-#define AI_GOOD_GUY				0x00000100
-#define AI_BRUTAL				0x00000200
-#define AI_NOSTEP				0x00000400
-#define AI_DUCKED				0x00000800
-#define AI_COMBAT_POINT			0x00001000
-#define AI_MEDIC				0x00002000
-#define AI_RESURRECTING			0x00004000
+#define AI_STAND_GROUND         0x00000001
+#define AI_TEMP_STAND_GROUND    0x00000002
+#define AI_SOUND_TARGET         0x00000004
+#define AI_LOST_SIGHT           0x00000008
+#define AI_PURSUIT_LAST_SEEN    0x00000010
+#define AI_PURSUE_NEXT          0x00000020
+#define AI_PURSUE_TEMP          0x00000040
+#define AI_HOLD_FRAME           0x00000080
+#define AI_GOOD_GUY             0x00000100
+#define AI_BRUTAL               0x00000200
+#define AI_NOSTEP               0x00000400
+#define AI_DUCKED               0x00000800
+#define AI_COMBAT_POINT         0x00001000
+#define AI_MEDIC                0x00002000
+#define AI_RESURRECTING         0x00004000
 
 //monster attack state
-#define AS_STRAIGHT				1
-#define AS_SLIDING				2
-#define	AS_MELEE				3
-#define	AS_MISSILE				4
+#define AS_STRAIGHT             1
+#define AS_SLIDING              2
+#define AS_MELEE                3
+#define AS_MISSILE              4
 
 // armor types
-#define ARMOR_NONE				0
-#define ARMOR_JACKET			1
-#define ARMOR_COMBAT			2
-#define ARMOR_BODY				3
-#define ARMOR_SHARD				4
+#define ARMOR_NONE              0
+#define ARMOR_JACKET            1
+#define ARMOR_COMBAT            2
+#define ARMOR_BODY              3
+#define ARMOR_SHARD             4
 
 // power armor types
-#define POWER_ARMOR_NONE		0
-#define POWER_ARMOR_SCREEN		1
-#define POWER_ARMOR_SHIELD		2
+#define POWER_ARMOR_NONE        0
+#define POWER_ARMOR_SCREEN      1
+#define POWER_ARMOR_SHIELD      2
 
 // handedness values
-#define RIGHT_HANDED			0
-#define LEFT_HANDED				1
-#define CENTER_HANDED			2
+#define RIGHT_HANDED            0
+#define LEFT_HANDED             1
+#define CENTER_HANDED           2
 
 
 // game.serverflags values
-#define SFL_CROSS_TRIGGER_1		0x00000001
-#define SFL_CROSS_TRIGGER_2		0x00000002
-#define SFL_CROSS_TRIGGER_3		0x00000004
-#define SFL_CROSS_TRIGGER_4		0x00000008
-#define SFL_CROSS_TRIGGER_5		0x00000010
-#define SFL_CROSS_TRIGGER_6		0x00000020
-#define SFL_CROSS_TRIGGER_7		0x00000040
-#define SFL_CROSS_TRIGGER_8		0x00000080
-#define SFL_CROSS_TRIGGER_MASK	0x000000ff
+#define SFL_CROSS_TRIGGER_1     0x00000001
+#define SFL_CROSS_TRIGGER_2     0x00000002
+#define SFL_CROSS_TRIGGER_3     0x00000004
+#define SFL_CROSS_TRIGGER_4     0x00000008
+#define SFL_CROSS_TRIGGER_5     0x00000010
+#define SFL_CROSS_TRIGGER_6     0x00000020
+#define SFL_CROSS_TRIGGER_7     0x00000040
+#define SFL_CROSS_TRIGGER_8     0x00000080
+#define SFL_CROSS_TRIGGER_MASK  0x000000ff
 
 
 // noise types for PlayerNoise
-#define PNOISE_SELF				0
-#define PNOISE_WEAPON			1
-#define PNOISE_IMPACT			2
+#define PNOISE_SELF             0
+#define PNOISE_WEAPON           1
+#define PNOISE_IMPACT           2
 
 
 // edict->movetype values
@@ -415,63 +404,63 @@ typedef struct
 } gitem_armor_t;
 
 // gitem_t->flags
-#define	IT_WEAPON		1		// use makes active weapon
-#define	IT_AMMO			2
-#define IT_ARMOR		4
-#define IT_STAY_COOP	8
-#define IT_KEY			16
-#define IT_POWERUP		32
+#define IT_WEAPON               1  // use makes active weapon
+#define IT_AMMO                 2
+#define IT_ARMOR                4
+#define IT_STAY_COOP            8
+#define IT_KEY                  16
+#define IT_POWERUP              32
 
-#define HEALTH_IGNORE_MAX	1
-#define HEALTH_TIMED		2
+#define HEALTH_IGNORE_MAX       1
+#define HEALTH_TIMED            2
 
 // gitem_t->weapmodel for weapons indicates model index
-#define WEAP_BLASTER			1 
-#define WEAP_SHOTGUN			2 
-#define WEAP_SUPERSHOTGUN		3 
-#define WEAP_MACHINEGUN			4 
-#define WEAP_CHAINGUN			5 
-#define WEAP_GRENADES			6 
-#define WEAP_GRENADELAUNCHER	7 
-#define WEAP_ROCKETLAUNCHER		8 
-#define WEAP_HYPERBLASTER		9 
-#define WEAP_RAILGUN			10
-#define WEAP_BFG				11
+#define WEAP_BLASTER            1
+#define WEAP_SHOTGUN            2
+#define WEAP_SUPERSHOTGUN       3
+#define WEAP_MACHINEGUN         4
+#define WEAP_CHAINGUN           5
+#define WEAP_GRENADES           6
+#define WEAP_GRENADELAUNCHER    7
+#define WEAP_ROCKETLAUNCHER     8
+#define WEAP_HYPERBLASTER       9
+#define WEAP_RAILGUN            10
+#define WEAP_BFG                11
 
-#define	TDM_MAX_MAP_SPAWNPOINTS	64
+#define TDM_MAX_MAP_SPAWNPOINTS 64
 
 typedef struct matchinfo_s matchinfo_t;
 typedef struct teamplayer_s teamplayer_t;
 
 typedef struct gitem_s
 {
-	const char	*classname;	// spawning name
-	qboolean	(*pickup)(struct edict_s *ent, struct edict_s *other);
-	void		(*use)(struct edict_s *ent, const struct gitem_s *item);
-	void		(*drop)(struct edict_s *ent, const struct gitem_s *item);
-	void		(*weaponthink)(struct edict_s *ent);
-	const char	*pickup_sound;
-	const char	*world_model;
-	int			world_model_flags;
-	const char	*view_model;
+	const char  *classname;	// spawning name
+	qboolean    (*pickup)(struct edict_s *ent, struct edict_s *other);
+	void        (*use)(struct edict_s *ent, const struct gitem_s *item);
+	void        (*drop)(struct edict_s *ent, const struct gitem_s *item);
+	void        (*weaponthink)(struct edict_s *ent);
+	const char  *pickup_sound;
+	const char  *world_model;
+	int         world_model_flags;
+	const char  *view_model;
 
 	// client side info
-	const char	*icon;
-	const char	*pickup_name;	// for printing on pickup
-	int			count_width;		// number of digits to display by icon
+	const char  *icon;
+	const char  *pickup_name;	// for printing on pickup
+	int         count_width;		// number of digits to display by icon
 
-	int			quantity;		// for ammo how much, for weapons how much is used per shot
+	int         quantity;		// for ammo how much, for weapons how much is used per shot
 	//const char	*ammo;			// for weapons
-	int			ammoindex;
-	int			flags;			// IT_* flags
+	int         ammoindex;
+	int         flags;			// IT_* flags
 
-	int			weapmodel;		// weapon model index (for weapons)
+	int         weapmodel;		// weapon model index (for weapons)
 
-	void		*info;
-	int			tag;
+	void        *info;
+	int         tag;
 
-	const char	*precaches;		// string of all models, sounds, and images this item will use
-	const char	*shortname;
+	const char  *precaches;		// string of all models, sounds, and images this item will use
+	const char  *shortname;
 } gitem_t;
 
 /**
@@ -481,12 +470,13 @@ typedef struct gitem_s
  */
 typedef struct
 {
-	qboolean 	recording;					// are we currently recording?
-	int			matches;					// how many have we already recorded?
-	char 		filename[MAX_STRING_CHARS];	// demo name
+	qboolean    recording;                  // are we currently recording?
+	int         matches;                    // how many have we already recorded?
+	char        filename[MAX_STRING_CHARS]; // demo name
 } server_demo_t;
 
 #define MVD_CAPABLE (game.server_features && sv_mvd_enable->value)
+
 //
 // this structure is left intact through an entire game
 // it should be initialized at dll load time, and read/written to
@@ -494,28 +484,28 @@ typedef struct
 //
 typedef struct
 {
-	gclient_t	*clients;		// [maxclients]
+	gclient_t     *clients;  // [maxclients]
 
 	// store latched cvars here that we want to get at often
-	int			maxclients;
-	int			maxentities;
+	int           maxclients;
+	int           maxentities;
 
 	// cross level triggers
-	int			serverflags;
+	int           serverflags;
 
 	// items
-	int			num_items;
+	int           num_items;
 
-	char		gamedir[MAX_QPATH];
+	char          gamedir[MAX_QPATH];
 
 	// greater than zero indicates we're running q2pro
-	int			server_features;
+	int           server_features;
 
 	// the number of matches played since mod was loaded
-	int			match_count;
+	int           match_count;
 
 	// auto server demo stuff
-	server_demo_t	mvd;
+	server_demo_t mvd;
 
 } game_locals_t;
 
@@ -526,42 +516,41 @@ typedef struct
 //
 typedef struct
 {
-	int			framenum;
+	int           framenum;
 
-	char		level_name[MAX_QPATH];	// the descriptive name (Outer Base, etc)
-	char		mapname[MAX_QPATH];		// the server name (base1, etc)
-	char		nextmap[MAX_QPATH];		// go here when fraglimit is hit
+	char          level_name[MAX_QPATH];	// the descriptive name (Outer Base, etc)
+	char          mapname[MAX_QPATH];		// the server name (base1, etc)
+	char          nextmap[MAX_QPATH];		// go here when fraglimit is hit
 
 	// intermission state
-	int			intermissionframe;		// time the intermission was started
-	char		*changemap;
-	int			exitintermission;
-	vec3_t		intermission_origin;
-	vec3_t		intermission_angle;
+	int           intermissionframe;		// time the intermission was started
+	char          *changemap;
+	int           exitintermission;
+	vec3_t        intermission_origin;
+	vec3_t        intermission_angle;
 
-	int			pic_health;
+	int           pic_health;
 
-	edict_t		*current_entity;	// entity running from G_RunFrame
-	int			body_que;			// dead bodies
+	edict_t       *current_entity;	// entity running from G_RunFrame
+	int           body_que;			// dead bodies
 
 	//tdm stuff
-	int				match_start_framenum;
-	int				match_end_framenum;
-	int				match_score_end_framenum;
-	int				next_ready_nag_framenum;
-	int				match_resume_framenum;
-	const char		*entity_string;
-	teamplayer_t	*tdm_timeout_caller;
-	int				realframenum;
-	int				last_tdm_match_status;
-	qboolean		tdm_pseudo_1v1mode;
-	int				timeout_end_framenum;
-	int				warmup_start_framenum;
+	int           match_start_framenum;
+	int           match_end_framenum;
+	int           match_score_end_framenum;
+	int           next_ready_nag_framenum;
+	int           match_resume_framenum;
+	const char    *entity_string;
+	teamplayer_t  *tdm_timeout_caller;
+	int           realframenum;
+	int           last_tdm_match_status;
+	qboolean      tdm_pseudo_1v1mode;
+	int           timeout_end_framenum;
+	int           warmup_start_framenum;
 
-	int				numspawns;
-	edict_t			*spawns[TDM_MAX_MAP_SPAWNPOINTS];
-
-	time_t			spawntime;
+	int           numspawns;
+	edict_t       *spawns[TDM_MAX_MAP_SPAWNPOINTS];
+	time_t        spawntime;
 } level_locals_t;
 
 
@@ -571,54 +560,54 @@ typedef struct
 typedef struct
 {
 	// world vars
-	char		*sky;
-	float		skyrotate;
-	vec3_t		skyaxis;
-	char		*nextmap;
+	char        *sky;
+	float       skyrotate;
+	vec3_t      skyaxis;
+	char        *nextmap;
 
-	int			lip;
-	int			distance;
-	int			height;
-	char		*noise;
-	float		pausetime;
-	char		*item;
-	char		*gravity;
+	int         lip;
+	int         distance;
+	int         height;
+	char        *noise;
+	float       pausetime;
+	char        *item;
+	char        *gravity;
 
-	float		minyaw;
-	float		maxyaw;
-	float		minpitch;
-	float		maxpitch;
+	float       minyaw;
+	float       maxyaw;
+	float       minpitch;
+	float       maxpitch;
 } spawn_temp_t;
 
 
 typedef struct
 {
 	// fixed data
-	vec3_t		start_origin;
-	vec3_t		start_angles;
-	vec3_t		end_origin;
-	vec3_t		end_angles;
+	vec3_t      start_origin;
+	vec3_t      start_angles;
+	vec3_t      end_origin;
+	vec3_t      end_angles;
 
-	int			sound_start;
-	int			sound_middle;
-	int			sound_end;
+	int         sound_start;
+	int         sound_middle;
+	int         sound_end;
 
-	float		accel;
-	float		speed;
-	float		decel;
-	float		distance;
+	float       accel;
+	float       speed;
+	float       decel;
+	float       distance;
 
-	float		wait;
+	float       wait;
 
 	// state data
-	int			state;
-	vec3_t		dir;
-	float		current_speed;
-	float		move_speed;
-	float		next_speed;
-	float		remaining_distance;
-	float		decel_distance;
-	void		(*endfunc)(edict_t *);
+	int         state;
+	vec3_t      dir;
+	float       current_speed;
+	float       move_speed;
+	float       next_speed;
+	float       remaining_distance;
+	float       decel_distance;
+	void        (*endfunc)(edict_t *);
 } moveinfo_t;
 
 
@@ -631,10 +620,10 @@ typedef struct
 
 typedef struct
 {
-	int			firstframe;
-	int			lastframe;
-	mframe_t	*frame;
-	void		(*endfunc)(edict_t *self);
+	int         firstframe;
+	int         lastframe;
+	mframe_t    *frame;
+	void        (*endfunc)(edict_t *self);
 } mmove_t;
 
 typedef struct
@@ -688,41 +677,41 @@ extern	int	body_armor_index;*/
 
 
 // means of death
-#define MOD_UNKNOWN			0
-#define MOD_BLASTER			1
-#define MOD_SHOTGUN			2
-#define MOD_SSHOTGUN		3
-#define MOD_MACHINEGUN		4
-#define MOD_CHAINGUN		5
-#define MOD_GRENADE			6
-#define MOD_G_SPLASH		7
-#define MOD_ROCKET			8
-#define MOD_R_SPLASH		9
-#define MOD_HYPERBLASTER	10
-#define MOD_RAILGUN			11
-#define MOD_BFG_LASER		12
-#define MOD_BFG_BLAST		13
-#define MOD_BFG_EFFECT		14
-#define MOD_HANDGRENADE		15
-#define MOD_HG_SPLASH		16
-#define MOD_WATER			17
-#define MOD_SLIME			18
-#define MOD_LAVA			19
-#define MOD_CRUSH			20
-#define MOD_TELEFRAG		21
-#define MOD_FALLING			22
-#define MOD_SUICIDE			23
-#define MOD_HELD_GRENADE	24
-#define MOD_EXPLOSIVE		25
-#define MOD_BARREL			26
-#define MOD_BOMB			27
-#define MOD_EXIT			28
-#define MOD_SPLASH			29
-#define MOD_TARGET_LASER	30
-#define MOD_TRIGGER_HURT	31
-#define MOD_HIT				32
-#define MOD_TARGET_BLASTER	33
-#define MOD_FRIENDLY_FIRE	0x8000000
+#define MOD_UNKNOWN         0
+#define MOD_BLASTER         1
+#define MOD_SHOTGUN         2
+#define MOD_SSHOTGUN        3
+#define MOD_MACHINEGUN      4
+#define MOD_CHAINGUN        5
+#define MOD_GRENADE         6
+#define MOD_G_SPLASH        7
+#define MOD_ROCKET          8
+#define MOD_R_SPLASH        9
+#define MOD_HYPERBLASTER    10
+#define MOD_RAILGUN         11
+#define MOD_BFG_LASER       12
+#define MOD_BFG_BLAST       13
+#define MOD_BFG_EFFECT      14
+#define MOD_HANDGRENADE     15
+#define MOD_HG_SPLASH       16
+#define MOD_WATER           17
+#define MOD_SLIME           18
+#define MOD_LAVA            19
+#define MOD_CRUSH           20
+#define MOD_TELEFRAG        21
+#define MOD_FALLING         22
+#define MOD_SUICIDE         23
+#define MOD_HELD_GRENADE    24
+#define MOD_EXPLOSIVE       25
+#define MOD_BARREL          26
+#define MOD_BOMB            27
+#define MOD_EXIT            28
+#define MOD_SPLASH          29
+#define MOD_TARGET_LASER    30
+#define MOD_TRIGGER_HURT    31
+#define MOD_HIT             32
+#define MOD_TARGET_BLASTER  33
+#define MOD_FRIENDLY_FIRE   0x8000000
 //if altering any of these, be sure to update the weaponToTDMG lookup table!!
 
 extern	int	meansOfDeath;
@@ -730,7 +719,7 @@ extern	int	meansOfDeath;
 
 extern	edict_t			*g_edicts;
 
-#define	FOFS(x) (size_t)&(((edict_t *)0)->x)
+#define	FOFS(x)  (size_t)&(((edict_t *)0)->x)
 #define	STOFS(x) (size_t)&(((spawn_temp_t *)0)->x)
 #define	LLOFS(x) (size_t)&(((level_locals_t *)0)->x)
 #define	CLOFS(x) (size_t)&(((gclient_t *)0)->x)
