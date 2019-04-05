@@ -1570,6 +1570,26 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	if (s[0])
 		ent->client->pers.userflags = atoi(s);
 
+	// left/right offset for weapon hud (negative is left)
+	s = Info_ValueForKey(userinfo, "wh.x");
+	if (s[0]) {
+		if (s[0] == '-') {
+			ent->client->pers.weaponhud_offset_x = atoi(s) | 1<<31;
+		} else {
+			ent->client->pers.weaponhud_offset_x = atoi(s);
+		}
+	}
+
+	// up/down offset for weapon hud (negative is up)
+	s = Info_ValueForKey(userinfo, "wh.y");
+	if (s[0]) {
+		if (s[0] == '-') {
+			ent->client->pers.weaponhud_offset_y = atoi(s) | 1<<31;
+		} else {
+			ent->client->pers.weaponhud_offset_y = atoi(s);
+		}
+	}
+
 	// save off the userinfo in case we want to check something later
 	strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
 

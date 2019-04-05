@@ -1486,6 +1486,8 @@ typedef struct
 	playerconfig_t	config;
 	unsigned		uniqueid;
 	int				userflags;
+	int				weaponhud_offset_x;
+	int				weaponhud_offset_y;
 } client_persistent_t;
 
 typedef struct

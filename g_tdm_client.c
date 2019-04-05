@@ -742,15 +742,19 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	static char weaponhud[175];		// the weapon icons
 	static char ammohud[135];		// the ammo counts
 	int			id_x, id_y;
-	int			hud_y;
+	int			hud_x, hud_y;
 
 	// opentdm default
 	id_x = -100;
 	id_y = -80;
 	hud_y = 0;
+	hud_x = -25;
 
 	id_x += player->client->pers.config.id_x;
 	id_y += player->client->pers.config.id_y;
+
+	hud_x += player->client->pers.weaponhud_offset_x;
+	hud_y += player->client->pers.weaponhud_offset_y;
 
 	weaponhud[0] = 0;
 	ammohud[0] = 0;
@@ -758,10 +762,10 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	if (UF(player, WEAPON_HUD)) {
 
 		// set x position at first for all weapon icons, to save the chars since CS max is 1000
-		strcpy(weaponhud, "xr -25 ");
+		strcpy(weaponhud, va("xr %d ", hud_x));
 
 		// set x position for ammo quantities ^
-		strcpy(ammohud, "xr -75 ");
+		strcpy(ammohud, va("xr %d ", hud_x - 50));
 
 		// super/shotgun
 		if (player->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
