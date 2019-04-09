@@ -759,7 +759,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	weaponhud[0] = 0;
 	ammohud[0] = 0;
 
-	if (UF(player, WEAPON_HUD)) {
+	if (UF(player, WEAPON_HUD) && g_weapon_hud->value > 0) {
 
 		// set x position at first for all weapon icons, to save the chars since CS max is 1000
 		strcpy(weaponhud, va("xr %d ", hud_x));
@@ -1506,6 +1506,10 @@ void TDM_UpdateHud(edict_t *ent, qboolean force) {
 		return;
 
 	if (!force) {
+		if (g_weapon_hud->value == 0) {
+			return;
+		}
+
 		if (!ent->client->next_hud_update) {
 			return;
 		}

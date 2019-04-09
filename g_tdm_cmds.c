@@ -69,6 +69,11 @@ static void TDM_ForceReady_f (qboolean status)
  *
  */
 static void TDM_WeaponHud_f(edict_t *ent) {
+	if (g_weapon_hud->value == 0) {
+		gi.cprintf(ent, PRINT_HIGH, "Weapon hud is disabled for this server\n");
+		return;
+	}
+
 	if (!UF(ent, WEAPON_HUD)) {
 		ent->client->pers.userflags |= UF_WEAPON_HUD;
 		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_WEAPON_HUD));

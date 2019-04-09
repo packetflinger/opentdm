@@ -97,6 +97,7 @@ cvar_t	*g_intermission_time;
 cvar_t	*g_force_screenshot;
 cvar_t	*g_force_record;
 cvar_t	*g_record_mvd;
+cvar_t	*g_weapon_hud;
 
 cvar_t	*g_tdmflags;
 cvar_t	*g_itdmflags;

@@ -519,7 +519,7 @@ void G_SetStats (edict_t *ent)
 	}
 
 	// update ammo counts if HUD is enabled
-	if (UF(ent, WEAPON_HUD)) {
+	if (UF(ent, WEAPON_HUD) && g_weapon_hud->value > 0) {
 		ent->client->ps.stats[STAT_WEAPHUD_BULLETS] = ent->client->inventory[ITEM_AMMO_BULLETS];
 		ent->client->ps.stats[STAT_WEAPHUD_SHELLS] = ent->client->inventory[ITEM_AMMO_SHELLS];
 		ent->client->ps.stats[STAT_WEAPHUD_GRENADES] = ent->client->inventory[ITEM_AMMO_GRENADES];
