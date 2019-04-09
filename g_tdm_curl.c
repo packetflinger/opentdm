@@ -205,6 +205,7 @@ void HTTP_ResolveOTDMServer (void)
 	//re-resolve if its been more than one day since we last did it
 	if (time(NULL) - last_dns_lookup > 86400)
 	{
+		gi.cprintf(NULL, PRINT_HIGH, "Resolving API server %s -> ", g_http_domain->string);
 		struct hostent	*h;
 		h = gethostbyname (g_http_domain->string);
 
@@ -218,6 +219,7 @@ void HTTP_ResolveOTDMServer (void)
 		time (&last_dns_lookup);
 
 		Q_strncpy (otdm_api_ip, inet_ntoa (*(struct in_addr *)h->h_addr_list[0]), sizeof(otdm_api_ip)-1);
+		gi.cprintf(NULL, PRINT_HIGH, "%s\n", otdm_api_ip);
 	}
 }
 
