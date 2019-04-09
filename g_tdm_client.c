@@ -597,7 +597,6 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 		"num 4 23 "
 
 		// Second team score / status
-//		"xr -66 "
 		"yb -72 "
 		"num 4 24 "
 
@@ -624,7 +623,7 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 		"endif "
 
 		// spectator
-		"xv 98 "
+		"xv 0 "
 		"yb -58 "
 		"string2 \"SPECTATOR MODE\" "
 
