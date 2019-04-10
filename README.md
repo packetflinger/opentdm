@@ -381,9 +381,9 @@ Value | Description
 
 ## Client CVARs
 
-`stats_id <string>` Userinfo variable. Obtain from https://opentdm.org for playerconfigs and stats. Example: `set stats_id "abczxy12345" u` (note the `u` at the end, this appends the value to your userinfo string sent to the server)
+`stats_id <string> u` Userinfo variable. Obtain your ID from https://opentdm.org for playerconfigs and stats. Note the `u` at the end
 
-`uf <integer>` Userflags - Userinfo variable, add them up. Example `set uf "256" u` (note the `u` again)
+`uf <integer> u` Userflags, add them up (note the `u` again)
 
 Value | Description
 ------ | ------
