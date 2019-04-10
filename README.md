@@ -316,7 +316,9 @@ Value | Description
 
 `g_http_proxy <string>` IP:port or hostname:port for proxying HTTP requests, *default: blank*
 
-`g_http_baseurl <string>` Url for api calls, *default: http://www.opentdm.net/api*
+`g_http_domain <string>` Domain for webconfig/playerconfig downloads, *default: opentdm.org*
+
+`g_http_path <string>` URL path for websconfig/playerconfig downloads, *default: /*
 
 `g_1v1_spawn_mode <0/1/2>` How spawns are picked in duel mode
 
@@ -374,4 +376,21 @@ Value | Description
 `g_vote_attention_sound <string>` The sound file played when vote is called and `g_vote_attention` value is greater or equal to 1, *default: misc/pc_up.wav*
 
 `g_record_mvd <integer>` Will record a multi-view server demo of &lt;integer&gt; matches. Only works with Q2Pro server, *default: 0*
+
+`g_weapon_hud <0/1>` Allow the weapon hud, *default: 1 (allowed)* Players still need to enable the hud using the `hud` command or setting the proper userflag: `set uf "256" u` 
+
+## Client CVARs
+
+`stats_id <string>` Userinfo variable. Obtain from https://opentdm.org for playerconfigs and stats. Example: `set stats_id "abczxy12345" u` (note the `u` at the end, this appends the value to your userinfo string sent to the server)
+
+`uf <integer>` Userflags - Userinfo variable, add them up. Example `set uf "256" u` (note the `u` again)
+
+Value | Description
+------ | ------
+1 | `Auto Screenshot` Force screenshot of intermission screen
+2 | `Auto Record` Force demo recording of every match
+4 | `Local FOV` Keep your FOV when chasing 
+8 | `Mute Players` Ignore all player chat
+16 | `Mute Observers` Ignore all Spec chat
+256 | `Weapon Hud` Enable the weapon hud 
 
