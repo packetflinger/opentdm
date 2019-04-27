@@ -752,8 +752,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	id_x += player->client->pers.config.id_x;
 	id_y += player->client->pers.config.id_y;
 
-	hud_x += player->client->pers.weaponhud_offset_x;
-	hud_y += player->client->pers.weaponhud_offset_y;
+	hud_x += player->client->pers.config.weapon_hud_x;
+	hud_y += player->client->pers.config.weapon_hud_y;
 
 	weaponhud[0] = 0;
 	ammohud[0] = 0;
@@ -1013,6 +1013,18 @@ qboolean TDM_ParsePlayerConfigLine (char *line, int line_number, void *param)
 		c->id_x = atoi (p);
 	else if (!strcmp (variable, "id_y"))
 		c->id_y = atoi (p);
+	else if (!strcmp(variable, "weapon_hud"))
+		c->weapon_hud = atoi(p);
+	else if (!strcmp(variable, "weapon_hud_x"))
+		c->weapon_hud_x = atoi(p);
+	else if (!strcmp(variable, "weapon_hud_y"))
+		c->weapon_hud_y = atoi(p);
+	else if (!strcmp(variable, "armor_timer"))
+		c->armor_timer = atoi(p);
+	else if (!strcmp(variable, "armor_timer_x"))
+		c->armor_timer_x = atoi(p);
+	else if (!strcmp(variable, "armor_timer_y"))
+		c->armor_timer_y = atoi(p);
 	else
 		gi.dprintf ("Unknown player config variable '%s'. Check you are using the latest version of OpenTDM.\n", variable);
 

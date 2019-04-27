@@ -2520,6 +2520,52 @@ void TDM_Shuffle_f(edict_t *ent)
 	gi.bprintf(PRINT_HIGH, "Teams randomized...\n");
 }
 
+/**
+ * Show client the details of their playerconfig
+ */
+void TDM_PlayerConfigDisplay_f(edict_t *ent)
+{
+	char *url;
+	playerconfig_t *cfg;
+
+	if (!ent->client->pers.config.loaded) {
+		gi.cprintf(ent, PRINT_HIGH, "No specific playerconfig is loaded for you, using defaults.\n");
+		return;
+	}
+
+	url = va("http://%s%splayerconfigs/%s",
+			g_http_domain->string,
+			g_http_path->string,
+			Info_ValueForKey (ent->client->pers.userinfo, "stats_id")
+	);
+
+	cfg = &ent->client->pers.config;
+
+	gi.cprintf(ent, PRINT_HIGH, "\nRemote playerconfig loaded from %s\n", url);
+	gi.cprintf(ent, PRINT_HIGH, va("  auto record:             %s\n", cfg->auto_record ? "yes" : "no"));
+	gi.cprintf(ent, PRINT_HIGH, va("  auto screenshot:         %s\n", cfg->auto_screenshot ? "yes" : "no"));
+	gi.cprintf(ent, PRINT_HIGH, va("  show weapon hud:         %s\n", cfg->weapon_hud ? "yes" : "no"));
+
+	if (cfg->weapon_hud) {
+		gi.cprintf(ent, PRINT_HIGH, "    X offset:              %d\n", cfg->weapon_hud_x);
+		gi.cprintf(ent, PRINT_HIGH, "    Y offset:              %d\n", cfg->weapon_hud_y);
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, va("  show armor timer:        %s\n", cfg->armor_timer ? "yes" : "no"));
+
+	if (cfg->armor_timer) {
+		gi.cprintf(ent, PRINT_HIGH, "    X offset:              %d\n", cfg->armor_timer_x);
+		gi.cprintf(ent, PRINT_HIGH, "    Y offset:              %d\n", cfg->armor_timer_y);
+	}
+
+	if (cfg->teamskin[0] != 0) {
+		gi.cprintf(ent, PRINT_HIGH, "  team skin:               %s\n", cfg->teamskin);
+	}
+	if (cfg->enemyskin[0] != 0) {
+		gi.cprintf(ent, PRINT_HIGH, "  enemy skin:              %s\n", cfg->enemyskin);
+	}
+}
+
 /*
 ==============
 TDM_Command
@@ -2764,6 +2810,8 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_AutoScreenshot_f(ent);
 		else if (!Q_stricmp(cmd, "autorecord"))
 			TDM_AutoRecord_f(ent);
+		else if (!Q_stricmp(cmd, "playerconfig"))
+			TDM_PlayerConfigDisplay_f(ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else

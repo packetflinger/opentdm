@@ -1398,6 +1398,12 @@ typedef struct
 	int         id_highlight;
 	int         id_x;
 	int         id_y;
+	int         weapon_hud;
+	int         weapon_hud_x;
+	int         weapon_hud_y;
+	int         armor_timer;
+	int         armor_timer_x;
+	int         armor_timer_y;
 	qboolean    loaded;
 } playerconfig_t;
 
