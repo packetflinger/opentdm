@@ -1376,7 +1376,6 @@ void ClientBeginDeathmatch (edict_t *ent)
 
 		strcpy (ent->client->pers.ip, saved_ip);
 		ent->client->pers.mvdclient = saved_mvdclient;
-		ClientUserinfoChanged (ent, userinfo);
 
 		client->resp.enterframe = level.framenum;
 		client->pers.connected = true;
@@ -1384,6 +1383,8 @@ void ClientBeginDeathmatch (edict_t *ent)
 
 		//unqiue id for tracking other clients taking this slot
 		client->pers.uniqueid = genrand_int32() & 0xffff;
+
+		ClientUserinfoChanged (ent, userinfo);
 
 		if (!ent->client->pers.mvdclient)
 			gi.bprintf (PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
