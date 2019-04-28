@@ -2566,6 +2566,13 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
 	}
 }
 
+/**
+ * Just for testing stuff
+ */
+void TDM_Test_f(edict_t *ent) {
+	gi.cprintf(ent, PRINT_HIGH, "Unique ID: %d\n", ent->client->pers.uniqueid);
+}
+
 /*
 ==============
 TDM_Command
@@ -2812,6 +2819,8 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_AutoRecord_f(ent);
 		else if (!Q_stricmp(cmd, "playerconfig"))
 			TDM_PlayerConfigDisplay_f(ent);
+		else if (!Q_stricmp(cmd, "test"))
+			TDM_Test_f(ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else
