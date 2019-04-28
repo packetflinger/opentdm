@@ -3198,27 +3198,11 @@ void TDM_HandleDownload (tdm_download_t *download, char *buff, int len, int code
 	//note on an extremely poor connection it's possible another player since occupied their slot, but
 	//for that to happen, the download must take 3+ seconds which should be unrealistic, so i don't
 	//deal with it.
-	if (!download->initiator->inuse || download->initiator->client->pers.uniqueid != download->unique_id)
+	if (!download->initiator->inuse || download->initiator->client->pers.uniqueid != download->unique_id) {
 		download->initiator = NULL;
+	}
 
 	download->onFinish (download, code, (byte *)buff, len);
-
-	/*switch (download->type)
-	{
-		case DL_CONFIG:
-			TDM_ConfigDownloaded (buff, len, code);
-			break;
-
-		case DL_PLAYER_CONFIG:
-			TDM_
-
-		case DL_POST_STATS:
-			break;
-		
-		default:
-			TDM_Error ("TDM_HandleDownload: Unrequested/unknown type");
-			break;
-	}*/
 }
 
 /*

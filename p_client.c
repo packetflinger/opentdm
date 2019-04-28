@@ -1368,8 +1368,6 @@ void ClientBeginDeathmatch (edict_t *ent)
 	//even across map changes
 	if (ent->client->pers.joinstate != JS_JOINED)
 	{
-		static unsigned client_counter = 0;
-
 		strcpy (userinfo, ent->client->pers.userinfo);
 		strcpy (saved_ip, ent->client->pers.ip);
 		saved_mvdclient = ent->client->pers.mvdclient;
@@ -1385,7 +1383,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 		client->pers.joinstate = JS_FIRST_JOIN;
 
 		//unqiue id for tracking other clients taking this slot
-		client->pers.uniqueid = client_counter++;
+		client->pers.uniqueid = genrand_int32() & 0xffff;
 
 		if (!ent->client->pers.mvdclient)
 			gi.bprintf (PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
