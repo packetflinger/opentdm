@@ -1051,7 +1051,7 @@ void TDM_PlayerConfigDownloaded (tdm_download_t *download, int code, byte *buff,
 		{
 			config.loaded = true;
 			download->initiator->client->pers.config = config;
-			gi.cprintf (download->initiator, PRINT_HIGH, "Your opentdm.net player config was loaded successfully.\n");
+			gi.cprintf (download->initiator, PRINT_HIGH, "Your opentdm.org player config was loaded successfully.\n");
 			TDM_SetTeamSkins (download->initiator, NULL);
 		}
 	}
