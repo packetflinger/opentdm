@@ -127,6 +127,8 @@ cvar_t	*g_http_debug;
 cvar_t	*g_http_path;
 cvar_t	*g_http_domain;
 
+cvar_t	*g_playerconfig_enabled;
+
 cvar_t	*g_debug_spawns;
 
 cvar_t	*g_max_players_per_team;

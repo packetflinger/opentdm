@@ -285,6 +285,8 @@ void InitGame (void)
 	g_http_path = gi.cvar ("g_http_path", "/", CVAR_LATCH);
 	g_http_domain = gi.cvar ("g_http_domain", "opentdm.org", CVAR_LATCH);
 
+	g_playerconfig_enabled = gi.cvar("g_playerconfig_enabled", "1", CVAR_LATCH);
+
 	sv_mvd_enable = gi.cvar("sv_mvd_enable", "", CVAR_LATCH);
 
 	// items

@@ -1081,6 +1081,9 @@ void TDM_DownloadPlayerConfig (edict_t *ent)
 {
 	const char	*stats_id;
 
+	if ((int) g_playerconfig_enabled->value == 0)
+		return;
+
 	if (ent->client->pers.config.loaded)
 		return;
 
