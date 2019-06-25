@@ -326,6 +326,145 @@ static void G_SetTeamScoreStats (edict_t *ent)
 	}
 }
 
+static item_timer_t get_next_timer(gclient_t *cl, item_timer_t *timer) {
+	// what's the current timer?
+	// is it still active?
+	// is it time to switch
+
+	/*
+	switch (*timer) {
+	case TIMER_QUAD:
+		if (cl->quad_framenum) {
+			if (level.framenum >= cl->timer1_switch_frame) {
+
+			} else {
+				return TIMER_QUAD;
+			}
+		}
+		break;
+
+	default:
+		return TIMER_NONE;
+	}
+	*/
+	return TIMER_ARMOR;
+}
+
+static void update_timers(gclient_t *cl) {
+	timer_state_t oldtimer1, oldtimer2;
+
+	oldtimer1 = cl->timer1;
+	oldtimer2 = cl->timer2;
+}
+
+static void G_SetTimerStats(gclient_t *cl)
+{
+	switch(get_next_timer(cl, &cl->timer1)) {
+	case TIMER_ARMOR:
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->item_timer[TIMER_ARMOR] - level.framenum);
+		cl->ps.stats[STAT_TIMER_ICON] = cl->item_timer_icon[TIMER_ARMOR];
+		break;
+	case TIMER_WEAPON:
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->item_timer[TIMER_WEAPON] - level.framenum);
+		cl->ps.stats[STAT_TIMER_ICON] = cl->item_timer_icon[TIMER_WEAPON];
+		break;
+	case TIMER_QUAD:
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->quad_framenum - level.framenum);
+		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
+		break;
+	case TIMER_INVULN:
+		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->invincible_framenum - level.framenum);
+		break;
+	case TIMER_ENVIROSUIT:
+		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->enviro_framenum - level.framenum);
+		break;
+	case TIMER_REBREATHER:
+		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->breather_framenum - level.framenum);
+		break;
+	case TIMER_NONE:
+	default:
+		cl->ps.stats[STAT_TIMER_ICON] = 0;
+		cl->ps.stats[STAT_TIMER] = 0;
+	}
+
+	switch(get_next_timer(cl, &cl->timer2)) {
+		case TIMER_ARMOR:
+			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->item_timer[TIMER_ARMOR] - level.framenum);
+			cl->ps.stats[STAT_TIMER2_ICON] = cl->item_timer_icon[TIMER_ARMOR];
+			break;
+		case TIMER_WEAPON:
+			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->item_timer[TIMER_WEAPON] - level.framenum);
+			cl->ps.stats[STAT_TIMER2_ICON] = cl->item_timer_icon[TIMER_WEAPON];
+			break;
+		case TIMER_QUAD:
+			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->quad_framenum - level.framenum);
+			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_quad");
+			break;
+		case TIMER_INVULN:
+			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_invulnerability");
+			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->invincible_framenum - level.framenum);
+			break;
+		case TIMER_ENVIROSUIT:
+			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_envirosuit");
+			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->enviro_framenum - level.framenum);
+			break;
+		case TIMER_REBREATHER:
+			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_rebreather");
+			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->breather_framenum - level.framenum);
+			break;
+		case TIMER_NONE:
+		default:
+			cl->ps.stats[STAT_TIMER2_ICON] = 0;
+			cl->ps.stats[STAT_TIMER2] = 0;
+		}
+	/*
+	if (cl->quad_framenum > level.framenum) {
+		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS((cl->quad_framenum - level.framenum));
+	} else if (cl->enviro_framenum > level.framenum) {
+		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->enviro_framenum - level.framenum);
+	} else if (cl->breather_framenum > level.framenum) {
+		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->breather_framenum - level.framenum);
+	} else {
+		cl->ps.stats[STAT_TIMER_ICON] = 0;
+		cl->ps.stats[STAT_TIMER] = 0;
+	}
+
+	if (cl->invincible_framenum > level.framenum) {
+		//is the usual timer in use?
+		if (cl->ps.stats[STAT_TIMER]) {
+			//yes, show new timer for invuln
+			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_invulnerability");
+			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->invincible_framenum - level.framenum);
+		} else {
+			cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+			cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->invincible_framenum - level.framenum);
+
+			// clear previous timer if there was something
+			if (cl->ps.stats[STAT_TIMER2]) {
+				//ent->client->ps.stats[STAT_TIMER_PENT_ICON] = 0;
+				cl->ps.stats[STAT_TIMER2] = 0;
+			}
+		}
+	} else {
+		cl->ps.stats[STAT_TIMER2] = 0;
+	}
+
+	if (cl->item_timer[TIMER_ARMOR] > level.framenum) {
+		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->item_timer[TIMER_ARMOR] - level.framenum);
+		cl->ps.stats[STAT_TIMER_ICON] = cl->item_timer_icon[TIMER_ARMOR];
+	} else {
+		cl->ps.stats[STAT_TIMER] = 0;
+		cl->ps.stats[STAT_TIMER_ICON] = 0;
+	}
+	*/
+}
+
 /*
 ===============
 G_SetStats
@@ -413,52 +552,7 @@ void G_SetStats (edict_t *ent)
 	//
 	// timers
 	//
-	if (ent->client->quad_framenum > level.framenum)
-	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
-		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS((ent->client->quad_framenum - level.framenum));
-	}
-	else if (ent->client->enviro_framenum > level.framenum)
-	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
-		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->enviro_framenum - level.framenum);
-	}
-	else if (ent->client->breather_framenum > level.framenum)
-	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
-		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->breather_framenum - level.framenum);
-	}
-	else
-	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = 0;
-		ent->client->ps.stats[STAT_TIMER] = 0;
-	}
-
-	if (ent->client->invincible_framenum > level.framenum)
-	{
-		//is the usual timer in use?
-		if (ent->client->ps.stats[STAT_TIMER])
-		{
-			//yes, show new timer for invuln
-			ent->client->ps.stats[STAT_TIMER_PENT] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
-		}
-		else
-		{
-			ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
-			ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
-
-			// clear previous timer if there was something
-			if (ent->client->ps.stats[STAT_TIMER_PENT])
-			{
-				//ent->client->ps.stats[STAT_TIMER_PENT_ICON] = 0;
-				ent->client->ps.stats[STAT_TIMER_PENT] = 0;
-			}
-		}
-	}
-	else
-	{
-		ent->client->ps.stats[STAT_TIMER_PENT] = 0;
-	}
+	G_SetTimerStats(ent->client);
 
 
 	// selected item

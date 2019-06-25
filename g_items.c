@@ -658,6 +658,9 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 	if (!(ent->spawnflags & DROPPED_ITEM))
 		SetRespawn (ent, 20);
 
+	// set the timer
+	other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+	other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex((GetItemByIndex(ent->item->tag)->icon));
 	return true;
 }
 

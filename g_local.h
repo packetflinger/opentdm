@@ -74,7 +74,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define STAT_GAME_STATUS_STRING_INDEX   26
 #define STAT_ID_VIEW_INDEX              27
 #define STAT_VOTE_STRING_INDEX          28
-#define STAT_TIMER_PENT                 30
+#define STAT_TIMER2_ICON                29
+#define STAT_TIMER2                     30
 #define STAT_TIME_REMAINING             31
 // maximum 31!
 
@@ -1446,6 +1447,17 @@ typedef enum
 	GRENADE_THROWN,
 } grenade_state_t;
 
+typedef enum
+{
+	TIMER_NONE,
+	TIMER_QUAD,
+	TIMER_INVULN,
+	TIMER_ARMOR,
+	TIMER_WEAPON,
+	TIMER_ENVIROSUIT,
+	TIMER_REBREATHER,
+} item_timer_t;
+
 // client data that stays across multiple level loads
 typedef struct
 {
@@ -1505,6 +1517,13 @@ typedef struct
 	int            last_id_powerarmor;
 	int            spec_mode;             // bitmask
 } client_respawn_t;
+
+typedef struct {
+	item_timer_t   current;    // which is current displayed? (quad, inv, armor, etc)
+	uint32_t       expires;    // frame to switch from current
+	uint8_t        stat_index; // ps stat for the timer value
+	uint8_t        stat_icon;  // ps stat for the icon
+} timer_state_t;
 
 // this structure is cleared on each PutClientInServer(),
 // except for 'client->pers'
@@ -1619,6 +1638,14 @@ struct gclient_s
 
 	int            last_hud_update;
 	int            next_hud_update;
+
+	// armor/weapon timers
+	int            item_timer[6];
+	int            item_timer_icon[6];
+
+	// the timers in the hud
+	timer_state_t   timer1;
+	timer_state_t   timer2;
 };
 
 typedef enum
