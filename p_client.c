@@ -1394,6 +1394,12 @@ void ClientBeginDeathmatch (edict_t *ent)
 		TDM_UpdateHud(ent, false);
 	}
 
+	// set timer icons indexes (armor/weapon is set on the fly)
+	client->item_timer_icon[TIMER_QUAD] = gi.imageindex ("p_quad");
+	client->item_timer_icon[TIMER_INVULN] = gi.imageindex ("p_invulnerability");
+	client->item_timer_icon[TIMER_ENVIROSUIT] = gi.imageindex ("p_envirosuit");
+	client->item_timer_icon[TIMER_REBREATHER] = gi.imageindex ("p_rebreather");
+
 	//no cross-level menus!
 	PMenu_Close (ent);
 

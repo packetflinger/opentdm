@@ -351,14 +351,48 @@ static item_timer_t get_next_timer(gclient_t *cl, item_timer_t *timer) {
 }
 
 static void update_timers(gclient_t *cl) {
+	item_timer_t i;
 	timer_state_t oldtimer1, oldtimer2;
 
 	oldtimer1 = cl->timer1;
 	oldtimer2 = cl->timer2;
+
+	// time to swap
+	if (oldtimer1.expires >= level.framenum) {
+
+		// from current to the end
+		for (i=oldtimer1.current; i<TIMER_MAX; i++) {
+			if (oldtimer1.current == i) {
+				continue;
+			}
+
+			if (cl->item_timer[i]) {
+				cl->timer1.current = i;
+				cl->timer1.expires = level.framenum + SECS_TO_FRAMES(2);
+				cl->timer1.stat_icon = STAT_TIMER_ICON;
+				cl->timer1.stat_index = STAT_TIMER;
+
+				return;
+			}
+		}
+
+		// circle around, from start to current
+		for (i=1; i<oldtimer1.current; i++) {
+			if (cl->item_timer[i]) {
+				cl->timer1.current = i;
+				cl->timer1.expires = level.framenum + SECS_TO_FRAMES(2);
+				cl->timer1.stat_icon = STAT_TIMER_ICON;
+				cl->timer1.stat_index = STAT_TIMER;
+				return;
+			}
+		}
+	}
 }
 
 static void G_SetTimerStats(gclient_t *cl)
 {
+	update_timers(cl);
+	/*
 	switch(get_next_timer(cl, &cl->timer1)) {
 	case TIMER_ARMOR:
 		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->item_timer[TIMER_ARMOR] - level.framenum);
@@ -420,6 +454,7 @@ static void G_SetTimerStats(gclient_t *cl)
 			cl->ps.stats[STAT_TIMER2_ICON] = 0;
 			cl->ps.stats[STAT_TIMER2] = 0;
 		}
+		*/
 	/*
 	if (cl->quad_framenum > level.framenum) {
 		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");

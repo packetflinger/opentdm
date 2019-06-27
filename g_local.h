@@ -1456,6 +1456,7 @@ typedef enum
 	TIMER_WEAPON,
 	TIMER_ENVIROSUIT,
 	TIMER_REBREATHER,
+	TIMER_MAX,	// make sure is always last
 } item_timer_t;
 
 // client data that stays across multiple level loads
@@ -1640,8 +1641,8 @@ struct gclient_s
 	int            next_hud_update;
 
 	// armor/weapon timers
-	int            item_timer[6];
-	int            item_timer_icon[6];
+	int            item_timer[TIMER_MAX];
+	int            item_timer_icon[TIMER_MAX];
 
 	// the timers in the hud
 	timer_state_t   timer1;
