@@ -270,7 +270,7 @@ void Think_Weapon (edict_t *ent)
 	// call active weapon think routine
 	if (ent->client->weapon && ent->client->weapon->weaponthink)
 	{
-		if (ent->client->quad_framenum > level.framenum)
+		if (ent->client->item_timer[TIMER_QUAD] > level.framenum)
 			is_quad = ent;
 		else
 			is_quad = NULL;
@@ -518,7 +518,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		{
 			if (ent->client->ps.gunframe == fire_frames[n])
 			{
-				if (ent->client->quad_framenum > level.framenum)
+				if (ent->client->item_timer[TIMER_QUAD] > level.framenum)
 					gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage3.wav"), 1, ATTN_NORM, 0);
 
 				fire (ent);

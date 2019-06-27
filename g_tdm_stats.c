@@ -205,7 +205,7 @@ void TDM_Damage (edict_t *ent, edict_t *victim, edict_t *inflictor, int damage)
 	ent->client->resp.teamplayerinfo->damage_dealt[weapon] += damage;
 
 	//wision: count quad damage
-	if (ent->client->quad_framenum > level.framenum)
+	if (ent->client->item_timer[TIMER_QUAD] > level.framenum)
 	{
 		ent->client->resp.teamplayerinfo->quad_dealt += damage;
 		victim->client->resp.teamplayerinfo->quad_recvd += damage;
@@ -282,7 +282,7 @@ void TDM_Killed (edict_t *attacker, edict_t *victim, int mod)
 	victim->client->resp.teamplayerinfo->deathweapons[tdmg]++;
 
 	//wision: count quad frags/deaths
-	if (attacker->client->quad_framenum > level.framenum)
+	if (attacker->client->item_timer[TIMER_QUAD] > level.framenum)
 	{
 		attacker->client->resp.teamplayerinfo->quad_kills++;
 		victim->client->resp.teamplayerinfo->quad_deaths++;

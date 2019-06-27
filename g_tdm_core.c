@@ -3254,7 +3254,7 @@ void TDM_UpdateSpectator (edict_t *ent)
 		// find quadder
 		if (ent->client->resp.spec_mode == SPEC_QUAD)
 		{
-			if (target->client->quad_framenum > level.framenum)
+			if (target->client->item_timer[TIMER_QUAD] > level.framenum)
 			{
 				SetChase (ent, target);
 				break;
