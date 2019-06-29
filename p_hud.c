@@ -52,7 +52,7 @@ void MoveClientToIntermission (edict_t *ent)
 	ent->client->ps.rdflags &= ~RDF_UNDERWATER;
 
 	// clean up powerup info
-	ent->client->item_timer[TIMER_QUAD]= 0;
+	ent->client->quad_framenum = 0;
 	ent->client->invincible_framenum = 0;
 	ent->client->breather_framenum = 0;
 	ent->client->enviro_framenum = 0;

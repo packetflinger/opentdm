@@ -361,7 +361,7 @@ void TossClientWeapon (edict_t *self)
 	if (!((int)(dmflags->value) & DF_QUAD_DROP))
 		quad = false;
 	else
-		quad = (self->client->item_timer[TIMER_QUAD] > (level.framenum + SECS_TO_FRAMES(1)));
+		quad = (self->client->quad_framenum > (level.framenum + SECS_TO_FRAMES(1)));
 
 	if (item && quad)
 		spread = 22.5;
@@ -384,7 +384,7 @@ void TossClientWeapon (edict_t *self)
 		drop->spawnflags |= DROPPED_PLAYER_ITEM;
 
 		drop->touch = Touch_Item;
-		drop->nextthink = level.framenum + (self->client->item_timer[TIMER_QUAD] - level.framenum);
+		drop->nextthink = level.framenum + (self->client->quad_framenum - level.framenum);
 		drop->think = G_FreeEdict;
 	}
 }
@@ -493,7 +493,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	}
 
 	// remove powerups
-	self->client->item_timer[TIMER_QUAD] = 0;
+	self->client->quad_framenum = 0;
 	self->client->invincible_framenum = 0;
 	self->client->breather_framenum = 0;
 	self->client->enviro_framenum = 0;

@@ -453,9 +453,9 @@ void SV_CalcBlend (edict_t *ent)
 		SV_AddBlend (0.5f, 0.3f, 0.2f, 0.4f, ent->client->ps.blend);
 
 	// add for powerups
-	if (ent->client->item_timer[TIMER_QUAD] > level.framenum)
+	if (ent->client->quad_framenum > level.framenum)
 	{
-		remaining = ent->client->item_timer[TIMER_QUAD] - level.framenum;
+		remaining = ent->client->quad_framenum - level.framenum;
 		if (remaining == SECS_TO_FRAMES(3))	// beginning to fade
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage2.wav"), 1, ATTN_NORM, 0);
 		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
@@ -791,9 +791,9 @@ void G_SetClientEffects (edict_t *ent)
 		}
 	}
 
-	if (ent->client->item_timer[TIMER_QUAD] > level.framenum)
+	if (ent->client->quad_framenum > level.framenum)
 	{
-		remaining = ent->client->item_timer[TIMER_QUAD] - level.framenum;
+		remaining = ent->client->quad_framenum - level.framenum;
 		if (remaining > SECS_TO_FRAMES(3) || ((remaining / SECS_TO_FRAMES(0.1f)) & 4))
 			ent->s.effects |= EF_QUAD;
 	}

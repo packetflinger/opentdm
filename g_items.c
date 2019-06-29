@@ -319,11 +319,11 @@ void Use_Quad (edict_t *ent, const gitem_t *item)
 		timeout = SECS_TO_FRAMES(30);
 	}
 
-	if (ent->client->item_timer[TIMER_QUAD] > level.framenum)
-		ent->client->item_timer[TIMER_QUAD] += timeout;
+	if (ent->client->quad_framenum > level.framenum)
+		ent->client->quad_framenum += timeout;
 	else
 	{
-		ent->client->item_timer[TIMER_QUAD] = level.framenum + timeout;
+		ent->client->quad_framenum = level.framenum + timeout;
 		TDM_UpdateSpectatorsOnEvent (SPEC_QUAD, ent, NULL);
 	}
 
