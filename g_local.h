@@ -1643,6 +1643,7 @@ struct gclient_s
 	// armor/weapon timers
 	int            item_timer[TIMER_MAX];
 	int            item_timer_icon[TIMER_MAX];
+	int            next_timer_update;
 
 	// the timers in the hud
 	timer_state_t   timer1;

@@ -1400,6 +1400,12 @@ void ClientBeginDeathmatch (edict_t *ent)
 	client->item_timer_icon[TIMER_ENVIROSUIT] = gi.imageindex ("p_envirosuit");
 	client->item_timer_icon[TIMER_REBREATHER] = gi.imageindex ("p_rebreather");
 
+	client->timer1.stat_index = STAT_TIMER;
+	client->timer2.stat_index = STAT_TIMER2;
+
+	// should update timers
+	client->next_timer_update = 0;
+
 	//no cross-level menus!
 	PMenu_Close (ent);
 

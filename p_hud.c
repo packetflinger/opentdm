@@ -326,36 +326,53 @@ static void G_SetTeamScoreStats (edict_t *ent)
 	}
 }
 
-static item_timer_t get_next_timer(gclient_t *cl, item_timer_t *timer) {
-	// what's the current timer?
-	// is it still active?
-	// is it time to switch
-
-	/*
-	switch (*timer) {
-	case TIMER_QUAD:
-		if (cl->quad_framenum) {
-			if (level.framenum >= cl->timer1_switch_frame) {
-
-			} else {
-				return TIMER_QUAD;
-			}
-		}
-		break;
-
-	default:
-		return TIMER_NONE;
-	}
-	*/
-	return TIMER_ARMOR;
-}
 
 static void update_timers(gclient_t *cl) {
 	item_timer_t i;
-	timer_state_t oldtimer1, oldtimer2;
+	timer_state_t oldtimer1, oldtimer2, *curtimer;
+	uint8_t active;
+
+	// not time yet
+	if (cl->next_timer_update > level.framenum) {
+		return;
+	}
+
+	cl->next_timer_update = SECS_TO_FRAMES(1) + level.framenum;
 
 	oldtimer1 = cl->timer1;
 	oldtimer2 = cl->timer2;
+
+	// get the status on current powerups
+	cl->item_timer[TIMER_QUAD] = cl->quad_framenum;
+	cl->item_timer[TIMER_INVULN] = cl->invincible_framenum;
+	cl->item_timer[TIMER_ENVIROSUIT] = cl->enviro_framenum;
+	cl->item_timer[TIMER_REBREATHER] = cl->breather_framenum;
+
+	// count how many are active
+	for (i=0, active=0; i<TIMER_MAX; i++) {
+		if (cl->item_timer[i] > level.framenum) {
+			active++;
+		}
+	}
+
+	if (!active) {
+		return;
+	}
+
+	gi.dprintf("%d timers active\n", active);
+
+	if (active <= 2) {
+		curtimer = &cl->timer1;
+		for (i=0; i<TIMER_MAX; i++) {
+			if (cl->item_timer[i] > level.framenum) {
+				curtimer->current = i;
+				curtimer->expires = cl->item_timer[i] + level.framenum;
+				curtimer->stat_icon = cl->item_timer_icon[i];
+
+				curtimer = &cl->timer2;
+			}
+		}
+	}
 
 	// time to swap
 	if (oldtimer1.expires >= level.framenum) {
@@ -391,71 +408,7 @@ static void update_timers(gclient_t *cl) {
 
 static void G_SetTimerStats(gclient_t *cl)
 {
-	update_timers(cl);
-	/*
-	switch(get_next_timer(cl, &cl->timer1)) {
-	case TIMER_ARMOR:
-		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->item_timer[TIMER_ARMOR] - level.framenum);
-		cl->ps.stats[STAT_TIMER_ICON] = cl->item_timer_icon[TIMER_ARMOR];
-		break;
-	case TIMER_WEAPON:
-		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->item_timer[TIMER_WEAPON] - level.framenum);
-		cl->ps.stats[STAT_TIMER_ICON] = cl->item_timer_icon[TIMER_WEAPON];
-		break;
-	case TIMER_QUAD:
-		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->quad_framenum - level.framenum);
-		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
-		break;
-	case TIMER_INVULN:
-		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
-		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->invincible_framenum - level.framenum);
-		break;
-	case TIMER_ENVIROSUIT:
-		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
-		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->enviro_framenum - level.framenum);
-		break;
-	case TIMER_REBREATHER:
-		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
-		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(cl->breather_framenum - level.framenum);
-		break;
-	case TIMER_NONE:
-	default:
-		cl->ps.stats[STAT_TIMER_ICON] = 0;
-		cl->ps.stats[STAT_TIMER] = 0;
-	}
 
-	switch(get_next_timer(cl, &cl->timer2)) {
-		case TIMER_ARMOR:
-			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->item_timer[TIMER_ARMOR] - level.framenum);
-			cl->ps.stats[STAT_TIMER2_ICON] = cl->item_timer_icon[TIMER_ARMOR];
-			break;
-		case TIMER_WEAPON:
-			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->item_timer[TIMER_WEAPON] - level.framenum);
-			cl->ps.stats[STAT_TIMER2_ICON] = cl->item_timer_icon[TIMER_WEAPON];
-			break;
-		case TIMER_QUAD:
-			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->quad_framenum - level.framenum);
-			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_quad");
-			break;
-		case TIMER_INVULN:
-			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_invulnerability");
-			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->invincible_framenum - level.framenum);
-			break;
-		case TIMER_ENVIROSUIT:
-			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_envirosuit");
-			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->enviro_framenum - level.framenum);
-			break;
-		case TIMER_REBREATHER:
-			cl->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_rebreather");
-			cl->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(cl->breather_framenum - level.framenum);
-			break;
-		case TIMER_NONE:
-		default:
-			cl->ps.stats[STAT_TIMER2_ICON] = 0;
-			cl->ps.stats[STAT_TIMER2] = 0;
-		}
-		*/
-	/*
 	if (cl->quad_framenum > level.framenum) {
 		cl->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
 		cl->ps.stats[STAT_TIMER] = FRAMES_TO_SECS((cl->quad_framenum - level.framenum));
@@ -497,7 +450,6 @@ static void G_SetTimerStats(gclient_t *cl)
 		cl->ps.stats[STAT_TIMER] = 0;
 		cl->ps.stats[STAT_TIMER_ICON] = 0;
 	}
-	*/
 }
 
 /*
