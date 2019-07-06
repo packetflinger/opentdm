@@ -659,8 +659,12 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 		SetRespawn (ent, 20);
 
 	// set the timer
-	other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
-	other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex((GetItemByIndex(ent->item->tag)->icon));
+	if (UF(ent, ARMOR_TIMER)) {
+		other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+		other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex((GetItemByIndex(ent->item->tag)->icon));
+		//other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex((GetItemByIndex(newinfo->armor)->icon));
+	}
+
 	return true;
 }
 

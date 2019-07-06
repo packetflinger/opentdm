@@ -112,6 +112,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define UF_PLAYERFOV        64		// unused
 #define UF_EXTENDED_LAYOUT  128		// increase layout size (unused)
 #define UF_WEAPON_HUD       256		// show weapon/ammo totals in hud
+#define UF_ARMOR_TIMER      512
+#define UF_WEAPON_TIMER     1024
 
 #define UF(ent, x)       ((ent->client->pers.userflags & UF_##x) != 0)
 
