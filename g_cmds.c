@@ -1059,12 +1059,12 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 		}
 
 		// client doesn't want to hear from players
-		if (UF(other, MUTE_PLAYERS) && ent->client->pers.team && ent != other) {
+		if (IGNORING(other, PLAYERS) && ent->client->pers.team && ent != other) {
 			continue;
 		}
 
 		// client doesn't want to hear from specs
-		if (UF(other, MUTE_OBSERVERS) && !ent->client->pers.team && ent != other) {
+		if (IGNORING(other, SPEC) && !ent->client->pers.team && ent != other) {
 			continue;
 		}
 

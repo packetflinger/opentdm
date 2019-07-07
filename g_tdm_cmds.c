@@ -2573,6 +2573,20 @@ void TDM_Test_f(edict_t *ent) {
 	gi.cprintf(ent, PRINT_HIGH, "Unique ID: %d\n", ent->client->pers.uniqueid);
 }
 
+
+/**
+ * Ignore chat
+ */
+void TDM_Ignore_f(edict_t *ent, uint32_t level)
+{
+	if (ent->client->pers.ignore & level) {
+		ent->client->pers.ignore &= ~level;
+	} else {
+		ent->client->pers.ignore |= level;
+	}
+}
+
+
 /*
 ==============
 TDM_Command
@@ -2692,6 +2706,12 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_AutoScreenshot_f(ent);
 		else if (!Q_stricmp(cmd, "autorecord"))
 			TDM_AutoRecord_f(ent);
+		else if (!Q_stricmp(cmd, "ignorespecs"))
+			TDM_Ignore_f(ent, IGNORE_CHAT_SPEC);
+		else if (!Q_stricmp(cmd, "ignoreplayers"))
+			TDM_Ignore_f(ent, IGNORE_CHAT_PLAYERS);
+		else if (!Q_stricmp(cmd, "ignoreall"))
+			TDM_Ignore_f(ent, IGNORE_CHAT_ALL);
 		else
 			return true;	//don't print everything else as a text
 
@@ -2821,6 +2841,12 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_PlayerConfigDisplay_f(ent);
 		else if (!Q_stricmp(cmd, "test"))
 			TDM_Test_f(ent);
+		else if (!Q_stricmp(cmd, "ignorespecs"))
+			TDM_Ignore_f(ent, IGNORE_CHAT_SPEC);
+		else if (!Q_stricmp(cmd, "ignoreplayers"))
+			TDM_Ignore_f(ent, IGNORE_CHAT_PLAYERS);
+		else if (!Q_stricmp(cmd, "ignoreall"))
+			TDM_Ignore_f(ent, IGNORE_CHAT_ALL);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else

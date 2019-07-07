@@ -106,9 +106,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define UF_AUTOSCREENSHOT   1		// stuff a screenshot
 #define UF_AUTORECORD       2		// force demo recording
 #define UF_LOCALFOV         4		// keep fov when chasing
-#define UF_MUTE_PLAYERS     8		// ignore player chat
-#define UF_MUTE_OBSERVERS   16		// ignore spec chat
-#define UF_MUTE_MISC        32		// unused
+// #define UF_MUTE_PLAYERS     8		// ignore player chat
+// #define UF_MUTE_OBSERVERS   16		// ignore spec chat
+// #define UF_MUTE_MISC        32		// unused
 #define UF_PLAYERFOV        64		// unused
 #define UF_EXTENDED_LAYOUT  128		// increase layout size (unused)
 #define UF_WEAPON_HUD       256		// show weapon/ammo totals in hud
@@ -116,6 +116,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define UF_WEAPON_TIMER     1024
 
 #define UF(ent, x)       ((ent->client->pers.userflags & UF_##x) != 0)
+
+#define IGNORE_CHAT_SPEC    1
+#define IGNORE_CHAT_PLAYERS 2
+#define IGNORE_CHAT_ALL     4
+
+#define IGNORING(ent, x)    ((ent->client->pers.ignore & IGNORE_CHAT_##x) != 0)
 
 #define GAMEMODE_TDM   0
 #define GAMEMODE_ITDM  1
@@ -1496,6 +1502,7 @@ typedef struct
 	int            userflags;
 	int            weaponhud_offset_x;
 	int            weaponhud_offset_y;
+	uint32_t       ignore;               // bitmask
 } client_persistent_t;
 
 typedef struct
