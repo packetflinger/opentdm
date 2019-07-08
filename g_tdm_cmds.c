@@ -2591,6 +2591,8 @@ void TDM_ArmorTimer_f(edict_t *ent)
 	if (g_armor_timer->value) {
 		ent->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
 		ent->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
+	} else {
+		gi.cprintf(ent, PRINT_HIGH, "Armor time disabled in server config\n");
 	}
 }
 
@@ -2599,6 +2601,8 @@ void TDM_WeaponTimer_f(edict_t *ent)
 	if (g_weapon_timer->value) {
 		ent->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
 		ent->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
+	} else {
+		gi.cprintf(ent, PRINT_HIGH, "Weapon time disabled in server config\n");
 	}
 }
 
