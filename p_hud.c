@@ -558,31 +558,16 @@ void G_SetStats (edict_t *ent)
 	}
 
 	if (ent->client->invincible_framenum > level.framenum) {
-		//is the usual timer in use?
-		//if (ent->client->ps.stats[STAT_TIMER]) {
-			//yes, show new timer for invuln
-			//ent->client->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_invulnerability");
-			//ent->client->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
-		//} else {
-			//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
-			//ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
+		ent->client->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_invulnerability");
+		ent->client->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
 
-			// clear previous timer if there was something
-			//if (ent->client->ps.stats[STAT_TIMER2]) {
-				//ent->client->ps.stats[STAT_TIMER_PENT_ICON] = 0;
-				//ent->client->ps.stats[STAT_TIMER2] = 0;
-			//}
-		//}
-	} else {
-		//ent->client->ps.stats[STAT_TIMER2] = 0;
-	}
+	} else if (ent->client->item_timer[TIMER_ARMOR] > level.framenum) {
+			ent->client->ps.stats[STAT_TIMER_ICON] = ent->client->item_timer_icon[TIMER_ARMOR];
+			ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->item_timer[TIMER_ARMOR] - level.framenum);
 
-	if (ent->client->item_timer[TIMER_ARMOR] > level.framenum) {
-		//ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->item_timer[TIMER_ARMOR] - level.framenum);
-		//ent->client->ps.stats[STAT_TIMER_ICON] = ent->client->item_timer_icon[TIMER_ARMOR];
 	} else {
-		//ent->client->ps.stats[STAT_TIMER] = 0;
-		//ent->client->ps.stats[STAT_TIMER_ICON] = 0;
+		ent->client->ps.stats[STAT_TIMER2_ICON] = 0;
+		ent->client->ps.stats[STAT_TIMER2] = 0;
 	}
 
 
