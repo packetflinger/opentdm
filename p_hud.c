@@ -539,7 +539,6 @@ void G_SetStats (edict_t *ent)
 	//
 	// timers
 	//
-	//G_SetTimerStats(ent->client);
 	if (ent->client->quad_framenum > level.framenum) {
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
 		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS((ent->client->quad_framenum - level.framenum));
@@ -560,11 +559,9 @@ void G_SetStats (edict_t *ent)
 	if (ent->client->invincible_framenum > level.framenum) {
 		ent->client->ps.stats[STAT_TIMER2_ICON] = gi.imageindex ("p_invulnerability");
 		ent->client->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
-
-	} else if (ent->client->item_timer[TIMER_ARMOR] > level.framenum) {
-			ent->client->ps.stats[STAT_TIMER_ICON] = ent->client->item_timer_icon[TIMER_ARMOR];
-			ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->item_timer[TIMER_ARMOR] - level.framenum);
-
+	} else if (ent->client->item_timer[TIMER_WEAPON] > level.framenum) {
+		ent->client->ps.stats[STAT_TIMER2_ICON] = ent->client->item_timer_icon[TIMER_WEAPON];
+		ent->client->ps.stats[STAT_TIMER2] = FRAMES_TO_SECS(ent->client->item_timer[TIMER_WEAPON] - level.framenum);
 	} else {
 		ent->client->ps.stats[STAT_TIMER2_ICON] = 0;
 		ent->client->ps.stats[STAT_TIMER2] = 0;

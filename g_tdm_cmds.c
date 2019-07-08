@@ -2586,6 +2586,17 @@ void TDM_Ignore_f(edict_t *ent, uint32_t level)
 	}
 }
 
+void TDM_ArmorTimer_f(edict_t *ent)
+{
+	ent->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+	ent->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
+}
+
+void TDM_WeaponTimer_f(edict_t *ent)
+{
+	ent->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
+	ent->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
+}
 
 /*
 ==============
@@ -2847,6 +2858,10 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_Ignore_f(ent, IGNORE_CHAT_PLAYERS);
 		else if (!Q_stricmp(cmd, "ignoreall"))
 			TDM_Ignore_f(ent, IGNORE_CHAT_ALL);
+		else if (!Q_stricmp(cmd, "armortimer"))
+			TDM_ArmorTimer_f(ent);
+		else if (!Q_stricmp(cmd, "weapontimer"))
+			TDM_WeaponTimer_f(ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else
