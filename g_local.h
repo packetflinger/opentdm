@@ -798,6 +798,8 @@ extern	cvar_t	*g_force_screenshot;
 extern	cvar_t	*g_force_record;
 extern	cvar_t	*g_record_mvd;
 extern	cvar_t	*g_weapon_hud;
+extern	cvar_t 	*g_armor_timer;
+extern	cvar_t	*g_weapon_timer;
 
 extern	cvar_t	*g_tdmflags;
 extern	cvar_t	*g_itdmflags;

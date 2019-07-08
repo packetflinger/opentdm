@@ -93,8 +93,8 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		other->client->next_hud_update = level.framenum + SECS_TO_FRAMES(1);
 	}
 
-	// set a timer
-	if (UF(other, WEAPON_TIMER)) {
+	// set a timer if enabled
+	if (UF(other, WEAPON_TIMER) && g_weapon_timer->value) {
 		other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
 		other->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
 	}
