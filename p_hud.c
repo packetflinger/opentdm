@@ -432,7 +432,10 @@ void G_SetStats (edict_t *ent)
 	}
 
 	int stat, stat_icon;
-	if (ent->client->quad_framenum > level.framenum || ent->client->item_timer[TIMER_ARMOR] > level.framenum || ent->client->enviro_framenum > level.framenum || ent->client->breather_framenum > level.framenum) {
+	if (ent->client->quad_framenum > level.framenum ||
+			ent->client->item_timer[TIMER_ARMOR] > level.framenum ||
+			ent->client->enviro_framenum > level.framenum ||
+			ent->client->breather_framenum > level.framenum) {
 		stat = STAT_TIMER2;
 		stat_icon = STAT_TIMER2_ICON;
 	} else {

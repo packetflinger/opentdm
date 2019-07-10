@@ -2586,6 +2586,10 @@ void TDM_Ignore_f(edict_t *ent, uint32_t level)
 	}
 }
 
+
+/**
+ * Start an armor timer
+ */
 void TDM_ArmorTimer_f(edict_t *ent)
 {
 	if (g_armor_timer->value) {
@@ -2596,6 +2600,10 @@ void TDM_ArmorTimer_f(edict_t *ent)
 	}
 }
 
+
+/**
+ * Start a weapon timer
+ */
 void TDM_WeaponTimer_f(edict_t *ent)
 {
 	if (g_weapon_timer->value) {
