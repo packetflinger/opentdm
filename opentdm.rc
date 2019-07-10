@@ -29,13 +29,13 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "Comments", "http://opentdm.net/"
-            VALUE "CompanyName", "r1ch.net"
+            VALUE "Comments", "http://opentdm.org/"
+            VALUE "CompanyName", "packetflinger.com, r1ch.net"
             VALUE "FileDescription", "Team deathmatch and 1v1 tournament mod"
             VALUE "OriginalFilename", VER_ORIGINALFILENAME_STR
             VALUE "FileVersion", OPENTDM_VERSION
             VALUE "InternalName", "opentdm"
-            VALUE "LegalCopyright", "Copyright © r1ch.net and contributors"
+            VALUE "LegalCopyright", "Copyright © packetflinger.com, r1ch.net and contributors"
             VALUE "ProductName", "OpenTDM"
             VALUE "ProductVersion", OPENTDM_VERSION
         END
