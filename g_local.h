@@ -1292,6 +1292,8 @@ typedef struct vote_s
 	edict_t         *last_initiator;
 	unsigned        last_vote_end_frame;
 	int             spawn_mode;
+	int             armor_timer;
+	int             weapon_timer;
 } vote_t;
 
 typedef struct vote_menu_s

@@ -830,7 +830,7 @@ char *TDM_SettingsString (void)
 	strcat (settings, "Timelimit: ");
 	strcat (settings, TDM_SetColorText(va("%g minute%s\n", g_match_time->value / 60, g_match_time->value / 60 == 1 ? "" : "s")));
 
-	strcat (settings, "Overtime: ");
+	strcat (settings, "Overtime:  ");
 	switch ((int)g_tie_mode->value)
 	{
 		case 0:
@@ -866,10 +866,15 @@ char *TDM_SettingsString (void)
 			strcat (settings, " ");
 		}
 	}
-	strcat (settings, "\n");
-	
-	strcat (settings, "\n");
+	strcat (settings, "\n\n");
 
+	strcat(settings, "Armor timer enabled:   ");
+	strcat(settings, TDM_SetColorText(va("%s", ((int)g_armor_timer->value > 0) ? "yes" : "no")));
+	strcat(settings, "\n");
+
+	strcat(settings, "Weapon timer enabled:  ");
+	strcat(settings, TDM_SetColorText(va("%s", ((int)g_weapon_timer->value > 0) ? "yes" : "no")));
+	strcat(settings, "\n\n");
 
 	strcat (settings, va("'%s' skin: ", teaminfo[TEAM_A].name));
 	strcat (settings, TDM_SetColorText(va("%s\n", teaminfo[TEAM_A].skin)));
@@ -879,13 +884,13 @@ char *TDM_SettingsString (void)
 
 	strcat (settings, "\n");
 
-	strcat (settings, "Weapon switch: ");
+	strcat (settings, "Weapon switch:    ");
 	strcat (settings, TDM_SetColorText(va("%s\n", switchmode_text[(int)g_fast_weap_switch->value])));
 
-	strcat (settings, "Teleporter mode: ");
+	strcat (settings, "Teleporter mode:  ");
 	strcat (settings, TDM_SetColorText(va("%s\n", telemode_text[(int)g_teleporter_nofreeze->value])));
 
-	strcat (settings, "Gameplay bugs: ");
+	strcat (settings, "Gameplay bugs:    ");
 	strcat (settings, TDM_SetColorText(va("%s\n", bugs_text[(int)g_bugs->value])));
 
 	if (TDM_Is1V1())
@@ -2596,7 +2601,7 @@ void TDM_ArmorTimer_f(edict_t *ent)
 		ent->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
 		ent->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
 	} else {
-		gi.cprintf(ent, PRINT_HIGH, "Armor time disabled in server config\n");
+		gi.cprintf(ent, PRINT_HIGH, "Armor timer disabled in server config\n");
 	}
 }
 
@@ -2610,7 +2615,7 @@ void TDM_WeaponTimer_f(edict_t *ent)
 		ent->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
 		ent->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
 	} else {
-		gi.cprintf(ent, PRINT_HIGH, "Weapon time disabled in server config\n");
+		gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled in server config\n");
 	}
 }
 

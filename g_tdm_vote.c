@@ -255,6 +255,16 @@ void TDM_ApplyVote (void)
 		TDM_RandomizeTeams();
 	}
 
+	if (vote.flags & VOTE_ARMOR_TIMER) {
+		sprintf(value, "%d", vote.armor_timer);
+		g_armor_timer = gi.cvar_set("g_armor_timer", value);
+	}
+
+	if (vote.flags & VOTE_WEAPON_TIMER) {
+		sprintf(value, "%d", vote.weapon_timer);
+		g_weapon_timer = gi.cvar_set("g_weapon_timer", value);
+	}
+
 	if (vote.flags & VOTE_ABORT)
 	{
 abort:
@@ -385,11 +395,11 @@ static void TDM_AnnounceVote (void)
 		strcat (what, va("weapons"));
 		for (j = 0; j < sizeof(weaponvotes) / sizeof(weaponvotes[1]); j++)
 		{
-			if (vote.newweaponflags & weaponvotes[j].value && !((int)g_itemflags->value & weaponvotes[j].value))
+			if ((vote.newweaponflags & weaponvotes[j].value) && !((int)g_itemflags->value & weaponvotes[j].value))
 			{
 				strcat (what, va(" -%s", weaponvotes[j].names[1]));
 			}
-			else if (!(vote.newweaponflags & weaponvotes[j].value) && (int)g_itemflags->value & weaponvotes[j].value)
+			else if (!(vote.newweaponflags & weaponvotes[j].value) && ((int)g_itemflags->value & weaponvotes[j].value))
 			{
 				strcat (what, va(" +%s", weaponvotes[j].names[1]));
 			}
@@ -414,11 +424,11 @@ static void TDM_AnnounceVote (void)
 		strcat (what, va("powerups"));
 		for (j = 0; j < sizeof(powerupvotes) / sizeof(powerupvotes[1]); j++)
 		{
-			if (vote.newpowerupflags & powerupvotes[j].value && !((int)g_powerupflags->value & powerupvotes[j].value))
+			if ((vote.newpowerupflags & powerupvotes[j].value) && !((int)g_powerupflags->value & powerupvotes[j].value))
 			{
 				strcat (what, va(" -%s", powerupvotes[j].names[0]));
 			}
-			else if (!(vote.newpowerupflags & powerupvotes[j].value) && (int)g_powerupflags->value & powerupvotes[j].value)
+			else if (!(vote.newpowerupflags & powerupvotes[j].value) && ((int)g_powerupflags->value & powerupvotes[j].value))
 			{
 				strcat (what, va(" +%s", powerupvotes[j].names[0]));
 			}
@@ -545,6 +555,30 @@ static void TDM_AnnounceVote (void)
 			strcat (what, ", ");
 		}
 		strcat(what, "shuffle team players");
+	}
+
+	if (vote.flags & VOTE_ARMOR_TIMER) {
+		if (what[0]) {
+			strcat (what, ", ");
+		}
+
+		if (vote.armor_timer) {
+			strcat(what, "enable armor timer");
+		} else {
+			strcat(what, "disable armor timer");
+		}
+	}
+
+	if (vote.flags & VOTE_WEAPON_TIMER) {
+		if (what[0]) {
+			strcat (what, ", ");
+		}
+
+		if (vote.weapon_timer) {
+			strcat(what, "enable weapon timer");
+		} else {
+			strcat(what, "disable weapon timer");
+		}
 	}
 
 	vote.vote_string = what;
@@ -2007,6 +2041,54 @@ qboolean TDM_VoteShuffle(edict_t *ent)
 	return true;
 }
 
+qboolean TDM_VoteArmorTimer(edict_t *ent) {
+	const char *value;
+
+	if (!((int) g_vote_mask->value & VOTE_ARMOR_TIMER) && !ent->client->pers.admin) {
+		gi.cprintf(ent, PRINT_HIGH, "Voting armor timer is not allowed in server config\n");
+		return false;
+	}
+
+	value = gi.argv(2);
+	if (!value[0]) {
+		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1>\n", gi.argv(1));
+		return false;
+	}
+
+	if (!Q_stricmp(value, "1")) {
+		vote.armor_timer = 1;
+	} else {
+		vote.armor_timer = 0;
+	}
+
+	vote.flags |= VOTE_ARMOR_TIMER;
+	return true;
+}
+
+qboolean TDM_VoteWeaponTimer(edict_t *ent) {
+	const char *value;
+
+	if (!((int) g_vote_mask->value & VOTE_WEAPON_TIMER) && !ent->client->pers.admin) {
+		gi.cprintf(ent, PRINT_HIGH, "Voting weapon timer is not allowed in server config\n");
+		return false;
+	}
+
+	value = gi.argv(2);
+	if (!value[0]) {
+		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1>\n", gi.argv(1));
+		return false;
+	}
+
+	if (!Q_stricmp(value, "1")) {
+		vote.weapon_timer = 1;
+	} else {
+		vote.weapon_timer = 0;
+	}
+
+	vote.flags |= VOTE_WEAPON_TIMER;
+	return true;
+}
+
 /*
 ==============
 TDM_Vote_f
@@ -2058,6 +2140,8 @@ void TDM_Vote_f (edict_t *ent)
 				"  restart\n"
 				"  bugs <0/1/2>\n"
 				"  shuffle\n"
+				"  armortimer <0/1>\n"
+				"  weapontimer <0/1>\n"
 				);
 			return;
 		}
@@ -2159,7 +2243,11 @@ void TDM_Vote_f (edict_t *ent)
 	else if (!Q_stricmp (cmd, "bugs"))
 		started_new_vote = TDM_VoteBugs (ent);
 	else if (!Q_stricmp (cmd, "shuffle") || !Q_stricmp (cmd, "randomize"))
-			started_new_vote = TDM_VoteShuffle (ent);
+		started_new_vote = TDM_VoteShuffle (ent);
+	else if (!Q_stricmp (cmd, "armortimer"))
+		started_new_vote = TDM_VoteArmorTimer(ent);
+	else if (!Q_stricmp (cmd, "weapontimer"))
+		started_new_vote = TDM_VoteWeaponTimer(ent);
 	else if (!Q_stricmp (cmd, "yes"))
 		TDM_Vote_X (ent, VOTE_YES, "YES");
 	else if (!Q_stricmp (cmd, "no"))
