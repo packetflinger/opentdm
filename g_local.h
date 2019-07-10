@@ -1506,7 +1506,7 @@ typedef struct
 	int            userflags;
 	int            weaponhud_offset_x;
 	int            weaponhud_offset_y;
-	uint32_t       ignore;               // bitmask
+	int            ignore;               // bitmask
 } client_persistent_t;
 
 typedef struct
@@ -1534,9 +1534,9 @@ typedef struct
 
 typedef struct {
 	item_timer_t   current;    // which is current displayed? (quad, inv, armor, etc)
-	uint32_t       expires;    // frame to switch from current
-	uint8_t        stat_index; // ps stat for the timer value
-	uint8_t        stat_icon;  // ps stat for the icon
+	int            expires;    // frame to switch from current
+	int            stat_index; // ps stat for the timer value
+	int            stat_icon;  // ps stat for the icon
 } timer_state_t;
 
 // this structure is cleared on each PutClientInServer(),

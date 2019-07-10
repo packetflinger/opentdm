@@ -2582,7 +2582,7 @@ void TDM_Test_f(edict_t *ent) {
 /**
  * Ignore chat
  */
-void TDM_Ignore_f(edict_t *ent, uint32_t level)
+void TDM_Ignore_f(edict_t *ent, int level)
 {
 	if (ent->client->pers.ignore & level) {
 		ent->client->pers.ignore &= ~level;
