@@ -1698,7 +1698,8 @@ qboolean TDM_VoteWebConfig (edict_t *ent)
 		return false;
 	}
 
-	Com_sprintf (tdm_vote_download.path , sizeof(tdm_vote_download.path ), "configs/%s.cfg", value);
+	//Com_sprintf (tdm_vote_download.path , sizeof(tdm_vote_download.path ), "configs/%s.cfg", value);
+	Com_sprintf (tdm_vote_download.path , sizeof(tdm_vote_download.path ), "%s.cfg", value);
 	tdm_vote_download.initiator = ent;
 	tdm_vote_download.type = DL_CONFIG;
 	strncpy (tdm_vote_download.name, value, sizeof(tdm_vote_download.name)-1);
