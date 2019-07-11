@@ -1413,12 +1413,13 @@ typedef struct
 	int         id_highlight;
 	int         id_x;
 	int         id_y;
-	int         weapon_hud;
-	int         weapon_hud_x;
-	int         weapon_hud_y;
-	int         armor_timer;
-	int         armor_timer_x;
-	int         armor_timer_y;
+	int         weapon_hud;          // show weapon/ammo hud?
+	int         weapon_hud_x;        // offset from right
+	int         weapon_hud_y;        // offset from center
+	int         armor_timer;         // auto time armor pickups
+	//int         armor_timer_x;
+	//int         armor_timer_y;
+	int         auto_weapon_timer;   // bitmask, which weapons
 	qboolean    loaded;
 } playerconfig_t;
 

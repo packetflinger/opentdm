@@ -2558,11 +2558,6 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
 
 	gi.cprintf(ent, PRINT_HIGH, va("  show armor timer:        %s\n", cfg->armor_timer ? "yes" : "no"));
 
-	if (cfg->armor_timer) {
-		gi.cprintf(ent, PRINT_HIGH, "    X offset:              %d\n", cfg->armor_timer_x);
-		gi.cprintf(ent, PRINT_HIGH, "    Y offset:              %d\n", cfg->armor_timer_y);
-	}
-
 	if (cfg->teamskin[0] != 0) {
 		gi.cprintf(ent, PRINT_HIGH, "  team skin:               %s\n", cfg->teamskin);
 	}
