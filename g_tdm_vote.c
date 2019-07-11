@@ -1614,7 +1614,7 @@ qboolean TDM_VoteConfig (edict_t *ent)
 ==============
 TDM_VoteWebConfig
 ==============
-Start a web config download. Web configs are configs stored on opentdm.net that are downloaded
+Start a web config download. Web configs are configs stored on opentdm.org that are downloaded
 via libcurl, allowing a single player / tournament config to be used by every OpenTDM server.
 */
 qboolean TDM_VoteWebConfig (edict_t *ent)
@@ -1730,7 +1730,7 @@ void TDM_VoteWebConfigResult (edict_t *ent, int code, tdm_config_t *config)
 
 	if (code == 404)
 	{
-		gi.cprintf (ent, PRINT_HIGH, "Web config '%s' was not found. Visit www.opentdm.net for more information on web configs.\n", tdm_vote_download.name);
+		gi.cprintf (ent, PRINT_HIGH, "Web config '%s' was not found. Visit opentdm.org for more information on web configs.\n", tdm_vote_download.name);
 		return;
 	}
 	else if (code == 600)
