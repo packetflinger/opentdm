@@ -1417,8 +1417,6 @@ typedef struct
 	int         weapon_hud_x;        // offset from right
 	int         weapon_hud_y;        // offset from center
 	int         armor_timer;         // auto time armor pickups
-	//int         armor_timer_x;
-	//int         armor_timer_y;
 	int         auto_weapon_timer;   // bitmask, which weapons
 	qboolean    loaded;
 } playerconfig_t;
