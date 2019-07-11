@@ -1103,7 +1103,7 @@ void TDM_DownloadPlayerConfig (edict_t *ent)
 		return;
 	}
 
-	Com_sprintf (ent->client->pers.download.path , sizeof(ent->client->pers.download.path ), "playerconfigs/%s", stats_id);
+	Com_sprintf (ent->client->pers.download.path , sizeof(ent->client->pers.download.path ), "%s", stats_id);
 	ent->client->pers.download.initiator = ent;
 	ent->client->pers.download.type = DL_PLAYER_CONFIG;
 	strncpy (ent->client->pers.download.name, stats_id, sizeof(ent->client->pers.download.name)-1);

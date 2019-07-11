@@ -284,7 +284,7 @@ void InitGame (void)
 	g_tdm_spawn_mode = gi.cvar ("g_tdm_spawn_mode", "1", 0);
 	
 	// include slash at beginning and end. ex: /api/
-	g_http_path = gi.cvar ("g_http_path", "/", CVAR_LATCH);
+	g_http_path = gi.cvar ("g_http_path", "/configs/", CVAR_LATCH);
 	g_http_domain = gi.cvar ("g_http_domain", "opentdm.org", CVAR_LATCH);
 
 	g_playerconfig_enabled = gi.cvar("g_playerconfig_enabled", "1", CVAR_LATCH);
