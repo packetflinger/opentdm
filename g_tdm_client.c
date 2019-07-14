@@ -1022,6 +1022,12 @@ qboolean TDM_ParsePlayerConfigLine (char *line, int line_number, void *param)
 		c->weapon_hud_y = atoi(p);
 	else if (!strcmp(variable, "armor_timer"))
 		c->armor_timer = atoi(p);
+	else if (!strcmp(variable, "armor_mask"))
+		c->armor_mask = atoi(p);
+	else if (!strcmp(variable, "weapon_timer"))
+		c->weapon_timer = atoi(p);
+	else if (!strcmp(variable, "weapon_mask"))
+		c->weapon_mask = atoi(p);
 	else
 		gi.dprintf ("Unknown player config variable '%s'. Check you are using the latest version of OpenTDM.\n", variable);
 

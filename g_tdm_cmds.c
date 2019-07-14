@@ -2538,7 +2538,7 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
 		return;
 	}
 
-	url = va("http://%s%splayerconfigs/%s",
+	url = va("http://%s%s%s",
 			g_http_domain->string,
 			g_http_path->string,
 			Info_ValueForKey (ent->client->pers.userinfo, "stats_id")
@@ -2556,7 +2556,17 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
 		gi.cprintf(ent, PRINT_HIGH, "    Y offset:              %d\n", cfg->weapon_hud_y);
 	}
 
-	gi.cprintf(ent, PRINT_HIGH, va("  show armor timer:        %s\n", cfg->armor_timer ? "yes" : "no"));
+	gi.cprintf(ent, PRINT_HIGH, va("  auto-time armor:         %s\n", cfg->armor_timer ? "yes" : "no"));
+
+	if (cfg->armor_timer) {
+		gi.cprintf(ent, PRINT_HIGH, va("    armor type:              \n"));
+	}
+
+	gi.cprintf(ent, PRINT_HIGH, va("  auto-time weapons:       %s\n", cfg->weapon_timer ? "yes" : "no"));
+
+	if (cfg->weapon_timer) {
+		gi.cprintf(ent, PRINT_HIGH, va("    weapons:                 \n"));
+	}
 
 	if (cfg->teamskin[0] != 0) {
 		gi.cprintf(ent, PRINT_HIGH, "  team skin:               %s\n", cfg->teamskin);

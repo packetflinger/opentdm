@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 #include "m_player.h"
+#include "g_tdm.h"
 
 
 static edict_t	*is_quad;
@@ -44,8 +45,9 @@ static void P_ProjectSource (gclient_t *client, vec3_t point, vec3_t distance, v
 
 qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 {
-	int				index;
-	const gitem_t	*ammo;
+	int             index;
+	const gitem_t   *ammo;
+	int             i;
 
 	index = ITEM_INDEX(ent->item);
 
@@ -95,8 +97,26 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 
 	// set a timer if enabled
 	if (UF(other, WEAPON_TIMER) && g_weapon_timer->value) {
-		other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
-		other->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
+
+		// no mask set, set timer for every weapon pickup
+		if (other->client->pers.weapon_mask == 0) {
+			other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
+			other->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
+		} else {
+			// lookup weapon vote bitmask index to game inventory index
+			for (i=0; i<WEAPON_MAX; i++) {
+				if (index == weaponvotes[i].itemindex) {
+					break;
+				}
+			}
+
+			gi.dprintf("%d & %d? %s\n", other->client->pers.weapon_mask, weaponvotes[i].value, weaponvotes[i].names[1]);
+			// client wants to time this weapon
+			if (other->client->pers.weapon_mask & weaponvotes[i].value) {
+				other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
+				other->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
+			}
+		}
 	}
 
 	return true;

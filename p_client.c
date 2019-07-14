@@ -1601,6 +1601,18 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		}
 	}
 
+	// weapon mask for auto timer
+	s = Info_ValueForKey(userinfo, "wmask");
+	if (s[0]) {
+		ent->client->pers.weapon_mask = atoi(s);
+	}
+
+	// armor mask for auto timer
+	s = Info_ValueForKey(userinfo, "amask");
+	if (s[0]) {
+		ent->client->pers.armor_mask = atoi(s);
+	}
+
 	// save off the userinfo in case we want to check something later
 	strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
 

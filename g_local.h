@@ -1406,8 +1406,8 @@ typedef struct tdm_download_s
 
 typedef struct
 {
-	int         auto_record;
-	int         auto_screenshot;
+	int         auto_record;         // record demo for each match
+	int         auto_screenshot;     // screenshot intermission
 	char        teamskin[64];
 	char        enemyskin[64];
 	int         id_highlight;
@@ -1417,7 +1417,9 @@ typedef struct
 	int         weapon_hud_x;        // offset from right
 	int         weapon_hud_y;        // offset from center
 	int         armor_timer;         // auto time armor pickups
-	int         auto_weapon_timer;   // bitmask, which weapons
+	int         armor_mask;          // which armor to time
+	int         weapon_timer;        // auto time weapon pickups
+	int         weapon_mask;         // which weapons to time
 	qboolean    loaded;
 } playerconfig_t;
 
@@ -1505,7 +1507,11 @@ typedef struct
 	int            userflags;
 	int            weaponhud_offset_x;
 	int            weaponhud_offset_y;
-	int            ignore;               // bitmask
+	int            ignore;                // bitmask
+	int            weapon_timer;          // auto timer for weapons
+	int            weapon_mask;           // weapons to auto timer
+	int            armor_timer;           // auto timer for armor
+	int            armor_mask;            // armor to auto timer
 } client_persistent_t;
 
 typedef struct
