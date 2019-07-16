@@ -50,6 +50,13 @@ const powerupinfo_t	powerupvotes[POWERUP_MAX] =
 	{{"envirosuit"}, POWERUP_ENVIROSUIT, ITEM_ITEM_ENVIRO},
 };
 
+const armorinfo_t armorvotes[ARMOR_MAX] =
+{
+	{{"jacket", "ga"}, ARMOR_JACKET, ITEM_ITEM_ARMOR_JACKET},
+	{{"combat", "ya"}, ARMOR_COMBAT, ITEM_ITEM_ARMOR_COMBAT},
+	{{"body", "ra"}, ARMOR_BODY, ITEM_ITEM_ARMOR_BODY},
+};
+
 //current vote
 vote_t			vote;
 
@@ -2710,6 +2717,53 @@ int G_WeaponStringToBitmask(char *str) {
 			}
 
 			if (!Q_stricmp(token, weaponvotes[i].names[0]) || !Q_stricmp(token, weaponvotes[i].names[1])) {
+				if (modifier == '+') {
+					mask |= weaponvotes[i].value;
+				} else if (modifier == '-') {
+					mask &= ~weaponvotes[i].value;
+				}
+			}
+		}
+
+		token = strtok(NULL, " ");
+	}
+
+	return mask;
+}
+
+/**
+ * Convert armor string ("+all -ya", "-all +body +combat", "-all +ra") to a bitmask
+ */
+int G_ArmorStringToBitmask(char *str) {
+	static int mask;
+	char modifier;
+	char s[MAX_STRING_CHARS];
+	char *token;
+	int i;
+
+	strcpy(s, str);
+	mask = 0;
+	token = strtok(s, " ");
+
+	while (token) {
+		modifier = token[0];
+
+		if (modifier == '+' || modifier == '-') {
+			token++;
+		} else {
+			modifier = '+';
+		}
+
+		for (i=0; i<ARMOR_MAX; i++) {
+			if (!Q_stricmp(token, "all")) {
+				if (modifier == '+') {
+					mask = 0x7fffffffU;
+				} else {
+					mask = 0;
+				}
+			}
+
+			if (!Q_stricmp(token, armorvotes[i].names[0]) || !Q_stricmp(token, armorvotes[i].names[1])) {
 				if (modifier == '+') {
 					mask |= weaponvotes[i].value;
 				} else if (modifier == '-') {

@@ -17,7 +17,7 @@ void TDM_ApplyVote (void);
 
 int LookupPlayer (const char *match, edict_t **out, edict_t *ent);
 int G_WeaponStringToBitmask(char *str);
-
+int G_ArmorStringToBitmask(char *str);
 
 //votemenu.c
 void OpenVoteMenu (edict_t *ent);
@@ -60,11 +60,20 @@ typedef struct powerupvote_s
 	int				itemindex;
 } powerupinfo_t;
 
+typedef struct armorvote_s
+{
+	const char		*names[2];
+	unsigned		value;
+	int				itemindex;
+} armorinfo_t;
+
 #define WEAPON_MAX		10
 #define POWERUP_MAX		7
+#define ARMOR_MAX       3
 
-extern const weaponinfo_t	weaponvotes[WEAPON_MAX];
-extern const powerupinfo_t	powerupvotes[POWERUP_MAX];
+extern const weaponinfo_t   weaponvotes[WEAPON_MAX];
+extern const powerupinfo_t  powerupvotes[POWERUP_MAX];
+extern const armorinfo_t    armorvotes[ARMOR_MAX];
 
 extern vote_t	vote;
 
@@ -88,6 +97,10 @@ extern char			**tdm_configlist;
 #define POWERUP_SILENCER		(1<<5)
 #define POWERUP_REBREATHER		(1<<6)
 #define POWERUP_ENVIROSUIT		(1<<7)
+
+#define ITEM_ARMOR_JACKET       (1<<1)
+#define ITEM_ARMOR_COMBAT       (1<<2)
+#define ITEM_ARMOR_BODY         (1<<3)
 
 #define VOTE_TIMELIMIT          0x1
 #define VOTE_MAP                0x2
