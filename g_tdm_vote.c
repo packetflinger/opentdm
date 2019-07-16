@@ -2676,3 +2676,50 @@ void TDM_ConfigDownloaded (tdm_download_t *download, int code, byte *buff, int l
 
 	tdm_vote_download.inuse = false;
 }
+
+/**
+ * Convert string like "-all +rg +cg" to a bitmask
+ */
+int G_WeaponStringToBitmask(char *str) {
+	static int mask;
+	char modifier;
+	char s[MAX_STRING_CHARS];
+	char *token;
+	int i;
+
+	strcpy(s, str);
+	mask = 0;
+	token = strtok(s, " ");
+
+	while (token) {
+		modifier = token[0];
+
+		if (modifier == '+' || modifier == '-') {
+			token++;
+		} else {
+			modifier = '+';
+		}
+
+		for (i=0; i<WEAPON_MAX; i++) {
+			if (!Q_stricmp(token, "all")) {
+				if (modifier == '+') {
+					mask = 0x7fffffffU;
+				} else {
+					mask = 0;
+				}
+			}
+
+			if (!Q_stricmp(token, weaponvotes[i].names[0]) || !Q_stricmp(token, weaponvotes[i].names[1])) {
+				if (modifier == '+') {
+					mask |= weaponvotes[i].value;
+				} else if (modifier == '-') {
+					mask &= ~weaponvotes[i].value;
+				}
+			}
+		}
+
+		token = strtok(NULL, " ");
+	}
+
+	return mask;
+}

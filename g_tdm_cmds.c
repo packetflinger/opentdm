@@ -2580,7 +2580,8 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
  * Just for testing stuff
  */
 void TDM_Test_f(edict_t *ent) {
-	gi.cprintf(ent, PRINT_HIGH, "Unique ID: %d\n", ent->client->pers.uniqueid);
+	//gi.cprintf(ent, PRINT_HIGH, "Unique ID: %d\n", ent->client->pers.uniqueid);
+	gi.cprintf(ent, PRINT_HIGH, "bits: %d\n", G_WeaponStringToBitmask(gi.args()));
 }
 
 
