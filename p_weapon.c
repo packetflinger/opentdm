@@ -99,10 +99,8 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 	if (UF(other, WEAPON_TIMER) && g_weapon_timer->value) {
 
 		// no mask set, set timer for every weapon pickup
-		if (other->client->pers.weapon_mask == 0) {
-			other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
-			other->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
-		} else {
+		if (other->client->pers.weapon_mask) {
+
 			// lookup weapon vote bitmask index to game inventory index
 			for (i=0; i<WEAPON_MAX; i++) {
 				if (index == weaponvotes[i].itemindex) {
@@ -110,7 +108,6 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 				}
 			}
 
-			gi.dprintf("%d & %d? %s\n", other->client->pers.weapon_mask, weaponvotes[i].value, weaponvotes[i].names[1]);
 			// client wants to time this weapon
 			if (other->client->pers.weapon_mask & weaponvotes[i].value) {
 				other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
