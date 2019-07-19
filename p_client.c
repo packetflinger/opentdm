@@ -2153,10 +2153,6 @@ void TDM_MergePlayerConfig(edict_t *ent)
 		return;
 	}
 
-	if (!ent->client->pers.config) {
-		return;
-	}
-
 	p = &ent->client->pers;
 	c = &p->config;
 
