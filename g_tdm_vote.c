@@ -2687,7 +2687,7 @@ void TDM_ConfigDownloaded (tdm_download_t *download, int code, byte *buff, int l
 /**
  * Convert string like "-all +rg +cg" to a bitmask
  */
-int G_WeaponStringToBitmask(char *str) {
+int TDM_WeaponStringToBitmask(char *str) {
 	static int mask;
 	char modifier;
 	char s[MAX_STRING_CHARS];
@@ -2734,7 +2734,7 @@ int G_WeaponStringToBitmask(char *str) {
 /**
  * Convert armor string ("+all -ya", "-all +body +combat", "-all +ra") to a bitmask
  */
-int G_ArmorStringToBitmask(char *str) {
+int TDM_ArmorStringToBitmask(char *str) {
 	static int mask;
 	char modifier;
 	char s[MAX_STRING_CHARS];

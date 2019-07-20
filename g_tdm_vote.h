@@ -16,8 +16,8 @@ void TDM_UpdateVoteConfigString (void);
 void TDM_ApplyVote (void);
 
 int LookupPlayer (const char *match, edict_t **out, edict_t *ent);
-int G_WeaponStringToBitmask(char *str);
-int G_ArmorStringToBitmask(char *str);
+int TDM_WeaponStringToBitmask(char *str);
+int TDM_ArmorStringToBitmask(char *str);
 
 //votemenu.c
 void OpenVoteMenu (edict_t *ent);
