@@ -1604,7 +1604,11 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	// weapon mask for auto timer
 	s = Info_ValueForKey(userinfo, "wmask");
 	if (s[0]) {
-		ent->client->pers.weapon_mask = atoi(s);
+		if (s[0] >= '0' && s[0] <= '9') {
+			ent->client->pers.weapon_mask = atoi(s);
+		} else {
+			ent->client->pers.weapon_mask = TDM_WeaponStringToBitmask(s);
+		}
 	}
 
 	// armor mask for auto timer
