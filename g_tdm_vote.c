@@ -52,9 +52,9 @@ const powerupinfo_t	powerupvotes[POWERUP_MAX] =
 
 const armorinfo_t armorvotes[ARMOR_MAX] =
 {
-	{{"jacket", "ga"}, ARMOR_JACKET, ITEM_ITEM_ARMOR_JACKET},
-	{{"combat", "ya"}, ARMOR_COMBAT, ITEM_ITEM_ARMOR_COMBAT},
-	{{"body", "ra"}, ARMOR_BODY, ITEM_ITEM_ARMOR_BODY},
+	{{"jacket", "ga"}, ITEM_ARMOR_JACKET, ITEM_ITEM_ARMOR_JACKET},
+	{{"combat", "ya"}, ITEM_ARMOR_COMBAT, ITEM_ITEM_ARMOR_COMBAT},
+	{{"body", "ra"}, ITEM_ARMOR_BODY, ITEM_ITEM_ARMOR_BODY},
 };
 
 //current vote

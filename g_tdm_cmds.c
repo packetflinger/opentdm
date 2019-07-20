@@ -2582,7 +2582,7 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
 void TDM_Test_f(edict_t *ent) {
 	//gi.cprintf(ent, PRINT_HIGH, "Unique ID: %d\n", ent->client->pers.uniqueid);
 	//gi.cprintf(ent, PRINT_HIGH, "bits: %d\n", TDM_ArmorStringToBitmask(gi.args()));
-	gi.cprintf(ent, PRINT_HIGH, "wmask: %d\n", ent->client->pers.weapon_mask);
+	gi.cprintf(ent, PRINT_HIGH, "amask: %d\n", ent->client->pers.armor_mask);
 }
 
 

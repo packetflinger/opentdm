@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "g_local.h"
+#include "g_tdm.h"
 
 
 qboolean	Pickup_Weapon (edict_t *ent, edict_t *other);
@@ -584,12 +585,15 @@ int ArmorIndex (edict_t *ent)
 
 qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 {
-	int				old_armor_index;
-	gitem_armor_t	*oldinfo;
-	gitem_armor_t	*newinfo;
-	int				newcount;
-	float			salvage;
-	int				salvagecount;
+	int             old_armor_index;
+	gitem_armor_t   *oldinfo;
+	gitem_armor_t   *newinfo;
+	int             newcount;
+	float           salvage;
+	int             salvagecount;
+	int             i, index;
+
+	index = ITEM_INDEX(ent->item);
 
 	// get info on new armor
 	newinfo = (gitem_armor_t *)ent->item->info;
@@ -660,8 +664,20 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 
 	// set the timer if enabled
 	if (UF(other, ARMOR_TIMER) && g_armor_timer->value) {
-		other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
-		other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex((GetItemByIndex(ent->item->tag)->icon));
+		if (other->client->pers.armor_mask) {
+
+			// lookup weapon vote bitmask index to game inventory index
+			for (i=0; i<ARMOR_MAX; i++) {
+				if (index == armorvotes[i].itemindex) {
+					break;
+				}
+			}
+
+			if (other->client->pers.armor_mask & armorvotes[i].value) {
+				other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+				other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex(ent->item->icon);
+			}
+		}
 	}
 
 	return true;

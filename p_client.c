@@ -1614,7 +1614,11 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	// armor mask for auto timer
 	s = Info_ValueForKey(userinfo, "amask");
 	if (s[0]) {
-		ent->client->pers.armor_mask = atoi(s);
+		if (s[0] >= '0' && s[0] <= '9') {
+			ent->client->pers.armor_mask = atoi(s);
+		} else {
+			ent->client->pers.armor_mask = TDM_ArmorStringToBitmask(s);
+		}
 	}
 
 	// save off the userinfo in case we want to check something later
