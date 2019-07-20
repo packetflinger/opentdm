@@ -2580,9 +2580,7 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
  * Just for testing stuff
  */
 void TDM_Test_f(edict_t *ent) {
-	//gi.cprintf(ent, PRINT_HIGH, "Unique ID: %d\n", ent->client->pers.uniqueid);
-	//gi.cprintf(ent, PRINT_HIGH, "bits: %d\n", TDM_ArmorStringToBitmask(gi.args()));
-	gi.cprintf(ent, PRINT_HIGH, "amask: %d\n", ent->client->pers.armor_mask);
+	gi.cprintf(ent, PRINT_HIGH, "bits: %d\n", TDM_ArmorStringToBitmask(gi.args()));
 }
 
 
@@ -2608,7 +2606,11 @@ void TDM_ArmorTimer_f(edict_t *ent)
 		ent->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
 		ent->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
 	} else {
-		gi.cprintf(ent, PRINT_HIGH, "Armor timer disabled in server config\n");
+		if (((int)g_vote_mask->value) & VOTE_ARMOR_TIMER) {
+			gi.cprintf(ent, PRINT_HIGH, "Armor timer disabled, vote to enable it: \"vote armortimer 1\"\n");
+		} else {
+			gi.cprintf(ent, PRINT_HIGH, "Armor timer disabled in server config\n");
+		}
 	}
 }
 
