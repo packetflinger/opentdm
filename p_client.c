@@ -2148,26 +2148,3 @@ void ClientBeginServerFrame (edict_t *ent)
 
 	client->latched_buttons = 0;
 }
-
-/**
- * Some playerconfig values need to be copied to client_persistent_t
- */
-void TDM_MergePlayerConfig(edict_t *ent)
-{
-	playerconfig_t *c;
-	client_persistent_t *p;
-
-	if (!ent->client) {
-		return;
-	}
-
-	p = &ent->client->pers;
-	c = &p->config;
-
-	p->weaponhud_offset_x = c->weapon_hud_x;
-	p->weaponhud_offset_y = c->weapon_hud_y;
-	p->weapon_mask = c->weapon_mask;
-	p->weapon_timer = c->weapon_timer;
-	p->armor_mask = c->armor_mask;
-	p->armor_timer = c->armor_timer;
-}
