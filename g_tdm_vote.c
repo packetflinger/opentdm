@@ -2063,7 +2063,7 @@ qboolean TDM_VoteArmorTimer(edict_t *ent) {
 		return false;
 	}
 
-	if (!Q_stricmp(value, "1")) {
+	if (!Q_stricmp(value, "1") || !Q_stricmp(value, "yes")) {
 		vote.armor_timer = 1;
 	} else {
 		vote.armor_timer = 0;
@@ -2087,7 +2087,7 @@ qboolean TDM_VoteWeaponTimer(edict_t *ent) {
 		return false;
 	}
 
-	if (!Q_stricmp(value, "1")) {
+	if (!Q_stricmp(value, "1") || !Q_stricmp(value, "yes")) {
 		vote.weapon_timer = 1;
 	} else {
 		vote.weapon_timer = 0;
