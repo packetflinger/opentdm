@@ -123,7 +123,7 @@ void JoinedTeam (edict_t *ent, qboolean reconnected, qboolean notify)
 	respawn (ent);
 
 	// switch from spec to player statusbar, if weapon hud is enabled, that'll happen in respawn()
-	if (!UF(ent, WEAPON_HUD)) {
+	if (!ent->client->pers.weaponhud) {
 		TDM_UpdateHud(ent, true);
 	}
 }
@@ -758,7 +758,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	weaponhud[0] = 0;
 	ammohud[0] = 0;
 
-	if (UF(player, WEAPON_HUD) && g_weapon_hud->value > 0) {
+	if (player->client->pers.weaponhud && g_weapon_hud->value > 0) {
 
 		// set x position at first for all weapon icons, to save the chars since CS max is 1000
 		strcpy(weaponhud, va("xr %d ", hud_x));
@@ -1055,6 +1055,11 @@ void TDM_MergePlayerConfig(edict_t *ent)
 	p->weapon_timer = c->weapon_timer;
 	p->armor_mask = c->armor_mask;
 	p->armor_timer = c->armor_timer;
+	if (c->weapon_hud) {
+		p->weaponhud = true;
+	} else {
+		p->weaponhud = false;
+	}
 
 	gi.cprintf(ent, PRINT_HIGH, "Remote config merged into playerstate\n");
 }

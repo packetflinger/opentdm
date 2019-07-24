@@ -1123,7 +1123,7 @@ void respawn (edict_t *self)
 	}
 
 	// refresh the statusbar to remove weapons from hud
-	if (self->client->pers.team && UF(self, WEAPON_HUD)) {
+	if (self->client->pers.team && self->client->pers.weaponhud) {
 		TDM_UpdateHud(self, true);
 	}
 
@@ -1578,8 +1578,14 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 
 	// user flags
 	s = Info_ValueForKey(userinfo, "uf");
-	if (s[0])
+	if (s[0]) {
 		ent->client->pers.userflags = atoi(s);
+		if (UF(ent, WEAPON_HUD)) {
+			ent->client->pers.weaponhud = true;
+		} else {
+			ent->client->pers.weaponhud = false;
+		}
+	}
 
 	// left/right offset for weapon hud (negative is left)
 	s = Info_ValueForKey(userinfo, "wh.x");

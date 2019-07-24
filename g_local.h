@@ -1505,13 +1505,15 @@ typedef struct
 	playerconfig_t config;
 	unsigned       uniqueid;
 	int            userflags;
-	int            weaponhud_offset_x;
-	int            weaponhud_offset_y;
+	qboolean       weaponhud;             // show weap/ammo counts on screen
+	int            weaponhud_offset_x;    // right/left offset from right side
+	int            weaponhud_offset_y;    // up/down offset from middle
 	int            ignore;                // bitmask
 	int            weapon_timer;          // auto timer for weapons
 	int            weapon_mask;           // weapons to auto timer
 	int            armor_timer;           // auto timer for armor
 	int            armor_mask;            // armor to auto timer
+
 } client_persistent_t;
 
 typedef struct

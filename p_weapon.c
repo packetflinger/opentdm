@@ -83,7 +83,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 	}
 
 	// update the weapon hud if we just picked up our only one of this weapon
-	if (UF(other, WEAPON_HUD) && other->client->inventory[index] == 1) {
+	if (other->client->pers.weaponhud && other->client->inventory[index] == 1) {
 
 		// ssg/cg/gl overtakes sg/mg/hg icon, don't update if we pick up lesser weap and have better
 		if (index == ITEM_WEAPON_SHOTGUN && other->client->inventory[ITEM_WEAPON_SUPERSHOTGUN] > 0) {
@@ -371,7 +371,7 @@ void Drop_Weapon (edict_t *ent, const gitem_t *item)
 	ent->client->inventory[index]--;
 
 	// update the weapon hud if we just dropped our last one of these weapons
-	if (UF(ent, WEAPON_HUD) && ent->client->inventory[index] == 0) {
+	if (ent->client->pers.weaponhud && ent->client->inventory[index] == 0) {
 		if (index == ITEM_WEAPON_SHOTGUN && ent->client->inventory[ITEM_WEAPON_SUPERSHOTGUN] > 0) {
 			return;
 		} else if (index == ITEM_WEAPON_MACHINEGUN && ent->client->inventory[ITEM_WEAPON_CHAINGUN] > 0) {

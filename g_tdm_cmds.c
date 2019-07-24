@@ -74,13 +74,13 @@ static void TDM_WeaponHud_f(edict_t *ent) {
 		return;
 	}
 
-	if (!UF(ent, WEAPON_HUD)) {
-		ent->client->pers.userflags |= UF_WEAPON_HUD;
+	if (!ent->client->pers.weaponhud) {
+		ent->client->pers.weaponhud = true;
 		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_WEAPON_HUD));
 		TDM_UpdateHud(ent, true);
 		gi.cprintf(ent, PRINT_HIGH, "Weapon hud enabled\n");
 	} else {
-		ent->client->pers.userflags &= ~UF_WEAPON_HUD;
+		ent->client->pers.weaponhud = false;
 		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags & ~UF_WEAPON_HUD));
 		TDM_UpdateHud(ent, true);
 		gi.cprintf(ent, PRINT_HIGH, "Weapon hud disabled\n");

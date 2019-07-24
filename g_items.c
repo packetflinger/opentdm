@@ -470,7 +470,7 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 
 	// special case, grenades are ammo and their own weapon,
 	// don't update if we already have a grenade launcher
-	if (UF(other, WEAPON_HUD) &&
+	if (other->client->pers.weaponhud &&
 			ITEM_INDEX(ent->item) == ITEM_AMMO_GRENADES &&
 			oldcount == 0 &&
 			other->client->inventory[ITEM_WEAPON_GRENADELAUNCHER] == 0) {
