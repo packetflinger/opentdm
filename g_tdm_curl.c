@@ -325,31 +325,6 @@ void HTTP_Shutdown (void)
 	curl_global_cleanup ();
 }
 
-/**
- * Some playerconfig values need to be copied to client_persistent_t
- */
-void TDM_MergePlayerConfig(edict_t *ent)
-{
-	playerconfig_t *c;
-	client_persistent_t *p;
-
-	if (!ent->client) {
-		return;
-	}
-
-	p = &ent->client->pers;
-	c = &p->config;
-
-	p->weaponhud_offset_x = c->weapon_hud_x;
-	p->weaponhud_offset_y = c->weapon_hud_y;
-	p->weapon_mask = c->weapon_mask;
-	p->weapon_timer = c->weapon_timer;
-	p->armor_mask = c->armor_mask;
-	p->armor_timer = c->armor_timer;
-
-	gi.cprintf(ent, PRINT_HIGH, "Remote config merged into playerstate\n");
-}
-
 /*
 ===============
 CL_FinishHTTPDownload
@@ -452,9 +427,6 @@ static void HTTP_FinishDownload (void)
 		dl->inuse = false;
 
 		gi.dprintf ("HTTP: Finished %s: %.f bytes, %.2fkB/sec\n", dl->URL, fileSize, (fileSize / 1024.0) / timeTaken);
-
-		//
-		TDM_MergePlayerConfig(dl->tdm_handle->initiator);
 	} while (msgs_in_queue > 0);
 }
 
