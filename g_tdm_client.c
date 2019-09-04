@@ -600,7 +600,7 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 		"yb -72 "
 		"num 4 24 "
 
-		// Time
+		// Match status
 		"xv 175 "
 		"yb -48 "
 		"stat_string 26 "
@@ -829,6 +829,15 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	}
 
 	dm_statusbar = va(
+		// Match Status
+		"xv 175 "
+		"yb -50 "
+		"stat_string 26 "
+
+		// Time value
+		"yb -42 "
+		"stat_string 31 "
+
 		"yb -24 "
 
 		// health
@@ -889,6 +898,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			"pic 29"
 		"endif "
 
+
+
 		// First team name
 		"xr -%ld "
 		"yb -96 "
@@ -908,14 +919,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"yb -72 "
 		"num 4 24 "
 
-		// Time
-		"xv 175 "
-		"yb -48 "
-		"stat_string 26 "
 
-		// Time value
-		"yb -39 "
-		"stat_string 31 "
 
 		// Timeout message
 		"if 25 "
@@ -966,13 +970,14 @@ Send status bar config string.
 */
 void TDM_SendPlayerStatusBar(edict_t *ent)
 {
-	gi.WriteByte (SVC_CONFIGSTRING);
-	gi.WriteShort (CS_STATUSBAR);
-	gi.WriteString (TDM_CreatePlayerDmStatusBar (ent));
-	gi.unicast (ent, true);
+	gi.WriteByte(SVC_CONFIGSTRING);
+	gi.WriteShort(CS_STATUSBAR);
+	gi.WriteString(TDM_CreatePlayerDmStatusBar(ent));
+	gi.unicast(ent, true);
 }
 
-void TDM_SendSpectatorStatusBar(edict_t *ent) {
+void TDM_SendSpectatorStatusBar(edict_t *ent)
+{
 	gi.WriteByte(SVC_CONFIGSTRING);
 	gi.WriteShort(CS_STATUSBAR);
 	gi.WriteString(TDM_CreateSpectatorStatusBar(ent));
