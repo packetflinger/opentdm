@@ -677,7 +677,7 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 				"yb -50 "
 			"endif "
 
-			// timer (quad, rebreather, envirosuit)
+			// timer (quad, armor, rebreather, envirosuit)
 			"if 9 "
 				"xv 246 "
 				"num 2 10 "
@@ -691,13 +691,13 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 				"pic 11 "
 			"endif "
 
-			// timer (pent)
+			// timer (pent/weapon)
 			"if 30 "
 				"yb -80 "
 				"xv 246 "
 				"num 2 30 "
 				"xv 296 "
-				"picn p_invulnerability "
+				"pic 29 "
 			"endif "
 		"endif "
 
@@ -829,15 +829,6 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	}
 
 	dm_statusbar = va(
-		// Match Status
-		"xv 175 "
-		"yb -50 "
-		"stat_string 26 "
-
-		// Time value
-		"yb -42 "
-		"stat_string 31 "
-
 		"yb -24 "
 
 		// health
@@ -874,7 +865,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			"yb -50 "
 		"endif "
 
-		// timer (quad, rebreather, envirosuit)
+		// timer (quad, armor, rebreather, envirosuit)
 		"if 9 "
 			"xv 246 "
 			"num 2 10 "
@@ -888,17 +879,23 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			"pic 11 "
 		"endif "
 
-		// timer (pent)
+		// timer (pent, weapon)
 		"if 30 "
 			"yb -80 "
 			"xv 246 "
 			"num 2 30 "
 			"xv 296 "
-			//"picn p_invulnerability "
-			"pic 29"
+			"pic 29 "
 		"endif "
 
+		// Match Status
+		"xv 175 "
+		"yb -50 "
+		"stat_string 26 "
 
+		// Time value
+		"yb -42 "
+		"stat_string 31 "
 
 		// First team name
 		"xr -%ld "
@@ -918,8 +915,6 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		// Second team score / status
 		"yb -72 "
 		"num 4 24 "
-
-
 
 		// Timeout message
 		"if 25 "
