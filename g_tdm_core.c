@@ -498,10 +498,8 @@ char *TDM_ScoreBoardString (edict_t *ent)
 
 	hostname = gi.cvar ("hostname", NULL, 0);
 
-	serverinfo[sizeof(serverinfo)-1] = '\0';
-
 	if (hostname)
-		strncpy (serverinfo, hostname->string, sizeof(serverinfo)-1);
+		Q_strncpy (serverinfo, hostname->string, sizeof(serverinfo)-1);
 	else
 		strcpy (serverinfo, "unnamed server");
 
@@ -1102,7 +1100,7 @@ void TDM_BeginCountdown (void)
 
 	// record multi-view demo on server
 	if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
-		strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
+		Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
 		gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
 		game.mvd.recording = true;
 	}
@@ -1902,7 +1900,7 @@ void TDM_UpdateTeamNames (void)
 		{
 			if (strcmp (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname))
 			{
-				strncpy (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
+				Q_strncpy (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
 				g_team_a_name->modified = true;
 			}
 		}
@@ -1919,7 +1917,7 @@ void TDM_UpdateTeamNames (void)
 		{
 			if (strcmp (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname))
 			{
-				strncpy (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
+				Q_strncpy (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
 				g_team_b_name->modified = true;
 			}
 		}
@@ -1946,13 +1944,13 @@ void TDM_UpdateTeamNames (void)
 			{
 				if (strcmp (teaminfo[TEAM_A].name, p1->client->pers.netname))
 				{
-					strncpy (teaminfo[TEAM_A].name, p1->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
+					Q_strncpy (teaminfo[TEAM_A].name, p1->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
 					g_team_a_name->modified = true;
 				}
 
 				if (strcmp (teaminfo[TEAM_B].name, p2->client->pers.netname))
 				{
-					strncpy (teaminfo[TEAM_B].name, p2->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
+					Q_strncpy (teaminfo[TEAM_B].name, p2->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
 					g_team_b_name->modified = true;
 				}
 			}
@@ -1961,13 +1959,13 @@ void TDM_UpdateTeamNames (void)
 		{
 			if (strcmp (teaminfo[TEAM_A].name, g_team_a_name->string))
 			{
-				strncpy (teaminfo[TEAM_A].name, g_team_a_name->string, sizeof(teaminfo[TEAM_A].name)-1);
+				Q_strncpy (teaminfo[TEAM_A].name, g_team_a_name->string, sizeof(teaminfo[TEAM_A].name)-1);
 				g_team_a_name->modified = true;
 			}
 
 			if (strcmp (teaminfo[TEAM_B].name, g_team_b_name->string))
 			{
-				strncpy (teaminfo[TEAM_B].name, g_team_b_name->string, sizeof(teaminfo[TEAM_B].name)-1);
+				Q_strncpy (teaminfo[TEAM_B].name, g_team_b_name->string, sizeof(teaminfo[TEAM_B].name)-1);
 				g_team_b_name->modified = true;
 			}
 		}
@@ -2634,7 +2632,7 @@ void TDM_Init (void)
 	if (!var)
 		gi.error ("Couldn't determine game directory");
 
-	strncpy (game.gamedir, var->string, sizeof(game.gamedir)-1);
+	Q_strncpy (game.gamedir, var->string, sizeof(game.gamedir)-1);
 
 	//ensure R1Q2 entflags are available since we use them for all projectiles
 	var = gi.cvar ("sv_new_entflags", NULL, 0);
@@ -2802,7 +2800,7 @@ void TDM_SetSkins (void)
 
 		//gi.configstring (index, va("/players/%s_i.pcx", newskin));
 
-		strncpy (teaminfo[i].skin, newskin, sizeof(teaminfo[i].skin)-1);
+		Q_strncpy (teaminfo[i].skin, newskin, sizeof(teaminfo[i].skin)-1);
 
 		for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
 		{

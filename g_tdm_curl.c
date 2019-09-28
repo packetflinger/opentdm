@@ -470,7 +470,7 @@ qboolean HTTP_QueueDownload (tdm_download_t *d)
 
 	downloads[i].tdm_handle = d;
 	downloads[i].inuse = true;
-	strncpy (downloads[i].filePath, d->path, sizeof(downloads[i].filePath)-1);
+	Q_strncpy (downloads[i].filePath, d->path, sizeof(downloads[i].filePath)-1);
 	HTTP_StartDownload (&downloads[i]);
 
 	return true;
