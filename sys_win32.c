@@ -26,7 +26,7 @@ const char *Sys_FindFirst (const char *path)
 	if (findhandle == INVALID_HANDLE_VALUE)
 		return NULL;
 
-	snprintf (findpath, sizeof(findpath), "%s/%s", findbase, findinfo.cFileName);
+	Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, findinfo.cFileName);
 	return findpath;
 }
 
@@ -40,7 +40,7 @@ const char *Sys_FindNext (void)
 	if (!FindNextFile (findhandle, &findinfo))
 		return NULL;
 
-	snprintf (findpath, sizeof(findpath), "%s/%s", findbase, findinfo.cFileName);
+	Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, findinfo.cFileName);
 	return findpath;
 }
 

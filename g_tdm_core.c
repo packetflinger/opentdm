@@ -2318,7 +2318,7 @@ qboolean TDM_CheckMapExists (const char *mapname)
 	if (gamedir)
 	{
 		// check gamedir
-		snprintf (buffer, sizeof(buffer), "%s/maps/%s.bsp", gamedir->string, mapname);
+		snprintf (buffer, sizeof(buffer)-1, "%s/maps/%s.bsp", gamedir->string, mapname);
 		mf = fopen (buffer, "r");
 		if (mf == NULL)
 			return false;
@@ -2986,7 +2986,7 @@ void TDM_UpdateConfigStrings (qboolean forceUpdate)
 	if (time_remaining != last_time_remaining || forceUpdate)
 	{
 		static int	last_secs = -1;
-		char		time_buffer[8];
+		char		time_buffer[32];
 		int			mins, secs;
 
 		last_time_remaining = time_remaining;
@@ -3022,7 +3022,7 @@ void TDM_UpdateConfigStrings (qboolean forceUpdate)
 	if (timeout_remaining != last_timeout_remaining)
 	{
 		static int	last_secs = -1;
-		char		time_buffer[8];
+		char		time_buffer[32];
 		int			mins, secs;
 
 		last_timeout_remaining = timeout_remaining;
