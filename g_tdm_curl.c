@@ -234,7 +234,7 @@ handle.
 void HTTP_StartDownload (dlhandle_t *dl)
 {
 	cvar_t				*hostname;
-	char				escapedFilePath[2048];
+	char				escapedFilePath[1024*3];
 
 	hostname = gi.cvar ("hostname", NULL, 0);
 	if (!hostname)
