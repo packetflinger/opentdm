@@ -583,12 +583,12 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 
 	spec_statusbar = va (
 		// First team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -96 "
 		"string \"%s\" "
 
 		// Second team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -48 "
 		"string \"%s\" "
 
@@ -722,8 +722,8 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 			"yb -180 "
 			"stat_string 28 "
 		"endif",
-		strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
-		strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
+		(int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
+		(int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
 		id_x, id_y
 	);
 
@@ -899,12 +899,12 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"stat_string 31 "
 
 		// First team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -96 "
 		"string \"%s\" "
 
 		// Second team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -48 "
 		"string \"%s\" "
 
@@ -949,8 +949,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"endif "
 
 		"%s%s",
-		strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
-		strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
+		(int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
+		(int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
 		id_x, id_y,
 		weaponhud, ammohud
 	);
