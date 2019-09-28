@@ -567,8 +567,9 @@ void TDM_Disconnected (edict_t *ent)
 }
 
 
-const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
-	static char *spec_statusbar;
+const char *TDM_CreateSpectatorStatusBar(edict_t *player)
+{
+	char		*spec_statusbar;
 	int			id_x, id_y;
 
 	// opentdm default
@@ -737,9 +738,9 @@ Create player's own customized dm_statusbar.
 */
 const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 {
-	static char	*dm_statusbar;
-	static char weaponhud[175];		// the weapon icons
-	static char ammohud[135];		// the ammo counts
+	char		*dm_statusbar;
+	char		weaponhud[1400];	// the weapon icons
+	char		ammohud[1400];		// the ammo counts
 	int			id_x, id_y;
 	int			hud_x, hud_y;
 
