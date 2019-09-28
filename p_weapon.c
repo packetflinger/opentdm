@@ -250,8 +250,6 @@ Think_Weapon
 Called by ClientBeginServerFrame and ClientThink
 =================
 */
-vote_t vote;
-
 void Think_Weapon (edict_t *ent)
 {
 	// if just died, put the weapon away

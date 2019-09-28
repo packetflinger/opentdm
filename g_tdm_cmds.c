@@ -76,12 +76,12 @@ static void TDM_WeaponHud_f(edict_t *ent) {
 
 	if (!ent->client->pers.weaponhud) {
 		ent->client->pers.weaponhud = true;
-		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_WEAPON_HUD));
+		G_StuffCmd(ent, "set uf \"%d\" u\n", ent->client->pers.userflags | UF_WEAPON_HUD);
 		TDM_UpdateHud(ent, true);
 		gi.cprintf(ent, PRINT_HIGH, "Weapon hud enabled\n");
 	} else {
 		ent->client->pers.weaponhud = false;
-		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags & ~UF_WEAPON_HUD));
+		G_StuffCmd(ent, "set uf \"%d\" u\n", ent->client->pers.userflags & ~UF_WEAPON_HUD);
 		TDM_UpdateHud(ent, true);
 		gi.cprintf(ent, PRINT_HIGH, "Weapon hud disabled\n");
 	}
@@ -90,20 +90,20 @@ static void TDM_WeaponHud_f(edict_t *ent) {
 
 static void TDM_AutoScreenshot_f(edict_t *ent) {
 	if (!UF(ent, AUTOSCREENSHOT)) {
-		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_AUTOSCREENSHOT));
+		G_StuffCmd(ent, "set uf \"%d\" u\n", ent->client->pers.userflags | UF_AUTOSCREENSHOT);
 		gi.cprintf(ent, PRINT_HIGH, "Auto-screenshot enabled\n");
 	} else {
-		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags & ~UF_AUTOSCREENSHOT));
+		G_StuffCmd(ent, "set uf \"%d\" u\n", ent->client->pers.userflags & ~UF_AUTOSCREENSHOT);
 		gi.cprintf(ent, PRINT_HIGH, "Auto-screenshot disabled\n");
 	}
 }
 
 static void TDM_AutoRecord_f(edict_t *ent) {
 	if (!UF(ent, AUTORECORD)) {
-		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags | UF_AUTORECORD));
+		G_StuffCmd(ent, "set uf \"%d\" u\n", ent->client->pers.userflags | UF_AUTORECORD);
 		gi.cprintf(ent, PRINT_HIGH, "Auto-record enabled\n");
 	} else {
-		G_StuffCmd(ent, va("set uf \"%d\" u", ent->client->pers.userflags & ~UF_AUTORECORD));
+		G_StuffCmd(ent, "set uf \"%d\" u\n", ent->client->pers.userflags & ~UF_AUTORECORD);
 		gi.cprintf(ent, PRINT_HIGH, "Auto-record disabled\n");
 	}
 }
@@ -2511,9 +2511,9 @@ void TDM_TeamEnemySkin_f (edict_t *ent, qboolean team)
 	}
 
 	if (team)
-		strncpy (ent->client->pers.config.teamskin, gi.argv(1), sizeof(ent->client->pers.config.teamskin)-1);
+		Q_strncpy (ent->client->pers.config.teamskin, gi.argv(1), sizeof(ent->client->pers.config.teamskin)-1);
 	else
-		strncpy (ent->client->pers.config.enemyskin, gi.argv(1), sizeof(ent->client->pers.config.enemyskin)-1);
+		Q_strncpy (ent->client->pers.config.enemyskin, gi.argv(1), sizeof(ent->client->pers.config.enemyskin)-1);
 
 	TDM_SetTeamSkins (ent, NULL);
 }
