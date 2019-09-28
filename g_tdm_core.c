@@ -3086,7 +3086,7 @@ void TDM_Error (const char *fmt, ...)
 		gi.dprintf ("%d: %s, connected %d, team %d, info %p\n", (int)(ent - g_edicts - 1), ent->client->pers.netname, ent->client->pers.connected, ent->client->pers.team, ent->client->resp.teamplayerinfo);
 	}
 
-	gi.error (text);
+	gi.error ("%s", text);
 }
 
 /*
