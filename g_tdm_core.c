@@ -3403,12 +3403,10 @@ void TDM_ServerDemoStatus(edict_t *ent)
 void TDM_RandomizeTeams(void)
 {
 	int i, count;
-	edict_t **players;
+	edict_t *players[MAX_CLIENTS];
 	edict_t *e;
-	size_t j;
 
 	count = 0;
-	players = malloc(game.maxclients * sizeof(edict_t));
 
 	// build an array of just team players
 	for (i=0; i < game.maxclients; i++) {
@@ -3426,16 +3424,7 @@ void TDM_RandomizeTeams(void)
 		players[count++] = e;
 	}
 
-	// get rid of the extra space at the end
-	players = realloc(players, count * sizeof(edict_t));
-
-	// Fisher-Yates shuffle
-	for (i = count - 1; i > 0; i--) {
-		j = (unsigned int) (genrand_float32_full() * (i + 1));
-		e = players[j];
-		players[j] = players[i];
-		players[i] = e;
-	}
+	RandomizeArray((void *)players, count);
 
 	// put players on new teams
 	for (i=0; i<count; i++) {
@@ -3471,6 +3460,4 @@ void TDM_RandomizeTeams(void)
 
 	// check stuff now that the teams are different
 	TDM_TeamsChanged();
-
-	free(players);
 }
