@@ -1145,6 +1145,8 @@ void CountPlayers (void);
 void UpdatePlayerTeamMenu (edict_t *ent);
 void UpdateTeamMenu (void);
 
+void RandomizeArray (void **base, size_t n);
+
 extern matchmode_t	tdm_match_status;
 extern qboolean		tdm_settings_not_default;
 //extern pmenu_t joinmenu[];

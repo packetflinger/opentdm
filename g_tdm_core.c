@@ -498,10 +498,8 @@ char *TDM_ScoreBoardString (edict_t *ent)
 
 	hostname = gi.cvar ("hostname", NULL, 0);
 
-	serverinfo[sizeof(serverinfo)-1] = '\0';
-
 	if (hostname)
-		strncpy (serverinfo, hostname->string, sizeof(serverinfo)-1);
+		Q_strncpy (serverinfo, hostname->string, sizeof(serverinfo)-1);
 	else
 		strcpy (serverinfo, "unnamed server");
 
@@ -1102,7 +1100,7 @@ void TDM_BeginCountdown (void)
 
 	// record multi-view demo on server
 	if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
-		strncpy(game.mvd.filename, TDM_MakeServerDemoName(), MAX_STRING_CHARS);
+		Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
 		gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
 		game.mvd.recording = true;
 	}
@@ -1902,7 +1900,7 @@ void TDM_UpdateTeamNames (void)
 		{
 			if (strcmp (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname))
 			{
-				strncpy (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
+				Q_strncpy (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
 				g_team_a_name->modified = true;
 			}
 		}
@@ -1919,7 +1917,7 @@ void TDM_UpdateTeamNames (void)
 		{
 			if (strcmp (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname))
 			{
-				strncpy (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
+				Q_strncpy (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
 				g_team_b_name->modified = true;
 			}
 		}
@@ -1946,13 +1944,13 @@ void TDM_UpdateTeamNames (void)
 			{
 				if (strcmp (teaminfo[TEAM_A].name, p1->client->pers.netname))
 				{
-					strncpy (teaminfo[TEAM_A].name, p1->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
+					Q_strncpy (teaminfo[TEAM_A].name, p1->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
 					g_team_a_name->modified = true;
 				}
 
 				if (strcmp (teaminfo[TEAM_B].name, p2->client->pers.netname))
 				{
-					strncpy (teaminfo[TEAM_B].name, p2->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
+					Q_strncpy (teaminfo[TEAM_B].name, p2->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
 					g_team_b_name->modified = true;
 				}
 			}
@@ -1961,13 +1959,13 @@ void TDM_UpdateTeamNames (void)
 		{
 			if (strcmp (teaminfo[TEAM_A].name, g_team_a_name->string))
 			{
-				strncpy (teaminfo[TEAM_A].name, g_team_a_name->string, sizeof(teaminfo[TEAM_A].name)-1);
+				Q_strncpy (teaminfo[TEAM_A].name, g_team_a_name->string, sizeof(teaminfo[TEAM_A].name)-1);
 				g_team_a_name->modified = true;
 			}
 
 			if (strcmp (teaminfo[TEAM_B].name, g_team_b_name->string))
 			{
-				strncpy (teaminfo[TEAM_B].name, g_team_b_name->string, sizeof(teaminfo[TEAM_B].name)-1);
+				Q_strncpy (teaminfo[TEAM_B].name, g_team_b_name->string, sizeof(teaminfo[TEAM_B].name)-1);
 				g_team_b_name->modified = true;
 			}
 		}
@@ -2320,7 +2318,7 @@ qboolean TDM_CheckMapExists (const char *mapname)
 	if (gamedir)
 	{
 		// check gamedir
-		snprintf (buffer, sizeof(buffer), "%s/maps/%s.bsp", gamedir->string, mapname);
+		snprintf (buffer, sizeof(buffer)-1, "%s/maps/%s.bsp", gamedir->string, mapname);
 		mf = fopen (buffer, "r");
 		if (mf == NULL)
 			return false;
@@ -2634,7 +2632,7 @@ void TDM_Init (void)
 	if (!var)
 		gi.error ("Couldn't determine game directory");
 
-	strncpy (game.gamedir, var->string, sizeof(game.gamedir)-1);
+	Q_strncpy (game.gamedir, var->string, sizeof(game.gamedir)-1);
 
 	//ensure R1Q2 entflags are available since we use them for all projectiles
 	var = gi.cvar ("sv_new_entflags", NULL, 0);
@@ -2684,7 +2682,7 @@ void TDM_Init (void)
 #ifdef OPENTDM_REVISION
 	//show opentdm version to browsers
 	gi.cvar ("revision", va("%d", OPENTDM_REVISION), CVAR_SERVERINFO|CVAR_NOSET);
-	gi.cvar_set ("revision", va("%d", OPENTDM_REVISION));
+	gi.cvar_forceset ("revision", va("%d", OPENTDM_REVISION));
 #endif
 
 	TDM_ResetGameState ();
@@ -2802,7 +2800,7 @@ void TDM_SetSkins (void)
 
 		//gi.configstring (index, va("/players/%s_i.pcx", newskin));
 
-		strncpy (teaminfo[i].skin, newskin, sizeof(teaminfo[i].skin)-1);
+		Q_strncpy (teaminfo[i].skin, newskin, sizeof(teaminfo[i].skin)-1);
 
 		for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
 		{
@@ -2988,7 +2986,7 @@ void TDM_UpdateConfigStrings (qboolean forceUpdate)
 	if (time_remaining != last_time_remaining || forceUpdate)
 	{
 		static int	last_secs = -1;
-		char		time_buffer[8];
+		char		time_buffer[32];
 		int			mins, secs;
 
 		last_time_remaining = time_remaining;
@@ -3024,7 +3022,7 @@ void TDM_UpdateConfigStrings (qboolean forceUpdate)
 	if (timeout_remaining != last_timeout_remaining)
 	{
 		static int	last_secs = -1;
-		char		time_buffer[8];
+		char		time_buffer[32];
 		int			mins, secs;
 
 		last_timeout_remaining = timeout_remaining;
@@ -3088,7 +3086,7 @@ void TDM_Error (const char *fmt, ...)
 		gi.dprintf ("%d: %s, connected %d, team %d, info %p\n", (int)(ent - g_edicts - 1), ent->client->pers.netname, ent->client->pers.connected, ent->client->pers.team, ent->client->resp.teamplayerinfo);
 	}
 
-	gi.error (text);
+	gi.error ("%s", text);
 }
 
 /*
@@ -3405,12 +3403,10 @@ void TDM_ServerDemoStatus(edict_t *ent)
 void TDM_RandomizeTeams(void)
 {
 	int i, count;
-	edict_t **players;
+	edict_t *players[MAX_CLIENTS];
 	edict_t *e;
-	size_t j;
 
 	count = 0;
-	players = malloc(game.maxclients * sizeof(edict_t));
 
 	// build an array of just team players
 	for (i=0; i < game.maxclients; i++) {
@@ -3428,16 +3424,7 @@ void TDM_RandomizeTeams(void)
 		players[count++] = e;
 	}
 
-	// get rid of the extra space at the end
-	players = realloc(players, count * sizeof(edict_t));
-
-	// Fisher-Yates shuffle
-	for (i = count - 1; i > 0; i--) {
-		j = (unsigned int) (genrand_float32_full() * (i + 1));
-		e = players[j];
-		players[j] = players[i];
-		players[i] = e;
-	}
+	RandomizeArray((void *)players, count);
 
 	// put players on new teams
 	for (i=0; i<count; i++) {
@@ -3473,6 +3460,4 @@ void TDM_RandomizeTeams(void)
 
 	// check stuff now that the teams are different
 	TDM_TeamsChanged();
-
-	free(players);
 }

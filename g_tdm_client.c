@@ -567,8 +567,9 @@ void TDM_Disconnected (edict_t *ent)
 }
 
 
-const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
-	static char *spec_statusbar;
+const char *TDM_CreateSpectatorStatusBar(edict_t *player)
+{
+	char		*spec_statusbar;
 	int			id_x, id_y;
 
 	// opentdm default
@@ -582,12 +583,12 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 
 	spec_statusbar = va (
 		// First team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -96 "
 		"string \"%s\" "
 
 		// Second team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -48 "
 		"string \"%s\" "
 
@@ -721,8 +722,8 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player) {
 			"yb -180 "
 			"stat_string 28 "
 		"endif",
-		strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
-		strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
+		(int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
+		(int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
 		id_x, id_y
 	);
 
@@ -737,9 +738,9 @@ Create player's own customized dm_statusbar.
 */
 const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 {
-	static char	*dm_statusbar;
-	static char weaponhud[175];		// the weapon icons
-	static char ammohud[135];		// the ammo counts
+	char		*dm_statusbar;
+	char		weaponhud[1400];	// the weapon icons
+	char		ammohud[1400];		// the ammo counts
 	int			id_x, id_y;
 	int			hud_x, hud_y;
 
@@ -898,12 +899,12 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"stat_string 31 "
 
 		// First team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -96 "
 		"string \"%s\" "
 
 		// Second team name
-		"xr -%ld "
+		"xr -%d "
 		"yb -48 "
 		"string \"%s\" "
 
@@ -948,8 +949,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"endif "
 
 		"%s%s",
-		strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
-		strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
+		(int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
+		(int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
 		id_x, id_y,
 		weaponhud, ammohud
 	);
@@ -1140,7 +1141,7 @@ void TDM_DownloadPlayerConfig (edict_t *ent)
 	Com_sprintf (ent->client->pers.download.path , sizeof(ent->client->pers.download.path ), "%s", stats_id);
 	ent->client->pers.download.initiator = ent;
 	ent->client->pers.download.type = DL_PLAYER_CONFIG;
-	strncpy (ent->client->pers.download.name, stats_id, sizeof(ent->client->pers.download.name)-1);
+	Q_strncpy (ent->client->pers.download.name, stats_id, sizeof(ent->client->pers.download.name)-1);
 	ent->client->pers.download.onFinish = TDM_PlayerConfigDownloaded;
 	ent->client->pers.download.inuse = true;
 	ent->client->pers.download.unique_id = ent->client->pers.uniqueid;

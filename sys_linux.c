@@ -169,7 +169,7 @@ const char *Sys_FindFirst (const char *filespec)
 	{
 		if (!*findpattern || glob_match(findpattern, d->d_name))
 		{
-			snprintf (findpath, sizeof(findpath)-1, "%s/%s", findbase, d->d_name);
+			Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, d->d_name);
 			return findpath;
 		}
 	}
@@ -188,7 +188,7 @@ const char *Sys_FindNext (void)
 	{
 		if (!*findpattern || glob_match(findpattern, d->d_name))
 		{
-			snprintf (findpath, sizeof(findpath), "%s/%s", findbase, d->d_name);
+			Com_sprintf (findpath, sizeof(findpath), "%s/%s", findbase, d->d_name);
 			return findpath;
 		}
 	}
