@@ -663,7 +663,7 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 		SetRespawn (ent, 20);
 
 	// set the timer if enabled
-	if (UF(other, ARMOR_TIMER) && g_armor_timer->value && ent->item->tag != ARMOR_SHARD) {
+	if (UF(other, ARMOR_TIMER) && g_armor_timer->value) {
 		if (other->client->pers.armor_mask) {
 
 			// lookup weapon vote bitmask index to game inventory index

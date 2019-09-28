@@ -69,7 +69,7 @@ typedef struct armorvote_s
 
 #define WEAPON_MAX		10
 #define POWERUP_MAX		7
-#define ARMOR_MAX       3
+#define ARMOR_MAX       4
 
 extern const weaponinfo_t   weaponvotes[WEAPON_MAX];
 extern const powerupinfo_t  powerupvotes[POWERUP_MAX];
@@ -101,6 +101,7 @@ extern char			**tdm_configlist;
 #define ITEM_ARMOR_JACKET       (1<<1)
 #define ITEM_ARMOR_COMBAT       (1<<2)
 #define ITEM_ARMOR_BODY         (1<<3)
+#define ITEM_ARMOR_SHARD        (1<<4)
 
 #define VOTE_TIMELIMIT          0x1
 #define VOTE_MAP                0x2
