@@ -222,8 +222,8 @@ void InitGame (void)
 	g_force_record = gi.cvar ("g_force_record", "0", 0);
 	g_record_mvd = gi.cvar("g_record_mvd", "0", 0);
 	g_weapon_hud = gi.cvar("g_weapon_hud", "1", CVAR_LATCH);
-	g_armor_timer = gi.cvar("g_armor_timer", "0", 0);
-	g_weapon_timer = gi.cvar("g_weapon_timer", "0", 0);
+	g_armor_timer = gi.cvar("g_armor_timer", "1", 0);
+	g_weapon_timer = gi.cvar("g_weapon_timer", "1", 0);
 
 	g_tdmflags = gi.cvar ("g_tdmflags", "1040", 0);
 	g_itdmflags = gi.cvar ("g_itdmflags", "142427", 0);
