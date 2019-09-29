@@ -61,6 +61,11 @@ OpenTDM is an open source team deathmatch and duel mod for Quake II.
 
 `topshots/bottomshots` Show best/worst accuracy for all weapons from previous match for all players
 
+`playerconfig` Show the playerconfig data downloaded from the config/API server
+
+`weapontimer` Start a 30 second weapon timer
+
+`armortimer` Start a 20 second armor timer
 
 ## Team Captain Commands
 `kickplayer/removeplayer/remove <id>` Remove a player from your team
@@ -393,4 +398,28 @@ Value | Description
 8 | `Mute Players` Ignore all player chat
 16 | `Mute Observers` Ignore all Spec chat
 256 | `Weapon Hud` Enable the weapon hud 
+
+`amask <integer or string> u` Userinfo Variable. Which armor you want to time upon pickup. Either add up the integer value or combine the string value in any combination including +/-all. Example: `-all +ra +ya` for only timing body and combat armors. 
+
+Int Value | String Value | Description
+------ | ------ | ------
+1 | `ga` or `jacket` | Jacket Armor
+2 | `ya` or `combat` | Combat Armor
+4 | `ra` or `body` | Body Armor
+8 | `sh` or `shard` | Armor Shard 
+
+`wmask <integer or string> u` Userinfo Variable. Which weapons you want to time upon pickup. Either add up the integer value or combine the string values in any combination including +/-all. Example: `-all +cg +rl` for only timing chaingun and rocketlauncher.
+
+Int Value | String Value | Description
+------ | ------ | ------
+1 | `sg` or `shot` | Shotgun
+2 | `ssg` or `sup` | Super Shotgun
+4 | `mg` or `mac` | Machinegun
+8 | `cg` or `cha` | Chaingun
+16 | `hg` or `han` | Hand Grenade
+32 | `gl` or `gre` | Grenade Launcher
+64 | `rl` or `roc` | Rocket Launcher
+128 | `hb` or `hyper` | Hyperblaster
+256 | `rg` or `rail` | Railgun
+512 | `bfg` or `10k` | BFG10K
 
