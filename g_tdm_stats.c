@@ -1438,7 +1438,7 @@ void TDM_SetupTeamInfoForPlayer (edict_t *ent, teamplayer_t *info)
 		//no prefered code, they get random
 		do
 		{
-			joincode = genrand_int31 () % 9999;
+			joincode = genrand_uniform (9999) + 1;
 		} while (TDM_FindTeamplayerForJoinCode (joincode));
 
 		info->joincode = joincode;

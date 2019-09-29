@@ -135,7 +135,7 @@ void InitGame (void)
 
 	gi.dprintf ("==== InitGame ====\n");
 
-	init_genrand ((unsigned long)time(NULL));
+	init_genrand ((uint32)time(NULL));
 
 	gi.cvar("time_remaining", "N/A", CVAR_SERVERINFO | CVAR_NOSET);
 	gi.cvar("match_type", "N/A", CVAR_SERVERINFO | CVAR_NOSET);

@@ -192,25 +192,12 @@ typedef enum {false, true}	qboolean;
 //r1: set this to 1 if you have a stupid endian thingy
 #define Q_BIGENDIAN 0
 
-#define random()		(genrand_float32_full())	// 0..1
-#define random2()		(genrand_float32_notone())	// 0..1
+#define random()	((int32)genrand_int32() * (1.0f / 4294967296.0f) + 0.5f)	//  0..1
+#define crandom()	((int32)genrand_int32() * (1.0f / 2147483648.0f))			// -1..1
 
-#define brandom(a,b)	((a)+random()*((b)-(a)))				// a..b
-#define crandom()		brandom(-1,1)							// -1..1 
-
-int		Q_rand (int *seed);
-#define Q_random(seed)		((Q_rand (seed) & 0x7fff) / ((float)0x7fff))	// 0..1
-#define Q_brandom(seed,a,b)	((a)+Q_random(seed)*((b)-(a)))						// a..b
-#define Q_crandom(seed)		Q_brandom(seed,-1,1)
-
-unsigned long genrand_int32(void);
-long genrand_int31(void);
-double genrand_float32_full(void);
-double genrand_float32_notone(void);
-void init_genrand(unsigned long s);
-
-//#define	frand()		(random())
-//#define	crand()		(((int)randomMT() - 0x7FFFFFFF) * 0.000000000465661287307739257812f)
+void init_genrand(uint32 s);
+uint32 genrand_int32(void);
+uint32 genrand_uniform(uint32 n);
 
 #ifndef NULL
 #define NULL ((void *)0)
