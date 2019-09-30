@@ -753,8 +753,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	id_x += player->client->pers.config.id_x;
 	id_y += player->client->pers.config.id_y;
 
-	hud_x += player->client->pers.config.weapon_hud_x;
-	hud_y += player->client->pers.config.weapon_hud_y;
+	hud_x += player->client->pers.weaponhud_offset_x;
+	hud_y += player->client->pers.weaponhud_offset_y;
 
 	weaponhud[0] = 0;
 	ammohud[0] = 0;
