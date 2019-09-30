@@ -1101,7 +1101,7 @@ void TDM_BeginCountdown (void)
 	// record multi-view demo on server
 	if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
 		Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
-		gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
+		gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
 		game.mvd.recording = true;
 	}
 }
@@ -1136,7 +1136,7 @@ void TDM_EndIntermission (void)
 		game.mvd.matches++;
 
 		if (game.mvd.matches >= (int) g_record_mvd->value) {
-			gi.AddCommandString("mvdstop");
+			gi.AddCommandString("mvdstop\n");
 			memset(&game.mvd, 0x0, sizeof(server_demo_t));
 		}
 	}

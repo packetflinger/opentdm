@@ -497,7 +497,7 @@ void G_RunFrame (void)
 			memset(&game.mvd, 0x0, sizeof(server_demo_t));
 		} else if (!game.mvd.recording && tdm_match_status > MM_WARMUP) {
 			Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
-			gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
+			gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
 			game.mvd.recording = true;
 		}
 	}
