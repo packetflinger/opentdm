@@ -67,9 +67,9 @@ void NextChaseMode (edict_t *ent)
 void UpdateLockCam(edict_t *ent)
 {
 	/* position on the map */
-	ent->s.origin[0] = 0.0;
-	ent->s.origin[1] = 0.0;
-	ent->s.origin[2] = 4000.0;
+	ent->s.origin[0] = 0.0f;
+	ent->s.origin[1] = 0.0f;
+	ent->s.origin[2] = 4000.0f;
 
 	/* view */
 	ent->client->ps.viewangles[ROLL] = 0;

@@ -507,7 +507,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 	total[0] = total[1] = 0;
 	last[0] = last[1] = 0;
 	totalscore[0] = totalscore[1] = 0;
-	averageping[0] = averageping[1] = 0.0;
+	averageping[0] = averageping[1] = 0.0f;
 
 	//init string
 	*string = 0;
@@ -2048,7 +2048,7 @@ void TDM_ResumeGame (void)
 	gi.bprintf (PRINT_CHAT, "Game resuming in 10 seconds. Match time remaining: %s\n", TDM_SecsToString(FRAMES_TO_SECS(level.match_end_framenum - level.framenum)));
 
 	level.timeout_end_framenum = 0;
-	level.match_resume_framenum = level.realframenum + SECS_TO_FRAMES(10.4);
+	level.match_resume_framenum = level.realframenum + SECS_TO_FRAMES(10.4f);
 }
 
 /*

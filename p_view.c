@@ -361,15 +361,15 @@ void SV_CalcGunOffset (edict_t *ent)
 	float	delta;
 
 	// gun angles from bobbing
-	ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.005;
-	ent->client->ps.gunangles[YAW] = xyspeed * bobfracsin * 0.01;
+	ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.005f;
+	ent->client->ps.gunangles[YAW] = xyspeed * bobfracsin * 0.01f;
 	if (bobcycle & 1)
 	{
 		ent->client->ps.gunangles[ROLL] = -ent->client->ps.gunangles[ROLL];
 		ent->client->ps.gunangles[YAW] = -ent->client->ps.gunangles[YAW];
 	}
 
-	ent->client->ps.gunangles[PITCH] = xyspeed * bobfracsin * 0.005;
+	ent->client->ps.gunangles[PITCH] = xyspeed * bobfracsin * 0.005f;
 
 	// gun angles from delta movement
 	for (i=0 ; i<3 ; i++)
@@ -384,8 +384,8 @@ void SV_CalcGunOffset (edict_t *ent)
 		if (delta < -45)
 			delta = -45;
 		if (i == YAW)
-			ent->client->ps.gunangles[ROLL] += 0.1*delta;
-		ent->client->ps.gunangles[i] += 0.2 * delta;
+			ent->client->ps.gunangles[ROLL] += 0.1f*delta;
+		ent->client->ps.gunangles[i] += 0.2f * delta;
 	}
 
 	// gun height
@@ -1001,8 +1001,8 @@ void ClientEndServerFrame (edict_t *ent)
 	//
 	for (i=0 ; i<3 ; i++)
 	{
-		current_client->ps.pmove.origin[i] = ent->s.origin[i]*8.0;
-		current_client->ps.pmove.velocity[i] = ent->velocity[i]*8.0;
+		current_client->ps.pmove.origin[i] = ent->s.origin[i]*8.0f;
+		current_client->ps.pmove.velocity[i] = ent->velocity[i]*8.0f;
 	}
 
 	//
@@ -1051,11 +1051,11 @@ void ClientEndServerFrame (edict_t *ent)
 	else if (ent->groundentity)
 	{	// so bobbing only cycles when on ground
 		if (xyspeed > 210)
-			bobmove = 0.25;
+			bobmove = 0.25f;
 		else if (xyspeed > 100)
-			bobmove = 0.125;
+			bobmove = 0.125f;
 		else
-			bobmove = 0.0625;
+			bobmove = 0.0625f;
 	}
 
 	bobmove *= (10.0f / (1 * SERVER_FPS));
