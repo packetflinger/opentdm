@@ -2547,25 +2547,25 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
 	cfg = &ent->client->pers.config;
 
 	gi.cprintf(ent, PRINT_HIGH, "\nRemote playerconfig loaded from %s\n", url);
-	gi.cprintf(ent, PRINT_HIGH, va("  auto record:             %s\n", cfg->auto_record ? "yes" : "no"));
-	gi.cprintf(ent, PRINT_HIGH, va("  auto screenshot:         %s\n", cfg->auto_screenshot ? "yes" : "no"));
-	gi.cprintf(ent, PRINT_HIGH, va("  show weapon hud:         %s\n", cfg->weapon_hud ? "yes" : "no"));
+	gi.cprintf(ent, PRINT_HIGH, "  auto record:             %s\n", cfg->auto_record ? "yes" : "no");
+	gi.cprintf(ent, PRINT_HIGH, "  auto screenshot:         %s\n", cfg->auto_screenshot ? "yes" : "no");
+	gi.cprintf(ent, PRINT_HIGH, "  show weapon hud:         %s\n", cfg->weapon_hud ? "yes" : "no");
 
 	if (cfg->weapon_hud) {
 		gi.cprintf(ent, PRINT_HIGH, "    X offset:              %d\n", cfg->weapon_hud_x);
 		gi.cprintf(ent, PRINT_HIGH, "    Y offset:              %d\n", cfg->weapon_hud_y);
 	}
 
-	gi.cprintf(ent, PRINT_HIGH, va("  auto-time armor:         %s\n", cfg->armor_timer ? "yes" : "no"));
+	gi.cprintf(ent, PRINT_HIGH, "  auto-time armor:         %s\n", cfg->armor_timer ? "yes" : "no");
 
 	if (cfg->armor_timer) {
-		gi.cprintf(ent, PRINT_HIGH, va("    armor type:              \n"));
+		gi.cprintf(ent, PRINT_HIGH, "    armor type:              \n");
 	}
 
-	gi.cprintf(ent, PRINT_HIGH, va("  auto-time weapons:       %s\n", cfg->weapon_timer ? "yes" : "no"));
+	gi.cprintf(ent, PRINT_HIGH, "  auto-time weapons:       %s\n", cfg->weapon_timer ? "yes" : "no");
 
 	if (cfg->weapon_timer) {
-		gi.cprintf(ent, PRINT_HIGH, va("    weapons:                 \n"));
+		gi.cprintf(ent, PRINT_HIGH, "    weapons:                 \n");
 	}
 
 	if (cfg->teamskin[0] != 0) {
