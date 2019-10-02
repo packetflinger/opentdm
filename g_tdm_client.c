@@ -635,14 +635,17 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 			"string \"Chasing\" "
 			"xv 64 "
 			"stat_string 16 "
+		"endif "
 
 			"yb -24 "
 
+		"if 16 "
 			// health
 			"xv 0 "
 			"hnum "
 			"xv 50 "
 			"pic 0 "
+		"endif "
 
 			// ammo
 			"if 2 "
@@ -700,7 +703,6 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 				"xv 296 "
 				"pic 29 "
 			"endif "
-		"endif "
 
 		// frags
 		"if 14 "
