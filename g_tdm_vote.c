@@ -2766,9 +2766,9 @@ int TDM_ArmorStringToBitmask(const char *str) {
 
 			if (!Q_stricmp(token, armorvotes[i].names[0]) || !Q_stricmp(token, armorvotes[i].names[1])) {
 				if (modifier == '+') {
-					mask |= weaponvotes[i].value;
+					mask |= armorvotes[i].value;
 				} else if (modifier == '-') {
-					mask &= ~weaponvotes[i].value;
+					mask &= ~armorvotes[i].value;
 				}
 			}
 		}
