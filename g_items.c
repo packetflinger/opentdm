@@ -673,7 +673,7 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 				}
 			}
 
-			if (other->client->pers.armor_mask & armorvotes[i].value) {
+			if (i < ARMOR_MAX && other->client->pers.armor_mask & armorvotes[i].value) {
 				other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
 				other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex(ent->item->icon);
 			}

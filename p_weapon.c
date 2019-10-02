@@ -109,7 +109,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 			}
 
 			// client wants to time this weapon
-			if (other->client->pers.weapon_mask & weaponvotes[i].value) {
+			if (i < WEAPON_MAX && other->client->pers.weapon_mask & weaponvotes[i].value) {
 				other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
 				other->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
 			}
