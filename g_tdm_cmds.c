@@ -2628,6 +2628,19 @@ void TDM_WeaponTimer_f(edict_t *ent)
 	}
 }
 
+/**
+ * List available maps in console
+ */
+void TDM_Maps_f(edict_t *ent)
+{
+	if (!g_maplistfile || !g_maplistfile->string[0]) {
+		gi.cprintf(ent, PRINT_HIGH, "maplist is undefined on this server.\n");
+		return;
+	}
+
+	TDM_WriteMaplist(ent);
+}
+
 /*
 ==============
 TDM_Command
@@ -2892,6 +2905,8 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_ArmorTimer_f(ent);
 		else if (!Q_stricmp(cmd, "weapontimer"))
 			TDM_WeaponTimer_f(ent);
+		else if (!Q_stricmp(cmd, "maps"))
+			TDM_Maps_f(ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else
