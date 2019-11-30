@@ -750,16 +750,16 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	hud_y = 0;
 	hud_x = -25;
 
-	id_x += player->client->pers.config.id_x;
-	id_y += player->client->pers.config.id_y;
+	if (player && player->client->pers.weaponhud && g_weapon_hud->value > 0) {
 
-	hud_x += player->client->pers.weaponhud_offset_x;
-	hud_y += player->client->pers.weaponhud_offset_y;
+		id_x += player->client->pers.config.id_x;
+		id_y += player->client->pers.config.id_y;
 
-	weaponhud[0] = 0;
-	ammohud[0] = 0;
+		hud_x += player->client->pers.weaponhud_offset_x;
+		hud_y += player->client->pers.weaponhud_offset_y;
 
-	if (player->client->pers.weaponhud && g_weapon_hud->value > 0) {
+		weaponhud[0] = 0;
+		ammohud[0] = 0;
 
 		// set x position at first for all weapon icons, to save the chars since CS max is 1000
 		strcpy(weaponhud, va("xr %d ", hud_x));
