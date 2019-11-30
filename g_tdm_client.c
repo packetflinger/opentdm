@@ -795,8 +795,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
-			strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
-			//strcat(weaponhud, va("yv %d picn a_grenade ", hud_y));
+			//strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
+			strcat(weaponhud, va("yv %d picn a_grenades ", hud_y));
 			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
 			hud_y += 25;
 		}
