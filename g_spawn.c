@@ -680,7 +680,8 @@ void SpawnEntities (const char *mapname, const char *entities, const char *spawn
 
 //===================================================================
 
-const char *TDM_CreateSpectatorStatusBar(edict_t *player);
+//const char *TDM_CreateSpectatorStatusBar(edict_t *player);
+const char *TDM_CreatePlayerDmStatusBar(edict_t *player);
 
 /*QUAKED worldspawn (0 0 0) ?
 
@@ -737,8 +738,8 @@ void SP_worldspawn (edict_t *ent)
 	// status bar program
 	// wision: we send this as unicast on every player's connect
 	// r1: but we send it globally too to avoid bugging out gtv/etc
-	gi.configstring (CS_STATUSBAR, TDM_CreateSpectatorStatusBar(NULL));
-
+	//gi.configstring (CS_STATUSBAR, TDM_CreateSpectatorStatusBar(NULL));
+	gi.configstring (CS_STATUSBAR, TDM_CreatePlayerDmStatusBar(NULL));
 	//---------------
 
 	// help icon for statusbar
