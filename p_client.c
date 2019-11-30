@@ -1386,8 +1386,11 @@ void ClientBeginDeathmatch (edict_t *ent)
 
 		ClientUserinfoChanged (ent, userinfo);
 
-		if (!ent->client->pers.mvdclient)
+		if (!ent->client->pers.mvdclient) {
 			gi.bprintf (PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
+		} else {
+			TDM_SendPlayerStatusBar(ent); // gtv needs a player hud, not spec
+		}
 	}
 	else
 	{
