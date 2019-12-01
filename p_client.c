@@ -1388,14 +1388,10 @@ void ClientBeginDeathmatch (edict_t *ent)
 
 		if (!ent->client->pers.mvdclient) {
 			gi.bprintf (PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
-		} else {
-			TDM_SendPlayerStatusBar(ent); // gtv needs a player hud, not spec
 		}
 	}
-	else
-	{
-		TDM_UpdateHud(ent, false);
-	}
+
+	TDM_UpdateHud(ent, true);
 
 	// set timer icons indexes (armor/weapon is set on the fly)
 	client->item_timer_icon[TIMER_QUAD] = gi.imageindex ("p_quad");
