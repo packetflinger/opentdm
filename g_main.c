@@ -100,6 +100,7 @@ cvar_t	*g_record_mvd;
 cvar_t	*g_weapon_hud;
 cvar_t	*g_armor_timer;
 cvar_t	*g_weapon_timer;
+cvar_t	*g_timeout_limit;
 
 cvar_t	*g_tdmflags;
 cvar_t	*g_itdmflags;

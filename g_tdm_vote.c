@@ -273,6 +273,12 @@ void TDM_ApplyVote (void)
 		g_weapon_timer = gi.cvar_set("g_weapon_timer", value);
 	}
 
+	if (vote.flags & VOTE_TIMEOUT_LIMIT) {
+		sprintf(value, "%d", vote.timeoutlimit);
+		g_timeout_limit = gi.cvar_set("g_timeout_limit", va("%d", vote.timeoutlimit));
+		gi.bprintf(PRINT_HIGH, "Per-player timeout limit set to %d\n", vote.timeoutlimit);
+	}
+
 	if (vote.flags & VOTE_ABORT)
 	{
 abort:
@@ -586,6 +592,18 @@ static void TDM_AnnounceVote (void)
 			strcat(what, "enable weapon timer");
 		} else {
 			strcat(what, "disable weapon timer");
+		}
+	}
+
+	if (vote.flags & VOTE_TIMEOUT_LIMIT) {
+		if (what[0]) {
+			strcat(what, ", ");
+		}
+
+		if (vote.timeoutlimit) {
+			strcat(what, va("timeout limit %d", vote.timeoutlimit));
+		} else {
+			strcat(what, "disable timeout limit");
 		}
 	}
 
@@ -2098,6 +2116,34 @@ qboolean TDM_VoteWeaponTimer(edict_t *ent) {
 	return true;
 }
 
+qboolean TDM_VoteTimeoutLimit(edict_t *ent) {
+	const char *value;
+	int intvalue;
+
+	if (!((int) g_vote_mask->value & VOTE_TIMEOUT_LIMIT) && !ent->client->pers.admin) {
+		gi.cprintf(ent, PRINT_HIGH, "Voting timeout limits is not allowed in the server config\n");
+		return false;
+	}
+
+	value = gi.argv(2);
+
+	if (!value[0]) {
+		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0..9>\n", gi.argv(1));
+		return false;
+	}
+
+	intvalue = atoi(value);
+
+	if (intvalue < 0 || intvalue > 100) {
+		gi.cprintf(ent, PRINT_HIGH, "Sane values please, 0-100...\n");
+		return false;
+	}
+
+	vote.timeoutlimit = intvalue;
+	vote.flags |= VOTE_TIMEOUT_LIMIT;
+
+	return true;
+}
 /*
 ==============
 TDM_Vote_f
@@ -2151,6 +2197,7 @@ void TDM_Vote_f (edict_t *ent)
 				"  shuffle\n"
 				"  armortimer <0/1>\n"
 				"  weapontimer <0/1>\n"
+				"  timeoutlimit <integer> (per player; 0 == unlimited)\n"
 				);
 			return;
 		}
@@ -2257,6 +2304,8 @@ void TDM_Vote_f (edict_t *ent)
 		started_new_vote = TDM_VoteArmorTimer(ent);
 	else if (!Q_stricmp (cmd, "weapontimer"))
 		started_new_vote = TDM_VoteWeaponTimer(ent);
+	else if (!Q_stricmp (cmd, "timeoutlimit"))
+			started_new_vote = TDM_VoteTimeoutLimit(ent);
 	else if (!Q_stricmp (cmd, "yes"))
 		TDM_Vote_X (ent, VOTE_YES, "YES");
 	else if (!Q_stricmp (cmd, "no"))

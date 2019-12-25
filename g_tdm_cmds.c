@@ -750,22 +750,37 @@ void TDM_Timeout_f (edict_t *ent)
 		return;
 	}
 
+	// timeout limits are imposed on this config
+	if (g_timeout_limit->value) {
+		if (ent->client->pers.timeout_count >= g_timeout_limit->value) {
+			gi.cprintf(
+					ent,
+					PRINT_HIGH,
+					"Timeout limit exceeded (%d/%d)",
+					ent->client->pers.timeout_count,
+					(int)g_timeout_limit->value
+			);
+			return;
+		}
+	}
+
 	if (g_max_timeout->value == 0)
 	{
 		gi.cprintf (ent, PRINT_HIGH, "Time out is disabled on this server.\n");
 		return;
 	}
 
-	// wision: if i'm admin, i want unlimited timeout!
-	// wision: check what happens if admin is just a spectator and he calls timeout
-	// r1: your method didn't work, and the code isn't really designed to allow such. is an hour enough to organize the game? :)
+	// admin timeout is held for 1 hour unless timein is called
 	if (ent->client->pers.admin)
 		time_len = 3600;
 	else
 		time_len = g_max_timeout->value;
 
+
+
 	level.timeout_end_framenum = level.realframenum + SECS_TO_FRAMES (time_len);
 	level.tdm_timeout_caller = ent->client->resp.teamplayerinfo;
+	ent->client->pers.timeout_count++;
 
 	// r1: crash fix, never reset the match status to a timeout (calling time during resume timer)
 	if (tdm_match_status != MM_TIMEOUT)
@@ -892,6 +907,13 @@ char *TDM_SettingsString (void)
 
 	strcat (settings, "Gameplay bugs:    ");
 	strcat (settings, TDM_SetColorText(va("%s\n", bugs_text[(int)g_bugs->value])));
+
+	strcat (settings, "Timeout limits:   ");
+	if (g_timeout_limit->value) {
+		strcat (settings, TDM_SetColorText(va("%d per player\n", (int)g_timeout_limit->value)));
+	} else {
+		strcat (settings, TDM_SetColorText(va("unlimited\n")));
+	}
 
 	if (TDM_Is1V1())
 	{

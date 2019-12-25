@@ -800,6 +800,7 @@ extern	cvar_t	*g_record_mvd;
 extern	cvar_t	*g_weapon_hud;
 extern	cvar_t 	*g_armor_timer;
 extern	cvar_t	*g_weapon_timer;
+extern	cvar_t	*g_timeout_limit;
 
 extern	cvar_t	*g_tdmflags;
 extern	cvar_t	*g_itdmflags;
@@ -1296,6 +1297,7 @@ typedef struct vote_s
 	int             spawn_mode;
 	int             armor_timer;
 	int             weapon_timer;
+	int             timeoutlimit;
 } vote_t;
 
 typedef struct vote_menu_s
@@ -1515,7 +1517,7 @@ typedef struct
 	int            weapon_mask;           // weapons to auto timer
 	int            armor_timer;           // auto timer for armor
 	int            armor_mask;            // armor to auto timer
-
+	int            timeout_count;         // how many timeouts did we call?
 } client_persistent_t;
 
 typedef struct

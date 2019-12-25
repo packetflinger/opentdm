@@ -225,6 +225,9 @@ void InitGame (void)
 	g_armor_timer = gi.cvar("g_armor_timer", "1", 0);
 	g_weapon_timer = gi.cvar("g_weapon_timer", "1", 0);
 
+	// max number of timeouts allowed per client (0 == unlimited)
+	g_timeout_limit = gi.cvar("g_timeout_limit", "2", 0);
+
 	g_tdmflags = gi.cvar ("g_tdmflags", "1040", 0);
 	g_itdmflags = gi.cvar ("g_itdmflags", "142427", 0);
 	g_1v1flags = gi.cvar ("g_1v1flags", "1040", 0);
