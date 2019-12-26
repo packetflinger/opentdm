@@ -750,8 +750,8 @@ void TDM_Timeout_f (edict_t *ent)
 		return;
 	}
 
-	// timeout limits are imposed on this config
-	if (g_timeout_limit->value) {
+	// timeout limits are imposed on this config (except for admins)
+	if (g_timeout_limit->value && !ent->client->pers.admin) {
 		if (ent->client->pers.timeout_count >= g_timeout_limit->value) {
 			gi.cprintf(
 					ent,
