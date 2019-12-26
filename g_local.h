@@ -1476,6 +1476,13 @@ typedef enum
 	TIMER_MAX,	// make sure is always last
 } item_timer_t;
 
+typedef struct {
+	item_timer_t   current;    // which is current displayed? (quad, inv, armor, etc)
+	int            expires;    // frame to switch from current
+	int            stat_index; // ps stat for the timer value
+	int            stat_icon;  // ps stat for the icon
+} timer_state_t;
+
 // client data that stays across multiple level loads
 typedef struct
 {
@@ -1518,6 +1525,15 @@ typedef struct
 	int            armor_timer;           // auto timer for armor
 	int            armor_mask;            // armor to auto timer
 	int            timeout_count;         // how many timeouts did we call?
+
+	// armor/weapon timers
+	int            item_timer[TIMER_MAX];
+	int            item_timer_icon[TIMER_MAX];
+	int            next_timer_update;
+
+	// the timers in the hud
+	timer_state_t   timer1;
+	timer_state_t   timer2;
 } client_persistent_t;
 
 typedef struct
@@ -1543,12 +1559,6 @@ typedef struct
 	int            spec_mode;             // bitmask
 } client_respawn_t;
 
-typedef struct {
-	item_timer_t   current;    // which is current displayed? (quad, inv, armor, etc)
-	int            expires;    // frame to switch from current
-	int            stat_index; // ps stat for the timer value
-	int            stat_icon;  // ps stat for the icon
-} timer_state_t;
 
 // this structure is cleared on each PutClientInServer(),
 // except for 'client->pers'
@@ -1663,15 +1673,6 @@ struct gclient_s
 
 	int            last_hud_update;
 	int            next_hud_update;
-
-	// armor/weapon timers
-	int            item_timer[TIMER_MAX];
-	int            item_timer_icon[TIMER_MAX];
-	int            next_timer_update;
-
-	// the timers in the hud
-	timer_state_t   timer1;
-	timer_state_t   timer2;
 };
 
 typedef enum

@@ -2625,8 +2625,8 @@ void TDM_Ignore_f(edict_t *ent, int level)
 void TDM_ArmorTimer_f(edict_t *ent)
 {
 	if (g_armor_timer->value) {
-		ent->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
-		ent->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
+		ent->client->pers.item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+		ent->client->pers.item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
 	} else {
 		if (((int)g_vote_mask->value) & VOTE_ARMOR_TIMER) {
 			gi.cprintf(ent, PRINT_HIGH, "Armor timer disabled, vote to enable it: \"vote armortimer 1\"\n");
@@ -2643,8 +2643,8 @@ void TDM_ArmorTimer_f(edict_t *ent)
 void TDM_WeaponTimer_f(edict_t *ent)
 {
 	if (g_weapon_timer->value) {
-		ent->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
-		ent->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
+		ent->client->pers.item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
+		ent->client->pers.item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
 	} else {
 		gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled in server config\n");
 	}
