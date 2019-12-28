@@ -2620,13 +2620,46 @@ void TDM_Ignore_f(edict_t *ent, int level)
 
 
 /**
- * Start an armor timer
+ * Start an armor timer or set the auto-timer mask
  */
 void TDM_ArmorTimer_f(edict_t *ent)
 {
+	char *mask;
+
+	if (gi.argc() == 2 && !Q_stricmp(gi.argv(1), "-h")){
+		gi.cprintf(ent, PRINT_HIGH,
+				"%s: %s - Start an armor timer\n"
+				"       %s [%s] - set your auto-timing mask\n\n"
+				"%s contains any: [-/+]all [-/+]ra [-/+]ya [-/+]ga\n\n",
+				//TDM_SetColorText("Usage"),
+				"Usage",
+				gi.argv(0),
+				gi.argv(0),
+				//TDM_SetColorText("armor_string"),
+				//TDM_SetColorText("armor_string")
+				"armor_string",
+				"armor_string"
+		);
+
+		return;
+	}
+
 	if (g_armor_timer->value) {
-		ent->client->pers.item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
-		ent->client->pers.item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
+		// command used alone, just start a timer
+		if (gi.argc() < 2) {
+			ent->client->pers.item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+			ent->client->pers.item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
+		} else {
+			mask = gi.argv(1);
+			if (mask[0] >= '0' && mask[0] <= '9') { // assume it's a numeric mask
+				ent->client->pers.armor_mask = atoi(mask);
+			} else {
+				ent->client->pers.armor_mask = TDM_ArmorStringToBitmask(mask);
+			}
+
+			G_StuffCmd(ent, "set amask \"%d\" u", ent->client->pers.armor_mask);
+			gi.cprintf(ent, PRINT_HIGH, "Armor timer mask set\n");
+		}
 	} else {
 		if (((int)g_vote_mask->value) & VOTE_ARMOR_TIMER) {
 			gi.cprintf(ent, PRINT_HIGH, "Armor timer disabled, vote to enable it: \"vote armortimer 1\"\n");
@@ -2638,15 +2671,54 @@ void TDM_ArmorTimer_f(edict_t *ent)
 
 
 /**
- * Start a weapon timer
+ * Start a weapon timer, or set auto-timer bitmask
  */
 void TDM_WeaponTimer_f(edict_t *ent)
 {
+	char *mask;
+
+	if (gi.argc() == 2 && !Q_stricmp(gi.argv(1), "-h")){
+		gi.cprintf(ent, PRINT_HIGH,
+				"%s: %s - Start a weapon timer\n"
+				"       %s [%s] - set your auto-timing mask\n\n"
+				"%s contains any: [-/+]all [-/+]sg [-/+]ssg\n"
+				"  [-/+]mg [-/+]cg [-/+]gl [-/+]hb [-/+]rl [-/+]rg [-/+]bfg\n\n",
+				//TDM_SetColorText("Usage"),
+				"Usage",
+				gi.argv(0),
+				gi.argv(0),
+				//TDM_SetColorText("weapon_string"),
+				//TDM_SetColorText("weapon_string")
+				"weapon_string",
+				"weapon_string"
+		);
+
+		return;
+	}
+
 	if (g_weapon_timer->value) {
-		ent->client->pers.item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
-		ent->client->pers.item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
+
+		// command used alone, just start a timer
+		if (gi.argc() < 2) {
+			ent->client->pers.item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
+			ent->client->pers.item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
+		} else {
+			mask = gi.argv(1);
+			if (mask[0] >= '0' && mask[0] <= '9') { // assume it's a numeric mask
+				ent->client->pers.weapon_mask = atoi(mask);
+			} else {
+				ent->client->pers.weapon_mask = TDM_WeaponStringToBitmask(mask);
+			}
+
+			G_StuffCmd(ent, "set wmask \"%d\" u", ent->client->pers.weapon_mask);
+			gi.cprintf(ent, PRINT_HIGH, "Weapon timer mask set\n");
+		}
 	} else {
-		gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled in server config\n");
+		if (((int)g_vote_mask->value) & VOTE_WEAPON_TIMER) {
+			gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled, vote to enable it: \"vote weapontimer 1\"\n");
+		} else {
+			gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled in server config\n");
+		}
 	}
 }
 
