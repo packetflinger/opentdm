@@ -663,7 +663,7 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 		SetRespawn (ent, 20);
 
 	// set the timer if enabled
-	if (UF(other, ARMOR_TIMER) && g_armor_timer->value) {
+	if (other->client->pers.armor_mask && g_armor_timer->value) {
 		if (index != ARMOR_SHARD) {
 
 			if (other->client->pers.armor_mask) {
