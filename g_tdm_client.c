@@ -785,7 +785,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
 			strcat(weaponhud, va("yv %d picn w_machinegun ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
 			hud_y += 25;
 		}
 
