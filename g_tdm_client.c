@@ -602,12 +602,11 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 		"num 4 24 "
 
 		// Match status
-		"xv 175 "
+		"xv 205 "
 		"yb -48 "
 		"stat_string 26 "
 
 		// Time value
-		"xv 175 "
 		"yb -39 "
 		"stat_string 31 "
 
@@ -660,12 +659,6 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 				"pic 4 "
 			"endif "
 
-			// selected item
-			"if 6 "
-				"xv 296 "
-				"pic 6 "
-			"endif "
-
 			"yb -50 "
 
 			// picked up item
@@ -680,9 +673,9 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 
 			// timer (quad, armor, rebreather, envirosuit)
 			"if 9 "
-				"xv 246 "
+				"xv 276 "
 				"num 2 10 "
-				"xv 296 "
+				"xv 310 "
 				"pic 9 "
 			"endif "
 
@@ -695,9 +688,9 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 			// timer (pent/weapon)
 			"if 30 "
 				"yb -80 "
-				"xv 246 "
+				"xv 276 "
 				"num 2 30 "
-				"xv 296 "
+				"xv 310 "
 				"pic 29 "
 			"endif "
 		"endif "
@@ -871,9 +864,9 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 
 		// timer (quad, armor, rebreather, envirosuit)
 		"if 9 "
-			"xv 246 "
+			"xv 276 "
 			"num 2 10 "
-			"xv 296 "
+			"xv 310 "
 			"pic 9 "
 		"endif "
 
@@ -886,19 +879,19 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		// timer (pent, weapon)
 		"if 30 "
 			"yb -80 "
-			"xv 246 "
+			"xv 276 "
 			"num 2 30 "
-			"xv 296 "
+			"xv 310 "
 			"pic 29 "
 		"endif "
 
 		// Match Status
-		"xv 95 "
-		"yb -60 "
+		"xv 205 "
+		"yb -48 "
 		"stat_string 26 "
 
 		// Time value
-		"xv 164 "
+		"yb -39 "
 		"stat_string 31 "
 
 		// First team name
