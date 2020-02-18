@@ -1532,8 +1532,9 @@ typedef struct
 	int            next_timer_update;
 
 	// the timers in the hud
-	timer_state_t   timer1;
-	timer_state_t   timer2;
+	timer_state_t  timer1;
+	timer_state_t  timer2;
+
 } client_persistent_t;
 
 typedef struct
