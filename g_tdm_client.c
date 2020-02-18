@@ -893,14 +893,11 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"endif "
 
 		// Match Status
-		//"xv 175 "
 		"xv 95 "
-		//"yb -50 "
 		"yb -60 "
 		"stat_string 26 "
 
 		// Time value
-		//"yb -42 "
 		"xv 164 "
 		"stat_string 31 "
 
