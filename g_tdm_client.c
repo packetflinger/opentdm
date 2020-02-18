@@ -831,6 +831,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	}
 
 	dm_statusbar = va(
+		// bottom row
 		"yb -24 "
 
 		// health
@@ -855,6 +856,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			"pic 4 "
 		"endif "
 
+		// next row up
 		"yb -50 "
 
 		// picked up item
@@ -891,12 +893,15 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		"endif "
 
 		// Match Status
-		"xv 175 "
-		"yb -50 "
+		//"xv 175 "
+		"xv 95 "
+		//"yb -50 "
+		"yb -60 "
 		"stat_string 26 "
 
 		// Time value
-		"yb -42 "
+		//"yb -42 "
+		"xv 164 "
 		"stat_string 31 "
 
 		// First team name
@@ -921,12 +926,12 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		// Timeout message
 		"if 25 "
 			"xr -58 "
-			"yt 50 "
+			"yt 40 "
 			"string \"Timeout\" "
 
 			// Timeout value
 			"xr -42 "
-			"yt 58 "
+			"yt 48 "
 			"stat_string 25 "
 		"endif "
 
