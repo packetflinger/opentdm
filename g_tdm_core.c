@@ -849,6 +849,11 @@ char *TDM_ScoreBoardString (edict_t *ent)
 					(cl->ping > 999) ? 999 : cl->ping
 				);
 
+				// this is the captain
+				if (teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
+
 
 				if (maxsize - len > strlen(entry))
 				{
@@ -871,6 +876,11 @@ char *TDM_ScoreBoardString (edict_t *ent)
 					cl->resp.ready ? "[READY]    " : "",
 					(cl->ping > 999) ? 999 : cl->ping
 				);
+
+				// this is the captain
+				if (teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
 
 				if (maxsize - len > strlen(entry))
 				{
