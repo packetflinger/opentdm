@@ -253,6 +253,9 @@ void InitGame (void)
 	g_gamemode = gi.cvar ("g_gamemode", "0", CVAR_LATCH);
 	g_gamemode->modified = false;
 
+	// put a * next to captain in team games in the scoreboard
+	g_highlight_captain = gi.cvar("g_highlight_captain", "0", 0);
+
 	// libcurl - IP address to use for libcurl requests
 	g_http_bind = gi.cvar ("g_http_bind", "", 0);
 

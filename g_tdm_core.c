@@ -683,6 +683,11 @@ char *TDM_ScoreBoardString (edict_t *ent)
 					tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
 					(ping > 999) ? 999 : ping);
 
+				// this is the captain
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
+
 				if (maxsize - len > strlen(entry))
 				{
 					strcat (string, entry);
@@ -714,6 +719,11 @@ char *TDM_ScoreBoardString (edict_t *ent)
 					tmpl->deaths,
 					tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
 					(ping > 999) ? 999 : ping);
+
+				// this is the captain
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
 
 				if (maxsize - len > strlen(entry))
 				{
@@ -850,7 +860,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 				);
 
 				// this is the captain
-				if (teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
 					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
 				}
 
@@ -878,7 +888,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 				);
 
 				// this is the captain
-				if (teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
 					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
 				}
 
