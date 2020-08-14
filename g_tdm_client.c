@@ -634,32 +634,65 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 			"string \"Chasing\" "
 			"xv 64 "
 			"stat_string 16 "
+		"endif "
 
-			"yb -24 "
+		"yb -24 "
 
+		"if 16 "
 			// health
 			"xv 0 "
 			"hnum "
 			"xv 50 "
 			"pic 0 "
+		"endif "
 
-			// ammo
-			"if 2 "
-				"xv 100 "
-				"anum "
-				"xv 150 "
-				"pic 2 "
-			"endif "
+		// ammo
+		"if 2 "
+			"xv 100 "
+			"anum "
+			"xv 150 "
+			"pic 2 "
+		"endif "
 
-			// armor
-			"if 4 "
-				"xv 200 "
-				"rnum "
-				"xv 250 "
-				"pic 4 "
-			"endif "
+		// armor
+		"if 4 "
+			"xv 200 "
+			"rnum "
+			"xv 250 "
+			"pic 4 "
+		"endif "
 
+		// selected item
+		"if 6 "
+			"xv 296 "
+			"pic 6 "
+		"endif "
+
+		"yb -50 "
+
+		// picked up item
+		"if 7 "
+			"xv 0 "
+			"pic 7 "
+			"xv 26 "
+			"yb -42 "
+			"stat_string 8 "
 			"yb -50 "
+		"endif "
+
+		// timer (quad, armor, rebreather, envirosuit)
+		"if 9 "
+			"xv 246 "
+			"num 2 10 "
+			"xv 296 "
+			"pic 9 "
+		"endif "
+
+		//  help / weapon icon
+		"if 11 "
+			"xv 148 "
+			"pic 11 "
+		"endif "
 
 			// picked up item
 			"if 7 "
@@ -693,7 +726,6 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 				"xv 310 "
 				"pic 29 "
 			"endif "
-		"endif "
 
 		// frags
 		"if 14 "
