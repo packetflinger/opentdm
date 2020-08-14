@@ -602,12 +602,11 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 		"num 4 24 "
 
 		// Match status
-		"xv 175 "
+		"xv 205 "
 		"yb -48 "
 		"stat_string 26 "
 
 		// Time value
-		"xv 175 "
 		"yb -39 "
 		"stat_string 31 "
 
@@ -695,14 +694,38 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 			"pic 11 "
 		"endif "
 
-		// timer (pent/weapon)
-		"if 30 "
-			"yb -80 "
-			"xv 246 "
-			"num 2 30 "
-			"xv 296 "
-			"pic 29 "
-		"endif "
+			// picked up item
+			"if 7 "
+				"xv 0 "
+				"pic 7 "
+				"xv 26 "
+				"yb -42 "
+				"stat_string 8 "
+				"yb -50 "
+			"endif "
+
+			// timer (quad, armor, rebreather, envirosuit)
+			"if 9 "
+				"xv 276 "
+				"num 2 10 "
+				"xv 310 "
+				"pic 9 "
+			"endif "
+
+			//  help / weapon icon
+			"if 11 "
+				"xv 148 "
+				"pic 11 "
+			"endif "
+
+			// timer (pent/weapon)
+			"if 30 "
+				"yb -80 "
+				"xv 276 "
+				"num 2 30 "
+				"xv 310 "
+				"pic 29 "
+			"endif "
 
 		// frags
 		"if 14 "
@@ -752,16 +775,16 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	hud_y = 0;
 	hud_x = -25;
 
-	id_x += player->client->pers.config.id_x;
-	id_y += player->client->pers.config.id_y;
+	if (player && player->client->pers.weaponhud && g_weapon_hud->value > 0) {
 
-	hud_x += player->client->pers.weaponhud_offset_x;
-	hud_y += player->client->pers.weaponhud_offset_y;
+		id_x += player->client->pers.config.id_x;
+		id_y += player->client->pers.config.id_y;
 
-	weaponhud[0] = 0;
-	ammohud[0] = 0;
+		hud_x += player->client->pers.weaponhud_offset_x;
+		hud_y += player->client->pers.weaponhud_offset_y;
 
-	if (player->client->pers.weaponhud && g_weapon_hud->value > 0) {
+		weaponhud[0] = 0;
+		ammohud[0] = 0;
 
 		// set x position at first for all weapon icons, to save the chars since CS max is 1000
 		strcpy(weaponhud, va("xr %d ", hud_x));
@@ -787,7 +810,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
 			strcat(weaponhud, va("yv %d picn w_machinegun ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
+			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
 			hud_y += 25;
 		}
 
@@ -797,7 +820,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
 			hud_y += 25;
 		} else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
-			strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
+			//strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
+			strcat(weaponhud, va("yv %d picn a_grenades ", hud_y));
 			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
 			hud_y += 25;
 		}
@@ -832,6 +856,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	}
 
 	dm_statusbar = va(
+		// bottom row
 		"yb -24 "
 
 		// health
@@ -856,6 +881,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 			"pic 4 "
 		"endif "
 
+		// next row up
 		"yb -50 "
 
 		// picked up item
@@ -870,9 +896,9 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 
 		// timer (quad, armor, rebreather, envirosuit)
 		"if 9 "
-			"xv 246 "
+			"xv 276 "
 			"num 2 10 "
-			"xv 296 "
+			"xv 310 "
 			"pic 9 "
 		"endif "
 
@@ -885,19 +911,19 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		// timer (pent, weapon)
 		"if 30 "
 			"yb -80 "
-			"xv 246 "
+			"xv 276 "
 			"num 2 30 "
-			"xv 296 "
+			"xv 310 "
 			"pic 29 "
 		"endif "
 
 		// Match Status
-		"xv 175 "
-		"yb -50 "
+		"xv 205 "
+		"yb -48 "
 		"stat_string 26 "
 
 		// Time value
-		"yb -42 "
+		"yb -39 "
 		"stat_string 31 "
 
 		// First team name
@@ -922,12 +948,12 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 		// Timeout message
 		"if 25 "
 			"xr -58 "
-			"yt 50 "
+			"yt 40 "
 			"string \"Timeout\" "
 
 			// Timeout value
 			"xr -42 "
-			"yt 58 "
+			"yt 48 "
 			"stat_string 25 "
 		"endif "
 
@@ -1577,7 +1603,9 @@ void TDM_UpdateHud(edict_t *ent, qboolean force) {
 		}
 	}
 
-	if (ent->client->pers.team == TEAM_SPEC) {
+	if (ent->client->pers.mvdclient) {
+		TDM_SendPlayerStatusBar(ent);
+	} else if (ent->client->pers.team == TEAM_SPEC) {
 		TDM_SendSpectatorStatusBar(ent);
 	} else if (ent->client->pers.team > TEAM_SPEC) {
 		TDM_SendPlayerStatusBar(ent);

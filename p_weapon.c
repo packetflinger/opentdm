@@ -96,7 +96,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 	}
 
 	// set a timer if enabled
-	if (UF(other, WEAPON_TIMER) && g_weapon_timer->value) {
+	if (other->client->pers.weapon_mask && g_weapon_timer->value) {
 
 		// no mask set, set timer for every weapon pickup
 		if (other->client->pers.weapon_mask) {

@@ -660,7 +660,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 			if (i >= total[firstteam-1] && i >= total[secondteam-1])
 				break; // we're done
 
-			// top (winning team)
+			// top
 			if (i < total[firstteam-1])
 			{
 				tmpl = &current_matchinfo.teamplayers[sorted[firstteam-1][i]];
@@ -673,6 +673,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 
 				// calculate player's score
 				j = tmpl->enemy_kills - tmpl->team_kills - tmpl->suicides;
+
 				sprintf (entry,
 					"yv %d string \"%-15.15s   %4d  %3d %3d  %3d\" ",
 					i * 8 + 56,
@@ -682,6 +683,11 @@ char *TDM_ScoreBoardString (edict_t *ent)
 					tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
 					(ping > 999) ? 999 : ping);
 
+				// this is the captain
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
+
 				if (maxsize - len > strlen(entry))
 				{
 					strcat (string, entry);
@@ -690,7 +696,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 				}
 			}
 
-			// bottom (losing team)
+			// bottom
 			if (i < total[secondteam-1])
 			{
 				tmpl = &current_matchinfo.teamplayers[sorted[secondteam-1][i]];
@@ -704,6 +710,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 
 				// calculate player's score
 				j = tmpl->enemy_kills - tmpl->team_kills - tmpl->suicides;
+
 				sprintf (entry,
 					"yv %d string \"%-15.15s   %4d  %3d %3d  %3d\" ",
 					i * 8 + 56 + offset,
@@ -712,6 +719,11 @@ char *TDM_ScoreBoardString (edict_t *ent)
 					tmpl->deaths,
 					tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
 					(ping > 999) ? 999 : ping);
+
+				// this is the captain
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
 
 				if (maxsize - len > strlen(entry))
 				{
@@ -722,7 +734,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 			}
 		}
 	}
-	// wision: warmup scoreboard
+	// warmup scoreboard
 	else
 	{
 		for (i=0 ; i < game.maxclients ; i++)
@@ -838,13 +850,20 @@ char *TDM_ScoreBoardString (edict_t *ent)
 				cl = &game.clients[sorted[firstteam-1][i]];
 				cl_ent = g_edicts + 1 + sorted[firstteam-1][i];
 
+
 				sprintf (entry,
 					"yv %d string \"%-15.15s   %13.13s  %3d\" ",
 					i * 8 + 56,
- 					cl->pers.netname,
+					cl->pers.netname,
 					cl->resp.ready ? "[READY]    " : "",
 					(cl->ping > 999) ? 999 : cl->ping
-					);
+				);
+
+				// this is the captain
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
+
 
 				if (maxsize - len > strlen(entry))
 				{
@@ -863,10 +882,15 @@ char *TDM_ScoreBoardString (edict_t *ent)
 				sprintf (entry,
 					"yv %d string \"%-15.15s   %13.13s  %3d\" ",
 					i * 8 + 56 + offset,
- 					cl->pers.netname,
+					cl->pers.netname,
 					cl->resp.ready ? "[READY]    " : "",
 					(cl->ping > 999) ? 999 : cl->ping
-					);
+				);
+
+				// this is the captain
+				if ((int)g_highlight_captain->value && teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
+					strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
+				}
 
 				if (maxsize - len > strlen(entry))
 				{

@@ -137,6 +137,7 @@ void InitGame (void)
 
 	init_genrand ((unsigned long)time(NULL));
 
+	// these are used for server browser replies
 	gi.cvar("time_remaining", "N/A", CVAR_SERVERINFO | CVAR_NOSET);
 	gi.cvar("match_type", "N/A", CVAR_SERVERINFO | CVAR_NOSET);
 	gi.cvar("Score_B", "N/A", CVAR_SERVERINFO | CVAR_NOSET);
@@ -191,104 +192,191 @@ void InitGame (void)
 	// dm map list
 	sv_maplist = gi.cvar ("sv_maplist", "", 0);
 
-	// r1: opentdm cvars
+
 	// flood wave control
 	flood_waves = gi.cvar ("flood_waves", "6", 0);
 	flood_waves_perminute = gi.cvar ("flood_waves_perminute", "6", 0);
 	flood_waves_waitdelay = gi.cvar ("flood_waves_waitdelay", "10", 0);
 
+	// random, farthest, fixed farthest
+	g_1v1_spawn_mode = gi.cvar ("g_1v1_spawn_mode", "1", 0);
+
+	//max timeout via implicit timeout in 1v1 disconnect
+	g_1v1_timeout = gi.cvar ("g_1v1_timeout", "60", 0);
+
+	// dm flags for 1v1 mode
+	g_1v1flags = gi.cvar ("g_1v1flags", "1040", 0);
+
+	// password for "admin" command, sets ref status
+	g_admin_password = gi.cvar ("g_admin_password", "", 0);
+
+	// an admin's vote wins, vote is over
+	g_admin_vote_decide = gi.cvar ("g_admin_vote_decide", "1", 0);
+
+	// let players change alias while a match is in progress
+	g_allow_name_change_during_match = gi.cvar ("g_allow_name_change_during_match", "1", 0);
+
+	// let players vote an available LOCAL configuration file (moddir/configs/<configname>)
+	g_allow_vote_config = gi.cvar ("g_allow_vote_config", "1", 0);
+
+	// enable the in-hud armor timer (using "armortimer" command)
+	g_armor_timer = gi.cvar("g_armor_timer", "1", 0);
+
+	// players can rejoin if they timeout/crash/ragequit if they have joincode set
+	g_auto_rejoin_match = gi.cvar ("g_auto_rejoin_match", "1", 0);
+
+	//
+	g_auto_rejoin_map = gi.cvar ("g_auto_rejoin_map", "1", 0);
+
+	// fix known bugs or let them be
+	g_bugs = gi.cvar ("g_bugs", "0", 0);
+
+	// allow all chat or only players?
+	g_chat_mode = gi.cvar ("g_chat_mode", "0", 0);
+
+	//
+	g_command_mask = gi.cvar ("g_command_mask", "-1", 0);
+
+	// testing
+	g_debug_spawns = gi.cvar ("g_debug_spawns", "0", 0);
+
+	// how quick weapons switch (0 is original quake 2 speed)
+	g_fast_weap_switch = gi.cvar ("g_fast_weap_switch", "0", 0);
+
+	// stuff screenshot command to players on intermission
+	g_force_screenshot = gi.cvar ("g_force_screenshot", "0", 0);
+
+	// stuff record command at start of match and stop at intermission
+	g_force_record = gi.cvar ("g_force_record", "0", 0);
+
+	// TDM, 1v1, Insta
 	g_gamemode = gi.cvar ("g_gamemode", "0", CVAR_LATCH);
 	g_gamemode->modified = false;
 
-	g_team_a_name = gi.cvar ("g_team_a_name", "Hometeam", 0);
-	g_team_b_name = gi.cvar ("g_team_b_name", "Visitors", 0);
-	g_locked_names = gi.cvar ("g_locked_names", "0", 0);
+	// put a * next to captain in team games in the scoreboard
+	g_highlight_captain = gi.cvar("g_highlight_captain", "0", 0);
 
-	g_team_a_skin = gi.cvar ("g_team_a_skin", "male/grunt", 0);
-	g_team_b_skin = gi.cvar ("g_team_b_skin", "female/athena", 0);
-	g_locked_skins = gi.cvar ("g_locked_skins", "0", 0);
-
-	g_admin_password = gi.cvar ("g_admin_password", "", 0);
-	g_admin_vote_decide = gi.cvar ("g_admin_vote_decide", "1", 0);
-	g_match_time = gi.cvar ("g_match_time", "600", 0);
-	g_match_countdown = gi.cvar ("g_match_countdown", "15", 0);
-	g_vote_time = gi.cvar ("g_vote_time", "30", 0);
-	g_vote_mask = gi.cvar ("g_vote_mask", "-1", 0);
-	g_vote_attention = gi.cvar("g_vote_attention", "0", 0);
-	g_vote_attention_sound = gi.cvar("g_vote_attention_sound", "misc/pc_up.wav", CVAR_LATCH);
-	g_ready_attention = gi.cvar("g_ready_attention", "0", 0);
-	g_intermission_time = gi.cvar ("g_intermission_time", "5", 0);
-	g_force_screenshot = gi.cvar ("g_force_screenshot", "0", 0);
-	g_force_record = gi.cvar ("g_force_record", "0", 0);
-	g_record_mvd = gi.cvar("g_record_mvd", "0", 0);
-	g_weapon_hud = gi.cvar("g_weapon_hud", "1", CVAR_LATCH);
-	g_armor_timer = gi.cvar("g_armor_timer", "1", 0);
-	g_weapon_timer = gi.cvar("g_weapon_timer", "1", 0);
-
-	g_tdmflags = gi.cvar ("g_tdmflags", "1040", 0);
-	g_itdmflags = gi.cvar ("g_itdmflags", "142427", 0);
-	g_1v1flags = gi.cvar ("g_1v1flags", "1040", 0);
-
-	g_itemflags = gi.cvar ("g_itemflags", "0", 0);
-	g_powerupflags = gi.cvar ("g_powerupflags", "0", 0);
-
-	g_tdm_allow_pick = gi.cvar ("g_tdm_allow_pick", "0", 0);
-
-	g_fast_weap_switch = gi.cvar ("g_fast_weap_switch", "0", 0);
-	g_teleporter_nofreeze = gi.cvar ("g_teleporter_nofreeze", "0", 0);
-
-	g_tie_mode = gi.cvar ("g_tie_mode", "1", 0);
-	// wision: 60 as default overtime for all leagues
-	g_overtime = gi.cvar ("g_overtime", "60", 0);
-	// wision: default from other mods (battle)..
-	// low values are making raping easy on small maps in duels
-	// shouldn't even be configurable probably
-	g_respawn_time = gi.cvar ("g_respawn_time", "5", 0);
-
-	//max timeout when called via cmd
-	g_max_timeout = gi.cvar ("g_max_timeout", "300", 0);
-
-	//max timeout via implicit timeout in 1v1 disconnect
-	g_1v1_timeout = gi.cvar ("g_1v1_timeout", "90", 0);
-
-	//allow all chat or only players?
-	g_chat_mode = gi.cvar ("g_chat_mode", "0", 0);
-
-	g_idle_time = gi.cvar ("g_idle_time", "300", 0);
-
-	g_http_enabled = gi.cvar ("g_http_enabled", "1", 0);
+	// libcurl - IP address to use for libcurl requests
 	g_http_bind = gi.cvar ("g_http_bind", "", 0);
-	g_http_proxy = gi.cvar ("g_http_proxy", "", 0);
-	g_http_debug = gi.cvar ("g_http_debug", "0", 0);
 
-	g_debug_spawns = gi.cvar ("g_debug_spawns", "0", 0);
-
-	g_max_players_per_team = gi.cvar ("g_max_players_per_team", "4", 0);
-
-	g_maplistfile = gi.cvar ("g_maplistfile", "", 0);
-	//g_motd_message = gi.cvar ("g_motd_message", "==========================\\n|    Quake 2 OpenTDM!    |\\n|------------------------|\\n|   http://opentdm.net/  |\\n==========================" , 0);
-	//default off since its super annoying
-	g_motd_message = gi.cvar ("g_motd_message", "" , 0);
-
-	g_bugs = gi.cvar ("g_bugs", "0", 0);
-	g_allow_name_change_during_match = gi.cvar ("g_allow_name_change_during_match", "1", 0);
-
-	g_allow_vote_config = gi.cvar ("g_allow_vote_config", "1", 0);
-
-	g_command_mask = gi.cvar ("g_command_mask", "-1", 0);
-
-	g_auto_rejoin_match = gi.cvar ("g_auto_rejoin_match", "1", 0);
-	g_auto_rejoin_map = gi.cvar ("g_auto_rejoin_map", "1", 0);
-
-	g_1v1_spawn_mode = gi.cvar ("g_1v1_spawn_mode", "1", 0);
-	g_tdm_spawn_mode = gi.cvar ("g_tdm_spawn_mode", "1", 0);
-	
-	// include slash at beginning and end. ex: /api/
-	g_http_path = gi.cvar ("g_http_path", "/configs/", CVAR_LATCH);
+	// domain name or IP address for API calls
 	g_http_domain = gi.cvar ("g_http_domain", "opentdm.org", CVAR_LATCH);
 
+	// libcurl - debug messages
+	g_http_debug = gi.cvar ("g_http_debug", "0", 0);
+
+	// libcurl - enable for webconfigs
+	g_http_enabled = gi.cvar ("g_http_enabled", "1", 0);
+
+	// include slash at beginning and end. ex: /api/
+	g_http_path = gi.cvar ("g_http_path", "/configs/", CVAR_LATCH);
+
+	// libcurl - proxy address for http access
+	g_http_proxy = gi.cvar ("g_http_proxy", "", 0);
+
+	// players idle this long will be switched to specs (in seconds)
+	g_idle_time = gi.cvar ("g_idle_time", "300", 0);
+
+	// seconds intermission lasts at end of match
+	g_intermission_time = gi.cvar ("g_intermission_time", "5", 0);
+
+	// instagib dm flags
+	g_itdmflags = gi.cvar ("g_itdmflags", "142427", 0);
+
+	// disabled items bitmask
+	g_itemflags = gi.cvar ("g_itemflags", "0", 0);
+
+	// whether team names can be changed or not
+	g_locked_names = gi.cvar ("g_locked_names", "0", 0);
+
+	// whether team skins can be changed
+	g_locked_skins = gi.cvar ("g_locked_skins", "0", 0);
+
+	// which file is the maplist
+	g_maplistfile = gi.cvar ("g_maplistfile", "", 0);
+
+	// seconds from ready to start
+	g_match_countdown = gi.cvar ("g_match_countdown", "15", 0);
+
+	// match length in seconds
+	g_match_time = gi.cvar ("g_match_time", "600", 0);
+
+	// player limit
+	g_max_players_per_team = gi.cvar ("g_max_players_per_team", "4", 0);
+
+	// max timeout when called via cmd
+	g_max_timeout = gi.cvar ("g_max_timeout", "300", 0);
+
+	// message displayed upon entering the game
+	g_motd_message = gi.cvar ("g_motd_message", "" , 0);
+
+	// seconds added if tied
+	g_overtime = gi.cvar ("g_overtime", "60", 0);
+
+	// allow downloading of player configs on connect
 	g_playerconfig_enabled = gi.cvar("g_playerconfig_enabled", "1", CVAR_LATCH);
 
+	// powerups removed (bitmask)
+	g_powerupflags = gi.cvar ("g_powerupflags", "0", 0);
+
+	// whether server should record multi-view demo of matches
+	g_record_mvd = gi.cvar("g_record_mvd", "0", 0);
+
+	// stop warmup players from shooting until match start
+	g_ready_attention = gi.cvar("g_ready_attention", "0", 0);
+
+	// seconds until fragged player repawns automatically
+	g_respawn_time = gi.cvar ("g_respawn_time", "5", 0);
+
+	//
+	g_tdm_allow_pick = gi.cvar ("g_tdm_allow_pick", "0", 0);
+
+	//
+	g_tdm_spawn_mode = gi.cvar ("g_tdm_spawn_mode", "1", 0);
+
+	// dm flags for TDM mode
+	g_tdmflags = gi.cvar ("g_tdmflags", "1040", 0);
+
+	// first team name
+	g_team_a_name = gi.cvar ("g_team_a_name", "Hometeam", 0);
+
+	// first team skin
+	g_team_a_skin = gi.cvar ("g_team_a_skin", "male/grunt", 0);
+
+	// second team name
+	g_team_b_name = gi.cvar ("g_team_b_name", "Visitors", 0);
+
+	// second team skin
+	g_team_b_skin = gi.cvar ("g_team_b_skin", "female/athena", 0);
+
+	// teleporter behavior (stop forward motion or not)
+	g_teleporter_nofreeze = gi.cvar ("g_teleporter_nofreeze", "0", 0);
+
+	// what happens if tied (add time, sudden death, just end tied)
+	g_tie_mode = gi.cvar ("g_tie_mode", "1", 0);
+
+	// max number of timeouts allowed per client (0 == unlimited)
+	g_timeout_limit = gi.cvar("g_timeout_limit", "2", 0);
+
+	// play a sound when a vote is called
+	g_vote_attention = gi.cvar("g_vote_attention", "0", 0);
+
+	// sound file to play when g_vote_attention is enabled
+	g_vote_attention_sound = gi.cvar("g_vote_attention_sound", "misc/pc_up.wav", CVAR_LATCH);
+
+	// which commands are voteable (-1 enables all)
+	g_vote_mask = gi.cvar ("g_vote_mask", "-1", 0);
+
+	// seconds votes last
+	g_vote_time = gi.cvar ("g_vote_time", "30", 0);
+	
+	// enable weapon/ammo counters in the hud
+	g_weapon_hud = gi.cvar("g_weapon_hud", "1", CVAR_LATCH);
+
+	// enables the weapontimer command
+	g_weapon_timer = gi.cvar("g_weapon_timer", "1", 0);
+
+	// ...
 	sv_mvd_enable = gi.cvar("sv_mvd_enable", "", CVAR_LATCH);
 
 	// items

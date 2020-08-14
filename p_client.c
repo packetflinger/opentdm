@@ -1386,25 +1386,24 @@ void ClientBeginDeathmatch (edict_t *ent)
 
 		ClientUserinfoChanged (ent, userinfo);
 
-		if (!ent->client->pers.mvdclient)
+		if (!ent->client->pers.mvdclient) {
 			gi.bprintf (PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
+		}
 	}
-	else
-	{
-		TDM_UpdateHud(ent, false);
-	}
+
+	TDM_UpdateHud(ent, true);
 
 	// set timer icons indexes (armor/weapon is set on the fly)
-	client->item_timer_icon[TIMER_QUAD] = gi.imageindex ("p_quad");
-	client->item_timer_icon[TIMER_INVULN] = gi.imageindex ("p_invulnerability");
-	client->item_timer_icon[TIMER_ENVIROSUIT] = gi.imageindex ("p_envirosuit");
-	client->item_timer_icon[TIMER_REBREATHER] = gi.imageindex ("p_rebreather");
+	client->pers.item_timer_icon[TIMER_QUAD] = gi.imageindex ("p_quad");
+	client->pers.item_timer_icon[TIMER_INVULN] = gi.imageindex ("p_invulnerability");
+	client->pers.item_timer_icon[TIMER_ENVIROSUIT] = gi.imageindex ("p_envirosuit");
+	client->pers.item_timer_icon[TIMER_REBREATHER] = gi.imageindex ("p_rebreather");
 
-	client->timer1.stat_index = STAT_TIMER;
-	client->timer2.stat_index = STAT_TIMER2;
+	client->pers.timer1.stat_index = STAT_TIMER;
+	client->pers.timer2.stat_index = STAT_TIMER2;
 
 	// should update timers
-	client->next_timer_update = 0;
+	client->pers.next_timer_update = 0;
 
 	//no cross-level menus!
 	PMenu_Close (ent);

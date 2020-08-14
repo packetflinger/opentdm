@@ -1510,6 +1510,9 @@ void TDM_SetupMatchInfoAndTeamPlayers (void)
 			TDM_SetupTeamInfoForPlayer (ent, current_matchinfo.teamplayers + i);
 			i++;
 		}
+
+		// reset timeout counter
+		ent->client->pers.timeout_count = 0;
 	}
 
 	if (teaminfo[TEAM_A].captain)

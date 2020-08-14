@@ -663,19 +663,22 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 		SetRespawn (ent, 20);
 
 	// set the timer if enabled
-	if (UF(other, ARMOR_TIMER) && g_armor_timer->value) {
-		if (other->client->pers.armor_mask) {
+	if (other->client->pers.armor_mask && g_armor_timer->value) {
+		if (index != ARMOR_SHARD) {
 
-			// lookup weapon vote bitmask index to game inventory index
-			for (i=0; i<ARMOR_MAX; i++) {
-				if (index == armorvotes[i].itemindex) {
-					break;
+			if (other->client->pers.armor_mask) {
+
+				// lookup weapon vote bitmask index to game inventory index
+				for (i=0; i<ARMOR_MAX; i++) {
+					if (index == armorvotes[i].itemindex) {
+						break;
+					}
 				}
-			}
 
 			if (i < ARMOR_MAX && other->client->pers.armor_mask & armorvotes[i].value) {
 				other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
 				other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex(ent->item->icon);
+
 			}
 		}
 	}

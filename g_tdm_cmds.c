@@ -750,22 +750,37 @@ void TDM_Timeout_f (edict_t *ent)
 		return;
 	}
 
+	// timeout limits are imposed on this config (except for admins)
+	if (g_timeout_limit->value && !ent->client->pers.admin) {
+		if (ent->client->pers.timeout_count >= g_timeout_limit->value) {
+			gi.cprintf(
+					ent,
+					PRINT_HIGH,
+					"Timeout limit exceeded (%d/%d)",
+					ent->client->pers.timeout_count,
+					(int)g_timeout_limit->value
+			);
+			return;
+		}
+	}
+
 	if (g_max_timeout->value == 0)
 	{
 		gi.cprintf (ent, PRINT_HIGH, "Time out is disabled on this server.\n");
 		return;
 	}
 
-	// wision: if i'm admin, i want unlimited timeout!
-	// wision: check what happens if admin is just a spectator and he calls timeout
-	// r1: your method didn't work, and the code isn't really designed to allow such. is an hour enough to organize the game? :)
+	// admin timeout is held for 1 hour unless timein is called
 	if (ent->client->pers.admin)
 		time_len = 3600;
 	else
 		time_len = g_max_timeout->value;
 
+
+
 	level.timeout_end_framenum = level.realframenum + SECS_TO_FRAMES (time_len);
 	level.tdm_timeout_caller = ent->client->resp.teamplayerinfo;
+	ent->client->pers.timeout_count++;
 
 	// r1: crash fix, never reset the match status to a timeout (calling time during resume timer)
 	if (tdm_match_status != MM_TIMEOUT)
@@ -892,6 +907,13 @@ char *TDM_SettingsString (void)
 
 	strcat (settings, "Gameplay bugs:    ");
 	strcat (settings, TDM_SetColorText(va("%s\n", bugs_text[(int)g_bugs->value])));
+
+	strcat (settings, "Timeout limits:   ");
+	if (g_timeout_limit->value) {
+		strcat (settings, TDM_SetColorText(va("%d per player\n", (int)g_timeout_limit->value)));
+	} else {
+		strcat (settings, TDM_SetColorText(va("unlimited\n")));
+	}
 
 	if (TDM_Is1V1())
 	{
@@ -2580,7 +2602,40 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
  * Just for testing stuff
  */
 void TDM_Test_f(edict_t *ent) {
-	gi.cprintf(ent, PRINT_HIGH, "bits: %d\n", TDM_ArmorStringToBitmask(gi.args()));
+	/*
+	gi.cprintf(ent, PRINT_HIGH,
+			"player_state_t       %lu\n"
+			"client_persistent_t  %lu\n"
+			"client_respawn_t     %lu\n"
+			"pmove_state_t        %lu\n"
+			"qboolean             %lu\n"
+			"gitem_t              %lu\n"
+			"int                  %lu\n"
+			"vec3_t               %lu\n"
+			"float                %lu\n"
+			"weaponstate_t        %lu\n"
+			"unsigned             %lu\n"
+			"grenade_state_t      %lu\n"
+			"edict_t              %lu\n"
+			"gclient_t            %lu\n",
+			sizeof(player_state_t),
+			sizeof(client_persistent_t),
+			sizeof(client_respawn_t),
+			sizeof(pmove_state_t),
+			sizeof(qboolean),
+			sizeof(gitem_t),
+			sizeof(int),
+			sizeof(vec3_t),
+			sizeof(float),
+			sizeof(weaponstate_t),
+			sizeof(unsigned),
+			sizeof(grenade_state_t),
+			sizeof(edict_t),
+			sizeof(gclient_t)
+	);
+	*/
+
+	gi.cprintf(ent, PRINT_HIGH, "weapon offset: %lu", offsetof(gclient_t, weapon));
 }
 
 
@@ -2598,13 +2653,46 @@ void TDM_Ignore_f(edict_t *ent, int level)
 
 
 /**
- * Start an armor timer
+ * Start an armor timer or set the auto-timer mask
  */
 void TDM_ArmorTimer_f(edict_t *ent)
 {
+	char *mask;
+
+	if (gi.argc() == 2 && !Q_stricmp(gi.argv(1), "-h")){
+		gi.cprintf(ent, PRINT_HIGH,
+				"%s: %s - Start an armor timer\n"
+				"       %s [%s] - set your auto-timing mask\n\n"
+				"%s contains any: [-/+]all [-/+]ra [-/+]ya [-/+]ga\n\n",
+				//TDM_SetColorText("Usage"),
+				"Usage",
+				gi.argv(0),
+				gi.argv(0),
+				//TDM_SetColorText("armor_string"),
+				//TDM_SetColorText("armor_string")
+				"armor_string",
+				"armor_string"
+		);
+
+		return;
+	}
+
 	if (g_armor_timer->value) {
-		ent->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
-		ent->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
+		// command used alone, just start a timer
+		if (gi.argc() < 2) {
+			ent->client->pers.item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+			ent->client->pers.item_timer_icon[TIMER_ARMOR] = gi.imageindex("i_combatarmor");
+		} else {
+			mask = gi.argv(1);
+			if (mask[0] >= '0' && mask[0] <= '9') { // assume it's a numeric mask
+				ent->client->pers.armor_mask = atoi(mask);
+			} else {
+				ent->client->pers.armor_mask = TDM_ArmorStringToBitmask(mask);
+			}
+
+			G_StuffCmd(ent, "set amask \"%d\" u", ent->client->pers.armor_mask);
+			gi.cprintf(ent, PRINT_HIGH, "Armor timer mask set\n");
+		}
 	} else {
 		if (((int)g_vote_mask->value) & VOTE_ARMOR_TIMER) {
 			gi.cprintf(ent, PRINT_HIGH, "Armor timer disabled, vote to enable it: \"vote armortimer 1\"\n");
@@ -2616,16 +2704,68 @@ void TDM_ArmorTimer_f(edict_t *ent)
 
 
 /**
- * Start a weapon timer
+ * Start a weapon timer, or set auto-timer bitmask
  */
 void TDM_WeaponTimer_f(edict_t *ent)
 {
-	if (g_weapon_timer->value) {
-		ent->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
-		ent->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
-	} else {
-		gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled in server config\n");
+	char *mask;
+
+	if (gi.argc() == 2 && !Q_stricmp(gi.argv(1), "-h")){
+		gi.cprintf(ent, PRINT_HIGH,
+				"%s: %s - Start a weapon timer\n"
+				"       %s [%s] - set your auto-timing mask\n\n"
+				"%s contains any: [-/+]all [-/+]sg [-/+]ssg\n"
+				"  [-/+]mg [-/+]cg [-/+]gl [-/+]hb [-/+]rl [-/+]rg [-/+]bfg\n\n",
+				//TDM_SetColorText("Usage"),
+				"Usage",
+				gi.argv(0),
+				gi.argv(0),
+				//TDM_SetColorText("weapon_string"),
+				//TDM_SetColorText("weapon_string")
+				"weapon_string",
+				"weapon_string"
+		);
+
+		return;
 	}
+
+	if (g_weapon_timer->value) {
+
+		// command used alone, just start a timer
+		if (gi.argc() < 2) {
+			ent->client->pers.item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
+			ent->client->pers.item_timer_icon[TIMER_WEAPON] = gi.imageindex("w_blaster");
+		} else {
+			mask = gi.argv(1);
+			if (mask[0] >= '0' && mask[0] <= '9') { // assume it's a numeric mask
+				ent->client->pers.weapon_mask = atoi(mask);
+			} else {
+				ent->client->pers.weapon_mask = TDM_WeaponStringToBitmask(mask);
+			}
+
+			G_StuffCmd(ent, "set wmask \"%d\" u", ent->client->pers.weapon_mask);
+			gi.cprintf(ent, PRINT_HIGH, "Weapon timer mask set\n");
+		}
+	} else {
+		if (((int)g_vote_mask->value) & VOTE_WEAPON_TIMER) {
+			gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled, vote to enable it: \"vote weapontimer 1\"\n");
+		} else {
+			gi.cprintf(ent, PRINT_HIGH, "Weapon timer disabled in server config\n");
+		}
+	}
+}
+
+/**
+ * List available maps in console
+ */
+void TDM_Maplist_f(edict_t *ent)
+{
+	if (!g_maplistfile || !g_maplistfile->string[0]) {
+		gi.cprintf(ent, PRINT_HIGH, "maplist is undefined on this server.\n");
+		return;
+	}
+
+	TDM_WriteMaplist(ent);
 }
 
 /*
@@ -2892,6 +3032,8 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_ArmorTimer_f(ent);
 		else if (!Q_stricmp(cmd, "weapontimer"))
 			TDM_WeaponTimer_f(ent);
+		else if (!Q_stricmp(cmd, "maplist") || !Q_stricmp(cmd, "maps"))
+			TDM_Maplist_f(ent);
 		else if (!Q_stricmp (cmd, "stopsound"))
 			return true;	//prevent chat from our stuffcmds on people who have no sound
 		else

@@ -417,9 +417,9 @@ void G_SetStats (edict_t *ent)
 	if (ent->client->quad_framenum > level.framenum) {
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
 		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS((ent->client->quad_framenum - level.framenum));
-	} else if (ent->client->item_timer[TIMER_ARMOR] > level.framenum) {
-		ent->client->ps.stats[STAT_TIMER_ICON] = ent->client->item_timer_icon[TIMER_ARMOR];
-		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->item_timer[TIMER_ARMOR] - level.framenum);
+	} else if (ent->client->pers.item_timer[TIMER_ARMOR] > level.framenum) {
+		ent->client->ps.stats[STAT_TIMER_ICON] = ent->client->pers.item_timer_icon[TIMER_ARMOR];
+		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->pers.item_timer[TIMER_ARMOR] - level.framenum);
 	} else if (ent->client->enviro_framenum > level.framenum) {
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
 		ent->client->ps.stats[STAT_TIMER] = FRAMES_TO_SECS(ent->client->enviro_framenum - level.framenum);
@@ -433,7 +433,7 @@ void G_SetStats (edict_t *ent)
 
 	int stat, stat_icon;
 	if (ent->client->quad_framenum > level.framenum ||
-			ent->client->item_timer[TIMER_ARMOR] > level.framenum ||
+			ent->client->pers.item_timer[TIMER_ARMOR] > level.framenum ||
 			ent->client->enviro_framenum > level.framenum ||
 			ent->client->breather_framenum > level.framenum) {
 		stat = STAT_TIMER2;
@@ -449,9 +449,9 @@ void G_SetStats (edict_t *ent)
 	if (ent->client->invincible_framenum > level.framenum) {
 		ent->client->ps.stats[stat_icon] = gi.imageindex ("p_invulnerability");
 		ent->client->ps.stats[stat] = FRAMES_TO_SECS(ent->client->invincible_framenum - level.framenum);
-	} else if (ent->client->item_timer[TIMER_WEAPON] > level.framenum) {
-		ent->client->ps.stats[stat_icon] = ent->client->item_timer_icon[TIMER_WEAPON];
-		ent->client->ps.stats[stat] = FRAMES_TO_SECS(ent->client->item_timer[TIMER_WEAPON] - level.framenum);
+	} else if (ent->client->pers.item_timer[TIMER_WEAPON] > level.framenum) {
+		ent->client->ps.stats[stat_icon] = ent->client->pers.item_timer_icon[TIMER_WEAPON];
+		ent->client->ps.stats[stat] = FRAMES_TO_SECS(ent->client->pers.item_timer[TIMER_WEAPON] - level.framenum);
 	} else {
 		ent->client->ps.stats[stat_icon] = 0;
 		ent->client->ps.stats[stat] = 0;
