@@ -143,7 +143,7 @@ edict_t *G_PickTarget (char *targetname)
 		return NULL;
 	}
 
-	return choice[genrand_int32() % num_choices];
+	return choice[genrand_uniform (num_choices)];
 }
 
 
