@@ -165,7 +165,7 @@ void AngleMove_Final (edict_t *ent)
 		return;
 	}
 
-	VectorScale (move, 1.0/FRAMETIME, ent->avelocity);
+	VectorScale (move, 1.0f/FRAMETIME, ent->avelocity);
 
 	ent->think = AngleMove_Done;
 	ent->nextthink = level.framenum + 1;
@@ -199,7 +199,7 @@ void AngleMove_Begin (edict_t *ent)
 	frames = floor(traveltime / FRAMETIME);
 
 	// scale the destdelta vector by the time spent traveling to get velocity
-	VectorScale (destdelta, 1.0 / traveltime, ent->avelocity);
+	VectorScale (destdelta, 1.0f / traveltime, ent->avelocity);
 
 	// set nextthink to trigger a think when dest is reached
 	ent->nextthink = level.framenum + frames;
@@ -288,7 +288,7 @@ void plat_Accelerate (moveinfo_t *moveinfo)
 			float	distance;
 
 			p1_distance = moveinfo->remaining_distance - moveinfo->decel_distance;
-			p2_distance = moveinfo->move_speed * (1.0 - (p1_distance / moveinfo->move_speed));
+			p2_distance = moveinfo->move_speed * (1.0f - (p1_distance / moveinfo->move_speed));
 			distance = p1_distance + p2_distance;
 			moveinfo->current_speed = moveinfo->move_speed;
 			moveinfo->next_speed = moveinfo->move_speed - moveinfo->decel * (p2_distance / distance);
@@ -319,8 +319,8 @@ void plat_Accelerate (moveinfo_t *moveinfo)
 		// and cross over the decel_distance; figure the average speed for the
 		// entire move
 		p1_distance = moveinfo->remaining_distance - moveinfo->decel_distance;
-		p1_speed = (old_speed + moveinfo->move_speed) / 2.0;
-		p2_distance = moveinfo->move_speed * (1.0 - (p1_distance / p1_speed));
+		p1_speed = (old_speed + moveinfo->move_speed) / 2.0f;
+		p2_distance = moveinfo->move_speed * (1.0f - (p1_distance / p1_speed));
 		distance = p1_distance + p2_distance;
 		moveinfo->current_speed = (p1_speed * (p1_distance / distance)) + (moveinfo->move_speed * (p2_distance / distance));
 		moveinfo->next_speed = moveinfo->move_speed - moveinfo->decel * (p2_distance / distance);
@@ -632,11 +632,11 @@ void SP_func_rotating (edict_t *ent)
 	// set the axis of rotation
 	VectorClear(ent->movedir);
 	if (ent->spawnflags & 4)
-		ent->movedir[2] = 1.0;
+		ent->movedir[2] = 1.0f;
 	else if (ent->spawnflags & 8)
-		ent->movedir[0] = 1.0;
+		ent->movedir[0] = 1.0f;
 	else // Z_AXIS
-		ent->movedir[1] = 1.0;
+		ent->movedir[1] = 1.0f;
 
 	// check for reverse rotation
 	if (ent->spawnflags & 2)
@@ -1269,11 +1269,11 @@ void SP_func_door_rotating (edict_t *ent)
 	// set the axis of rotation
 	VectorClear(ent->movedir);
 	if (ent->spawnflags & DOOR_X_AXIS)
-		ent->movedir[2] = 1.0;
+		ent->movedir[2] = 1.0f;
 	else if (ent->spawnflags & DOOR_Y_AXIS)
-		ent->movedir[0] = 1.0;
+		ent->movedir[0] = 1.0f;
 	else // Z_AXIS
-		ent->movedir[1] = 1.0;
+		ent->movedir[1] = 1.0f;
 
 	// check for reverse rotation
 	if (ent->spawnflags & DOOR_REVERSE)
@@ -1805,7 +1805,7 @@ void func_timer_use (edict_t *self, edict_t *other, edict_t *activator)
 void SP_func_timer (edict_t *self)
 {
 	if (!self->wait)
-		self->wait = 1.0;
+		self->wait = 1.0f;
 
 	self->use = func_timer_use;
 	self->think = func_timer_think;

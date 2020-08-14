@@ -233,7 +233,7 @@ int SV_FlyMove (edict_t *ent, float time, int mask)
 
 		hit = trace.ent;
 
-		if (trace.plane.normal[2] > 0.7)
+		if (trace.plane.normal[2] > 0.7f)
 		{
 			blocked |= 1;		// floor
 			if ( hit->solid == SOLID_BSP)

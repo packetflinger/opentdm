@@ -94,10 +94,10 @@ void SP_target_speaker (edict_t *ent)
 	ent->noise_index = gi.soundindex (buffer);
 
 	if (!ent->volume)
-		ent->volume = 1.0;
+		ent->volume = 1.0f;
 
 	if (!ent->attenuation)
-		ent->attenuation = 1.0;
+		ent->attenuation = 1.0f;
 	else if (ent->attenuation == -1)	// use -1 so 0 defaults to 1
 		ent->attenuation = 0;
 
@@ -432,7 +432,7 @@ void target_laser_think (edict_t *self)
 	if (self->enemy)
 	{
 		VectorCopy (self->movedir, last_movedir);
-		VectorMA (self->enemy->absmin, 0.5, self->enemy->size, point);
+		VectorMA (self->enemy->absmin, 0.5f, self->enemy->size, point);
 		VectorSubtract (point, self->s.origin, self->movedir);
 		VectorNormalize (self->movedir);
 		if (!VectorCompare(self->movedir, last_movedir))
@@ -597,7 +597,7 @@ void target_earthquake_think (edict_t *self)
 
 	if (self->pain_debounce_framenum < level.framenum)
 	{
-		gi.positioned_sound (self->s.origin, self, CHAN_AUTO, self->noise_index, 1.0, ATTN_NONE, 0);
+		gi.positioned_sound (self->s.origin, self, CHAN_AUTO, self->noise_index, 1.0f, ATTN_NONE, 0);
 		self->pain_debounce_framenum = level.framenum + SECS_TO_FRAMES(0.5f);
 	}
 
@@ -613,7 +613,7 @@ void target_earthquake_think (edict_t *self)
 		e->groundentity = NULL;
 		e->velocity[0] += crandom()* 150;
 		e->velocity[1] += crandom()* 150;
-		e->velocity[2] = self->speed * (100.0 / e->mass);
+		e->velocity[2] = self->speed * (100.0f / e->mass);
 	}
 
 	if (level.framenum < self->damage_debounce_framenum)

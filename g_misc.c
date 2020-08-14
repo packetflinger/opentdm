@@ -145,7 +145,7 @@ void ThrowGib (edict_t *self, char *gibname, int damage, int type)
 
 	gib = G_Spawn();
 
-	VectorScale (self->size, 0.5, size);
+	VectorScale (self->size, 0.5f, size);
 	VectorAdd (self->absmin, size, origin);
 	gib->s.origin[0] = origin[0] + crandom() * size[0];
 	gib->s.origin[1] = origin[1] + crandom() * size[1];
@@ -164,12 +164,12 @@ void ThrowGib (edict_t *self, char *gibname, int damage, int type)
 	{
 		gib->movetype = MOVETYPE_TOSS;
 		//gib->touch = gib_touch;
-		vscale = 0.5;
+		vscale = 0.5f;
 	}
 	else
 	{
 		gib->movetype = MOVETYPE_BOUNCE;
-		vscale = 1.0;
+		vscale = 1.0f;
 	}
 
 	VelocityForDamage (damage, vd);
@@ -211,12 +211,12 @@ void ThrowHead (edict_t *self, char *gibname, int damage, int type)
 	{
 		self->movetype = MOVETYPE_TOSS;
 		//self->touch = gib_touch;
-		vscale = 0.5;
+		vscale = 0.5f;
 	}
 	else
 	{
 		self->movetype = MOVETYPE_BOUNCE;
-		vscale = 1.0;
+		vscale = 1.0f;
 	}
 
 	VelocityForDamage (damage, vd);
@@ -526,7 +526,7 @@ void func_object_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface
 	// only squash thing we fall on top of
 	if (!plane)
 		return;
-	if (plane->normal[2] < 1.0)
+	if (plane->normal[2] < 1.0f)
 		return;
 	if (other->takedamage == DAMAGE_NO)
 		return;
@@ -610,7 +610,7 @@ void func_explosive_explode (edict_t *self, edict_t *inflictor, edict_t *attacke
 	int		mass;
 
 	// bmodel origins are (0 0 0), we need to adjust that here
-	VectorScale (self->size, 0.5, size);
+	VectorScale (self->size, 0.5f, size);
 	VectorAdd (self->absmin, size, origin);
 	VectorCopy (origin, self->s.origin);
 
@@ -624,7 +624,7 @@ void func_explosive_explode (edict_t *self, edict_t *inflictor, edict_t *attacke
 	VectorScale (self->velocity, 150, self->velocity);
 
 	// start chunks towards the center
-	VectorScale (size, 0.5, size);
+	VectorScale (size, 0.5f, size);
 
 	mass = self->mass;
 	if (!mass)
@@ -1004,10 +1004,10 @@ void misc_viper_bomb_prethink (edict_t *self)
 	self->groundentity = NULL;
 
 	diff = self->timestamp - level.framenum * FRAMETIME;
-	if (diff < -1.0)
-		diff = -1.0;
+	if (diff < -1.0f)
+		diff = -1.0f;
 
-	VectorScale (self->moveinfo.dir, 1.0 + diff, v);
+	VectorScale (self->moveinfo.dir, 1.0f + diff, v);
 	v[2] = diff;
 
 	diff = self->s.angles[2];

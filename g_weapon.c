@@ -82,7 +82,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 		return false;
 
 	// do our special form of knockback here
-	VectorMA (self->enemy->absmin, 0.5, self->enemy->size, v);
+	VectorMA (self->enemy->absmin, 0.5f, self->enemy->size, v);
 	VectorSubtract (v, point, v);
 	VectorNormalize (v);
 	VectorMA (self->enemy->velocity, kick, v, self->enemy->velocity);
@@ -112,7 +112,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 	int			content_mask = MASK_SHOT | MASK_WATER;
 
 	tr = gi.trace (self->s.origin, NULL, NULL, start, self, MASK_SHOT);
-	if (!(tr.fraction < 1.0))
+	if (!(tr.fraction < 1.0f))
 	{
 		vectoangles (aimdir, dir);
 		AngleVectors (dir, forward, right, up);
@@ -186,7 +186,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 	// send gun puff / flash
 	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
 	{
-		if (tr.fraction < 1.0)
+		if (tr.fraction < 1.0f)
 		{
 			if (tr.ent->takedamage)
 			{
@@ -220,7 +220,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 			tr = gi.trace (pos, NULL, NULL, water_start, tr.ent, MASK_WATER);
 
 		VectorAdd (water_start, tr.endpos, pos);
-		VectorScale (pos, 0.5, pos);
+		VectorScale (pos, 0.5f, pos);
 
 		gi.WriteByte (SVC_TEMP_ENTITY);
 		gi.WriteByte (TE_BUBBLETRAIL);
@@ -358,7 +358,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 	gi.linkentity (bolt);
 
 	tr = gi.trace (self->s.origin, NULL, NULL, bolt->s.origin, bolt, MASK_SHOT);
-	if (tr.fraction < 1.0 && tr.ent != self)
+	if (tr.fraction < 1.0f && tr.ent != self)
 	{
 		VectorMA (bolt->s.origin, -10, dir, bolt->s.origin);
 		bolt->touch (bolt, tr.ent, NULL, NULL);
@@ -386,7 +386,7 @@ static void Grenade_Explode (edict_t *ent)
 		vec3_t	dir;
 
 		VectorAdd (ent->enemy->mins, ent->enemy->maxs, v);
-		VectorMA (ent->enemy->s.origin, 0.5, v, v);
+		VectorMA (ent->enemy->s.origin, 0.5f, v, v);
 		VectorSubtract (ent->s.origin, v, v);
 		points = ent->dmg - 0.5f * VectorLength (v);
 		VectorSubtract (ent->enemy->s.origin, ent->s.origin, dir);
@@ -443,7 +443,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	{
 		if (ent->spawnflags & 1)
 		{
-			if (random() > 0.5)
+			if (random() > 0.5f)
 				gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
 			else
 				gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb2a.wav"), 1, ATTN_NORM, 0);
@@ -571,7 +571,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	}
 
 	// calculate position for the explosion entity
-	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
+	VectorMA (ent->s.origin, -0.02f, ent->velocity, origin);
 
 	TDM_BeginDamage ();
 
