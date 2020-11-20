@@ -91,7 +91,7 @@ edict_t *findradius (edict_t *from, vec3_t org, float rad)
 		if (from->solid == SOLID_NOT)
 			continue;
 		for (j=0 ; j<3 ; j++)
-			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j])*0.5);
+			eorg[j] = org[j] - (from->s.origin[j] + (from->mins[j] + from->maxs[j])*0.5f);
 		if (VectorLength(eorg) > rad)
 			continue;
 		return from;
@@ -143,7 +143,7 @@ edict_t *G_PickTarget (char *targetname)
 		return NULL;
 	}
 
-	return choice[genrand_int32() % num_choices];
+	return choice[genrand_uniform (num_choices)];
 }
 
 
@@ -402,7 +402,7 @@ void G_InitEdict (edict_t *e)
 {
 	e->inuse = true;
 	e->classname = "noclass";
-	e->gravity = 1.0;
+	e->gravity = 1.0f;
 	e->s.number = e - g_edicts;
 }
 
@@ -412,7 +412,7 @@ void G_StuffCmd (edict_t *e, const char *fmt, ...)
 	char		text[512];
 
 	if (e && !e->client->pers.connected)
-		TDM_Error ("G_StuffCmd: Bad client %d for '%s'", e - g_edicts, fmt);
+		TDM_Error ("G_StuffCmd: Bad client %d for '%s'", (int)(e - g_edicts - 1), fmt);
 
 	va_start (argptr,fmt);
 	Q_vsnprintf (text, sizeof(text), fmt, argptr);
@@ -671,7 +671,7 @@ qboolean visible (edict_t *self, edict_t *other, int mask)
 	{
 		trace = gi.trace (spot1, vec3_origin, vec3_origin, spot2, self, mask);
 		
-		if (trace.fraction == 1.0)
+		if (trace.fraction == 1.0f)
 			return true;
 
 		if (trace.ent == world && trace.surface && (trace.surface->flags & (SURF_TRANS33|SURF_TRANS66)))

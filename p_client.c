@@ -364,9 +364,9 @@ void TossClientWeapon (edict_t *self)
 		quad = (self->client->quad_framenum > (level.framenum + SECS_TO_FRAMES(1)));
 
 	if (item && quad)
-		spread = 22.5;
+		spread = 22.5f;
 	else
-		spread = 0.0;
+		spread = 0.0f;
 
 	if (item)
 	{
@@ -563,7 +563,7 @@ edict_t *SelectRandomDeathmatchSpawnPoint (void)
 	edict_t	*spot;
 	int		selection;
 
-	selection = genrand_int32() % level.numspawns;
+	selection = genrand_uniform (level.numspawns);
 	spot = level.spawns[selection];
 	return spot;
 }
@@ -622,7 +622,7 @@ void RandomizeArray (void **base, size_t n)
 		size_t i;
 		for (i = 0; i < n - 1; i++)
 		{
-			size_t j = i + genrand_int32() / (0xffffffff / (n - i) + 1);
+			size_t j = i + genrand_uniform (n - i);
 			void *t = base[j];
 			base[j] = base[i];
 			base[i] = t;
@@ -816,7 +816,7 @@ edict_t *SelectRandomDeathmatchSpawnPointAvoidingTwoClosest (void)
 
 	do
 	{
-		selection = genrand_int32() % level.numspawns;
+		selection = genrand_uniform (level.numspawns);
 		spot = level.spawns[selection];
 	} while (spot == spot1 || spot == spot2);
 
@@ -889,7 +889,7 @@ edict_t *SelectRandomDeathmatchSpawnPointAvoidingTwoClosestBugged (void)
 
 	do
 	{
-		selection = genrand_int32() % level.numspawns;
+		selection = genrand_uniform (level.numspawns);
 		spot = level.spawns[selection];
 	} while (spot == spot1 || spot == spot2);
 
@@ -1958,8 +1958,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		for (i=0 ; i<3 ; i++)
 		{
-			ent->s.origin[i] = pm.s.origin[i]*0.125;
-			ent->velocity[i] = pm.s.velocity[i]*0.125;
+			ent->s.origin[i] = pm.s.origin[i]*0.125f;
+			ent->velocity[i] = pm.s.velocity[i]*0.125f;
 		}
 
 		VectorCopy (pm.mins, ent->mins);

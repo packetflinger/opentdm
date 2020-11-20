@@ -507,7 +507,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
 	total[0] = total[1] = 0;
 	last[0] = last[1] = 0;
 	totalscore[0] = totalscore[1] = 0;
-	averageping[0] = averageping[1] = 0.0;
+	averageping[0] = averageping[1] = 0.0f;
 
 	//init string
 	*string = 0;
@@ -1125,7 +1125,7 @@ void TDM_BeginCountdown (void)
 	// record multi-view demo on server
 	if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
 		Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
-		gi.AddCommandString(va("mvdrecord %s", game.mvd.filename));
+		gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
 		game.mvd.recording = true;
 	}
 }
@@ -1160,7 +1160,7 @@ void TDM_EndIntermission (void)
 		game.mvd.matches++;
 
 		if (game.mvd.matches >= (int) g_record_mvd->value) {
-			gi.AddCommandString("mvdstop");
+			gi.AddCommandString("mvdstop\n");
 			memset(&game.mvd, 0x0, sizeof(server_demo_t));
 		}
 	}
@@ -1305,7 +1305,7 @@ void TDM_EndMatch (void)
 		if (ent->inuse && ent->client->pers.team)
 		{
 			if (!ent->client->resp.teamplayerinfo)
-				TDM_Error ("TDM_EndMatch: Missing teamplayerinfo for client %d", ent - g_edicts - 1);
+				TDM_Error ("TDM_EndMatch: Missing teamplayerinfo for client %d", (int)(ent - g_edicts - 1));
 
 			TDM_Stats_f (ent, ent->client->resp.teamplayerinfo->matchinfo);
 		}
@@ -2072,7 +2072,7 @@ void TDM_ResumeGame (void)
 	gi.bprintf (PRINT_CHAT, "Game resuming in 10 seconds. Match time remaining: %s\n", TDM_SecsToString(FRAMES_TO_SECS(level.match_end_framenum - level.framenum)));
 
 	level.timeout_end_framenum = 0;
-	level.match_resume_framenum = level.realframenum + SECS_TO_FRAMES(10.4);
+	level.match_resume_framenum = level.realframenum + SECS_TO_FRAMES(10.4f);
 }
 
 /*

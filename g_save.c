@@ -135,7 +135,7 @@ void InitGame (void)
 
 	gi.dprintf ("==== InitGame ====\n");
 
-	init_genrand ((unsigned long)time(NULL));
+	init_genrand ((uint32)time(NULL));
 
 	// these are used for server browser replies
 	gi.cvar("time_remaining", "N/A", CVAR_SERVERINFO | CVAR_NOSET);

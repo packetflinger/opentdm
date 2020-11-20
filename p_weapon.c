@@ -109,9 +109,9 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 			}
 
 			// client wants to time this weapon
-			if (other->client->pers.weapon_mask & weaponvotes[i].value) {
-				other->client->pers.item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
-				other->client->pers.item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
+			if (i < WEAPON_MAX && other->client->pers.weapon_mask & weaponvotes[i].value) {
+				other->client->item_timer[TIMER_WEAPON] = level.framenum + SECS_TO_FRAMES(30);
+				other->client->item_timer_icon[TIMER_WEAPON] = gi.imageindex(ent->item->icon);
 			}
 		}
 	}
@@ -580,7 +580,7 @@ GRENADE
 ======================================================================
 */
 
-#define GRENADE_TIMER		3.0
+#define GRENADE_TIMER		3.0f
 #define GRENADE_MINSPEED	400
 #define GRENADE_MAXSPEED	800
 
@@ -778,7 +778,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	ent->client->kick_origin_start = 0;
 	ent->client->kick_origin_end = 0.1f * SERVER_FPS;
 
-	fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+	fire_grenade (ent, start, forward, damage, 600, 2.5f, radius);
 	TDM_WeaponFired (ent);
 
 	gi.WriteByte (SVC_MUZZLEFLASH);

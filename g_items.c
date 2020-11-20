@@ -103,7 +103,7 @@ void DoRespawn (edict_t *ent)
 		for (count = 0, ent = master; ent; ent = ent->chain, count++)
 			;
 
-		choice = genrand_int32() % count;
+		choice = genrand_uniform (count);
 
 		for (count = 0, ent = master; count < choice; ent = ent->chain, count++)
 			;
@@ -675,10 +675,10 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 					}
 				}
 
-				if (other->client->pers.armor_mask & armorvotes[i].value) {
-					other->client->pers.item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
-					other->client->pers.item_timer_icon[TIMER_ARMOR] = gi.imageindex(ent->item->icon);
-				}
+			if (i < ARMOR_MAX && other->client->pers.armor_mask & armorvotes[i].value) {
+				other->client->item_timer[TIMER_ARMOR] = level.framenum + SECS_TO_FRAMES(20);
+				other->client->item_timer_icon[TIMER_ARMOR] = gi.imageindex(ent->item->icon);
+
 			}
 		}
 	}
@@ -777,7 +777,7 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 	if (taken)
 	{
 		// flash the screen
-		other->client->bonus_alpha = 0.25;	
+		other->client->bonus_alpha = 0.25f;
 
 		// show icon and name on status bar
 		other->client->ps.stats[STAT_PICKUP_ICON] = gi.imageindex(ent->item->icon);
