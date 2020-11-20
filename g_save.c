@@ -176,6 +176,7 @@ void InitGame (void)
 	spectator_password = gi.cvar ("spectator_password", "", CVAR_USERINFO);
 	filterban = gi.cvar ("filterban", "1", 0);
 
+	// whether you can switch to an empty gun or not
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
 
 	run_pitch = gi.cvar ("run_pitch", "0.002", 0);
