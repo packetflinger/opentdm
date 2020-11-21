@@ -1,0 +1,27 @@
+# build with libcurl - enable things like voting webconfigs
+CONFIG_HTTP = 1
+
+TARGET = gamex86.dll
+
+# building a windows .dll
+CONFIG_WINDOWS = 1
+CC = i686-w64-mingw32-gcc
+WINDRES = i686-w64-mingw32-windres
+
+# this craziness was required to staticly link all of libcurl's deps
+CFLAGS = -static -static-libgcc -DCURL_STATICLIB -I/usr/i686-w64-mingw32/sys-root/mingw/include
+CURL_LIBS = /usr/i686-w64-mingw32/sys-root/mingw/lib/libcurl.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libcrypto.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libcrypt32.a
+#CURL_LIBS += /root/zlib-1.2.11/libz.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libz.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libssl.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libssh2.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libidn.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libiconv.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libintl.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libwldap32.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libgdi32.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libcrypto.a
+CURL_LIBS += /usr/i686-w64-mingw32/sys-root/mingw/lib/libcrypt32.a
+CURL_LIBS += -static -static-libgcc
