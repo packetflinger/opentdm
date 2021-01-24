@@ -117,6 +117,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define UF(ent, x)       ((ent->client->pers.userflags & UF_##x) != 0)
 
+typedef enum {
+    HUD_DISABLED,   // not allowed
+    HUD_ENABLED,    // allowed, but user controlled
+    HUD_DEFAULT,    // allowed, on by default, user can turn off
+    HUD_FORCED      // forced on, user cannot disable
+} weaphud_t;
+#define SHOWWEAPONHUD(e)    (e && e->client && ((e->client->pers.weaponhud && g_weapon_hud->value > HUD_DISABLED) || \
+                                g_weapon_hud->value == HUD_FORCED))
+
 #define IGNORE_CHAT_SPEC    1
 #define IGNORE_CHAT_PLAYERS 2
 #define IGNORE_CHAT_ALL     4

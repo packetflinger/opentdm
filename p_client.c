@@ -1391,6 +1391,11 @@ void ClientBeginDeathmatch (edict_t *ent)
 		}
 	}
 
+	if (g_weapon_hud->value >= HUD_DEFAULT) {
+	    ent->client->pers.weaponhud = true;
+        G_StuffCmd(ent, "set uf \"%d\" u\n", ent->client->pers.userflags | UF_WEAPON_HUD);
+	}
+
 	TDM_UpdateHud(ent, true);
 
 	// set timer icons indexes (armor/weapon is set on the fly)
@@ -1582,7 +1587,9 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		if (UF(ent, WEAPON_HUD)) {
 			ent->client->pers.weaponhud = true;
 		} else {
-			ent->client->pers.weaponhud = false;
+		    if ((int) g_weapon_hud->value != HUD_FORCED) {
+		        ent->client->pers.weaponhud = false;
+		    }
 		}
 	}
 

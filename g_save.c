@@ -372,7 +372,7 @@ void InitGame (void)
 	g_vote_time = gi.cvar ("g_vote_time", "30", 0);
 	
 	// enable weapon/ammo counters in the hud
-	g_weapon_hud = gi.cvar("g_weapon_hud", "1", CVAR_LATCH);
+	g_weapon_hud = gi.cvar("g_weapon_hud", "2", CVAR_LATCH);
 
 	// enables the weapontimer command
 	g_weapon_timer = gi.cvar("g_weapon_timer", "1", 0);

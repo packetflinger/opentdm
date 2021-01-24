@@ -382,7 +382,15 @@ Value | Description
 
 `g_record_mvd <integer>` Will record a multi-view server demo of &lt;integer&gt; matches. Only works with Q2Pro server, *default: 0*
 
-`g_weapon_hud <0/1>` Allow the weapon hud, *default: 1 (allowed)* Players still need to enable the hud using the `hud` command or setting the proper userflag: `set uf "256" u` 
+`g_weapon_hud <integer>` Allow the weapon hud, *default: 1 (enabled)* Players can enable/disable the hud in their client using the `hud` command or setting the proper userflag: `set uf "256" u` 
+
+Value | Description
+------ | ------
+0 | `Disabled` Hud not allowed at all
+1 | `Enabled` Hud allowed, but off until client turns it on
+2 | `Default` Hud on by default for all players, they can still turn it off if they like 
+3 | `Forced` Hud is forced on for all players, they can't turn it off
+
 
 ## Client CVARs
 

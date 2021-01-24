@@ -775,7 +775,7 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 	hud_y = 0;
 	hud_x = -25;
 
-	if (player && player->client->pers.weaponhud && g_weapon_hud->value > 0) {
+	if (SHOWWEAPONHUD(player)) {
 
 		id_x += player->client->pers.config.id_x;
 		id_y += player->client->pers.config.id_y;

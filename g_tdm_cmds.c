@@ -68,11 +68,17 @@ static void TDM_ForceReady_f (qboolean status)
  * Toggle the weapon hud
  *
  */
-static void TDM_WeaponHud_f(edict_t *ent) {
-	if (g_weapon_hud->value == 0) {
+static void TDM_WeaponHud_f(edict_t *ent)
+{
+	if (g_weapon_hud->value == HUD_DISABLED) {
 		gi.cprintf(ent, PRINT_HIGH, "Weapon hud is disabled for this server\n");
 		return;
 	}
+
+	if (g_weapon_hud->value == HUD_FORCED) {
+        gi.cprintf(ent, PRINT_HIGH, "Weapon hud is forced for this server\n");
+        return;
+    }
 
 	if (!ent->client->pers.weaponhud) {
 		ent->client->pers.weaponhud = true;
