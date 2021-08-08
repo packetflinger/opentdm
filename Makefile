@@ -7,7 +7,7 @@ ifndef CPU
 endif
 
 ifndef REV
-    REV := $(shell git rev-list HEAD | wc -l)
+    REV := $(shell git rev-list HEAD | wc -l | tr -d " ")
 endif
 
 ifndef VER
@@ -28,7 +28,7 @@ ifdef CONFIG_WINDOWS
     LDFLAGS += -Wl,--nxcompat,--dynamicbase
 else
     CFLAGS += -fPIC -fvisibility=hidden
-    LDFLAGS += -Wl,--no-undefined
+    LDFLAGS += -Wl
 endif
 
 CFLAGS += -DC_ONLY
