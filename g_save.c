@@ -398,7 +398,7 @@ void InitGame (void)
 
 	//ensure it has NOSET if it didn't exist
 	g_features = gi.cvar ("g_features", "0", CVAR_NOSET);
-	gi.cvar_forceset ("g_features", va("%d", GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE | GMF_MVDSPEC));
+	gi.cvar_forceset ("g_features", va("%d", GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE | GMF_MVDSPEC | GMF_VARIABLE_FPS));
 
 	//init server features
 	sv_features = gi.cvar ("sv_features", NULL, 0);

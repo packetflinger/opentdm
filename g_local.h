@@ -1851,3 +1851,5 @@ struct edict_s
 
 // inform game DLL of disconnects between level changes
 #define GMF_WANT_ALL_DISCONNECTS 8
+
+#define GMF_VARIABLE_FPS	0x800
