@@ -7,8 +7,8 @@ typedef struct
 
 #define	MAX_IPFILTERS	1024
 
-ipfilter_t	ipfilters[MAX_IPFILTERS];
-unsigned	numipfilters;
+extern ipfilter_t	ipfilters[MAX_IPFILTERS];
+extern unsigned	numipfilters;
 
 void SVCmd_AddIP_f (edict_t *ent, char *ip, int exp);
 void SVCmd_RemoveIP_f (edict_t *ent, char *ip);

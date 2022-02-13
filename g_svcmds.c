@@ -53,6 +53,9 @@ If 0, then only addresses matching the list will be allowed.  This lets you easi
 ==============================================================================
 */
 
+ipfilter_t  ipfilters[MAX_IPFILTERS];
+unsigned    numipfilters;
+
 /*
 =================
 StringToFilter
