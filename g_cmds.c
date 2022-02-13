@@ -521,7 +521,7 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
     const gitem_t *weap, *ammo;
     nearest_player_t closest, next;
 
-    if (!TDM_Is1V1()) {
+    if (TDM_Is1V1()) {
         gi.cprintf(ent, PRINT_HIGH, "Not allowed in 1v1 mode\n");
         return;
     }
