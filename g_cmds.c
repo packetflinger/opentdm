@@ -502,6 +502,77 @@ void Cmd_Drop_f (edict_t *ent)
 	it->drop (ent, it);
 }
 
+typedef struct {
+    edict_t *ent;
+    //vec3_t distance;
+    int16 distance[3];
+    uint32_t overall;
+} nearest_player_t;
+
+/**
+ * Find your nearest teammate and drop ammo for whatever gun
+ * they're holding
+ */
+void Cmd_DropNearestAmmo_f(edict_t *ent)
+{
+    uint8_t i;
+    edict_t *player;
+    int16 pos1[3];
+    const gitem_t *weap, *ammo;
+    nearest_player_t closest, next;
+
+    if (!TDM_Is1V1()) {
+        gi.cprintf(ent, PRINT_HIGH, "Not allowed in 1v1 mode\n");
+        return;
+    }
+
+    VectorCopy(ent->client->ps.pmove.origin, pos1);
+
+    // find your teammates
+    for (i=0; i<game.maxclients; i++) {
+        player = g_edicts + 1 + i;
+
+        if (player == ent) {
+            continue;
+        }
+
+        if (OnSameTeam(player, ent)) {
+            if (closest.ent == NULL) {
+                closest.ent = player;
+                //_VectorSubtract(pos1, player->client->ps.pmove.origin, closest.distance);
+                closest.distance[0] = pos1[0] - player->client->ps.pmove.origin[0];
+                closest.distance[1] = pos1[1] - player->client->ps.pmove.origin[1];
+                closest.distance[2] = pos1[2] - player->client->ps.pmove.origin[2];
+                closest.overall = closest.distance[0] + closest.distance[1] + closest.distance[2];
+                gi.cprintf(ent, PRINT_HIGH, "Nearest: %s\n", closest.ent->client->pers.netname);
+                continue;
+            }
+
+            next.ent = player;
+            //_VectorSubtract(pos1, player->client->ps.pmove.origin, next.distance);
+            next.distance[0] = pos1[0] - player->client->ps.pmove.origin[0];
+            next.distance[1] = pos1[1] - player->client->ps.pmove.origin[1];
+            next.distance[2] = pos1[2] - player->client->ps.pmove.origin[2];
+            next.overall = next.distance[0] + next.distance[1] + next.distance[2];
+
+            if (next.overall < closest.overall) {
+                closest = next;
+                gi.cprintf(ent, PRINT_HIGH, "Nearest: %s\n", closest.ent->client->pers.netname);
+            }
+        }
+    }
+
+    if (closest.ent != NULL) {
+        weap = closest.ent->client->weapon;
+        ammo = GETITEM(weap->ammoindex);
+        /*if (!ent->client->inventory[index]) {
+            gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", ammo->classname);
+            return;
+        }*/
+        gi.cprintf(ent, PRINT_HIGH, "Dropping %s\n", ammo->classname);
+        ammo->drop(ent, ammo);
+    }
+}
 
 /*
 =================

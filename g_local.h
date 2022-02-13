@@ -927,6 +927,7 @@ extern	const gitem_t	itemlist[];
 void Cmd_Help_f (edict_t *ent);
 void Cmd_Score_f (edict_t *ent);
 void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0);
+void Cmd_DropNearestAmmo_f(edict_t *ent);
 
 //
 // g_items.c
@@ -1151,6 +1152,7 @@ void TDM_ItemGrabbed (edict_t *ent, edict_t *player);
 void TDM_MacroExpand (edict_t *ent, char *text, int maxlength);
 void ToggleChaseCam (edict_t *ent);
 void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *killer);
+qboolean TDM_Is1V1 (void);
 
 void CountPlayers (void);
 void UpdatePlayerTeamMenu (edict_t *ent);
