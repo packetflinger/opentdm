@@ -532,6 +532,10 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
     for (i=0; i<game.maxclients; i++) {
         player = g_edicts + 1 + i;
 
+        if (!player->inuse) {
+            continue;
+        }
+
         if (player == ent) {
             continue;
         }
@@ -539,20 +543,22 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
         if (OnSameTeam(player, ent)) {
             if (closest.ent == NULL) {
                 closest.ent = player;
-                //_VectorSubtract(pos1, player->client->ps.pmove.origin, closest.distance);
+
                 closest.distance[0] = pos1[0] - player->client->ps.pmove.origin[0];
                 closest.distance[1] = pos1[1] - player->client->ps.pmove.origin[1];
                 closest.distance[2] = pos1[2] - player->client->ps.pmove.origin[2];
+
                 closest.overall = closest.distance[0] + closest.distance[1] + closest.distance[2];
                 gi.cprintf(ent, PRINT_HIGH, "Nearest: %s\n", closest.ent->client->pers.netname);
                 continue;
             }
 
             next.ent = player;
-            //_VectorSubtract(pos1, player->client->ps.pmove.origin, next.distance);
+
             next.distance[0] = pos1[0] - player->client->ps.pmove.origin[0];
             next.distance[1] = pos1[1] - player->client->ps.pmove.origin[1];
             next.distance[2] = pos1[2] - player->client->ps.pmove.origin[2];
+
             next.overall = next.distance[0] + next.distance[1] + next.distance[2];
 
             if (next.overall < closest.overall) {
@@ -562,16 +568,18 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
         }
     }
 
+    /*
     if (closest.ent != NULL) {
         weap = closest.ent->client->weapon;
         ammo = GETITEM(weap->ammoindex);
-        /*if (!ent->client->inventory[index]) {
+        if (!ent->client->inventory[index]) {
             gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", ammo->classname);
             return;
-        }*/
+        }
         gi.cprintf(ent, PRINT_HIGH, "Dropping %s\n", ammo->classname);
         ammo->drop(ent, ammo);
     }
+*/
 }
 
 /*
