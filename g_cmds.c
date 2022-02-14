@@ -519,7 +519,7 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
 
     weap = player->client->weapon;
 
-    if (Q_stricmp(weap->classname, "weapon_blaster") == 0) {
+    if (weap == GETITEM(ITEM_WEAPON_BLASTER)) {
         gi.cprintf(ent, PRINT_HIGH, "Can't drop blaster ammo\n");
         return;
     }
