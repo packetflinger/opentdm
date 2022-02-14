@@ -34,6 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	OPENTDM_VERSION "Unknown"
 #endif
 
+#define NAME(e) ((e)->client->pers.netname)
+
 // protocol bytes that can be directly added to messages
 #define SVC_MUZZLEFLASH    1
 #define SVC_MUZZLEFLASH2   2
@@ -673,7 +675,11 @@ typedef struct
 	int        power_armor_power;
 } monsterinfo_t;
 
-
+typedef struct {
+    edict_t     *ent;
+    int16       distance[3];
+    uint32_t    overall;
+} nearest_player_t;
 
 extern	game_locals_t	game;
 extern	level_locals_t	level;
@@ -1153,6 +1159,7 @@ void TDM_MacroExpand (edict_t *ent, char *text, int maxlength);
 void ToggleChaseCam (edict_t *ent);
 void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *killer);
 qboolean TDM_Is1V1 (void);
+edict_t *TDM_ClosestTeammate(edict_t *ent);
 
 void CountPlayers (void);
 void UpdatePlayerTeamMenu (edict_t *ent);

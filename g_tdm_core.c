@@ -399,6 +399,78 @@ void TDM_ResetLevel (void)
 	}
 }
 
+/**
+ * Get a pointer to the teammate that is physically
+ * closest to the arg entity. This can be above, below,
+ * behind a wall, in the water, etc.
+ */
+edict_t *TDM_ClosestTeammate(edict_t *ent)
+{
+    uint8_t i;
+    int16 pos[3];
+    edict_t *player;
+    nearest_player_t closest, next;
+
+    memset(&closest, 0, sizeof(nearest_player_t));
+    memset(&next, 0, sizeof(nearest_player_t));
+
+    if (TDM_Is1V1()) {
+        return NULL;
+    }
+
+    // make a local copy of our location
+    VectorCopy(ent->client->ps.pmove.origin, pos);
+
+    for (i=0; i<game.maxclients; i++) {
+        player = g_edicts + 1 + i;
+
+        if (!player->inuse) {
+            continue;
+        }
+
+        if (player == ent) {
+            continue;
+        }
+
+        if (player->health <= 0) {
+            continue;
+        }
+
+        // only look at our team mates
+        if (OnSameTeam(player, ent)) {
+            if (closest.ent == NULL) {
+                closest.ent = player;
+
+                closest.distance[0] = pos[0] - player->client->ps.pmove.origin[0];
+                closest.distance[1] = pos[1] - player->client->ps.pmove.origin[1];
+                closest.distance[2] = pos[2] - player->client->ps.pmove.origin[2];
+
+                // a single number representing our distance
+                closest.overall = closest.distance[0] + closest.distance[1] + closest.distance[2];
+
+                continue;
+            }
+
+            next.ent = player;
+
+            next.distance[0] = pos[0] - player->client->ps.pmove.origin[0];
+            next.distance[1] = pos[1] - player->client->ps.pmove.origin[1];
+            next.distance[2] = pos[2] - player->client->ps.pmove.origin[2];
+
+            next.overall = next.distance[0] + next.distance[1] + next.distance[2];
+
+            if (next.overall < closest.overall) {
+                closest = next;
+            }
+        }
+    }
+
+    if (closest.ent) {
+        return closest.ent;
+    }
+
+    return NULL;
+}
 /*
 ==============
 TDM_BeginMatch
