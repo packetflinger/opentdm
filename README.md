@@ -67,6 +67,31 @@ OpenTDM is an open source team deathmatch and duel mod for Quake II.
 
 `armortimer` Start a 20 second armor timer
 
+## Client Macros
+`%h` Shows your current health - `H:100`
+
+`%H` Alias for `%h`
+
+`%A` Current armor (long) - `A:200 Red`
+
+`%a` Current armor (short) - `A:100`
+
+`%W` Current weapon and ammo (long) - `Rocket Launcher:15`
+
+`%w` Current weapon and ammo (short) - `RL:15`
+
+`%n` List your nearby team members (in sight) - `claire, shloo, adz`
+
+`%N` List all players nearby (in sight) - `claire, naymlis, shloo, 888, adz`
+
+`#h` Raw health value - `100`
+
+`#a` Raw armor quantity - `50`
+
+`%m` The ammo name of your current weapon (for use in dropping) - `Slugs`
+
+`%M` The ammo name of the current weapon of your nearest teammate (for dropping to them) - `Rockets`
+
 ## Team Captain Commands
 `kickplayer/removeplayer/remove <id>` Remove a player from your team
 
