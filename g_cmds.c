@@ -528,7 +528,6 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
 
     VectorCopy(ent->client->ps.pmove.origin, pos1);
 
-    // find your teammates
     for (i=0; i<game.maxclients; i++) {
         player = g_edicts + 1 + i;
 
@@ -549,7 +548,7 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
                 closest.distance[2] = pos1[2] - player->client->ps.pmove.origin[2];
 
                 closest.overall = closest.distance[0] + closest.distance[1] + closest.distance[2];
-                gi.cprintf(ent, PRINT_HIGH, "Nearest: %s\n", closest.ent->client->pers.netname);
+
                 continue;
             }
 
@@ -563,23 +562,25 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
 
             if (next.overall < closest.overall) {
                 closest = next;
-                gi.cprintf(ent, PRINT_HIGH, "Nearest: %s\n", closest.ent->client->pers.netname);
             }
         }
     }
 
-    /*
     if (closest.ent != NULL) {
         weap = closest.ent->client->weapon;
-        ammo = GETITEM(weap->ammoindex);
-        if (!ent->client->inventory[index]) {
-            gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", ammo->classname);
+        ammo = (const gitem_t *)(itemlist + weap->ammoindex);
+
+        if (!ent->client->inventory[ITEM_INDEX(ammo)]) {
+            gi.cprintf (ent, PRINT_HIGH, "Out of item: %s\n", ammo->pickup_name);
             return;
         }
-        gi.cprintf(ent, PRINT_HIGH, "Dropping %s\n", ammo->classname);
-        ammo->drop(ent, ammo);
+
+        if (ammo->drop) {
+            ammo->drop(ent, ammo);
+        } else {
+            gi.cprintf(ent, PRINT_HIGH, "Item is not droppable\n");
+        }
     }
-*/
 }
 
 /*
