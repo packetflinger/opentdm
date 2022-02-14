@@ -513,8 +513,6 @@ void Cmd_DropNearestAmmo_f(edict_t *ent)
 
     player = TDM_ClosestTeammate(ent);
 
-    gi.cprintf(ent, PRINT_HIGH, "Closest player: %s\n", NAME(player));
-
     if (player == NULL) {
         return;
     }
