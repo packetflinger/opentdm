@@ -37,6 +37,8 @@ const char *TDM_Macro_NearByAll (edict_t *ent, size_t *length);
 const char *TDM_Macro_RawHealth (edict_t *ent, size_t *length);
 const char *TDM_Macro_RawArmor (edict_t *ent, size_t *length);
 
+const char *TDM_Macro_CurrentAmmo(edict_t *ent, size_t *length);
+
 typedef struct
 {
 	const char		*symbol;
@@ -64,6 +66,8 @@ static const tdm_macro_t tdm_macros[] =
 
 	{"#h", 2, TDM_Macro_RawHealth},
 	{"#a", 2, TDM_Macro_RawArmor},
+
+	{"%m", 2, TDM_Macro_CurrentAmmo},
 };
 
 /*
@@ -288,6 +292,25 @@ const char *TDM_Macro_ShortWeapon (edict_t *ent, size_t *length)
 	return buff;
 }
 
+/**
+ * Get the pickup name for the ammo of whatever gun we're holding
+ */
+const char *TDM_Macro_CurrentAmmo(edict_t *ent, size_t *length)
+{
+    static char buff[16];
+    const gitem_t *ammo;
+
+    // blasters don't have an ammo_index
+    if (!ent->client->ammo_index) {
+        return NULL;
+    }
+
+    ammo = (const gitem_t *)(itemlist + ent->client->ammo_index);
+
+    *length = sprintf (buff, "%s", ammo->pickup_name);
+
+    return buff;
+}
 /*
 ==========
 Location
