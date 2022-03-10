@@ -44,6 +44,9 @@ void TDM_CreateMaplist (void);
 void TDM_ServerDemoStatus(edict_t *ent);
 char *TDM_MakeServerDemoName(void);
 void TDM_RandomizeTeams(void);
+void TDM_RecordMVD(void);
+void TDM_StopMVD(void);
+void TDM_DeleteMVD(char *name);
 
 extern char		**tdm_maplist;
 

@@ -490,6 +490,7 @@ typedef struct gitem_s
 typedef struct
 {
 	qboolean    recording;                  // are we currently recording?
+	qboolean    compressed;                 // compress the demo?
 	int         matches;                    // how many have we already recorded?
 	char        filename[MAX_STRING_CHARS]; // demo name
 } server_demo_t;

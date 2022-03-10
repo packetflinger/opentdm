@@ -1196,18 +1196,7 @@ void TDM_BeginCountdown (void)
         }
     }
 
-    // record multi-view demo on server
-    if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
-        Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
-
-        // compress demo on the fly if instructed to
-        if ((int)g_record_mvd->value == 2) {
-            gi.AddCommandString(va("mvdrecord -z %s\n", game.mvd.filename));
-        } else {
-            gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
-        }
-        game.mvd.recording = true;
-    }
+    TDM_RecordMVD();
 }
 
 /*
@@ -1235,11 +1224,7 @@ void TDM_EndIntermission (void)
 		}
 	}
 
-    // stop multi-view demo recording on server if required
-    if (game.mvd.recording) {
-        gi.AddCommandString("mvdstop\n");
-        memset(&game.mvd, 0x0, sizeof(server_demo_t));
-    }
+    TDM_StopMVD();
 
 	game.match_count++;
 
@@ -1845,8 +1830,6 @@ void TDM_CheckMatchStart (void)
 		teaminfo[TEAM_A].safety = false;
 		teaminfo[TEAM_B].safety = false;
 
-		//wision: do NOT restart match during the match
-		//r1: under what conditions can/did this happen? late joining shouldn't be possible?
 		if (tdm_match_status < MM_COUNTDOWN)
 			TDM_BeginCountdown ();
 	}
@@ -1873,6 +1856,8 @@ void TDM_CheckMatchStart (void)
 			//reset teamnames if we entered pseudo-1v1 mode
 			TDM_UpdateTeamNames ();
 		}
+
+		TDM_StopMVD();
 	}
 }
 
@@ -2636,6 +2621,57 @@ void TDM_MapChanged (void)
 	TDM_SetupSounds ();
 	TDM_UpdateConfigStrings (true);
 	TDM_SetupSpawns ();
+}
+
+/**
+ * Start recording a multi-view demo (q2pro server only)
+ */
+void TDM_RecordMVD(void)
+{
+    if (game.mvd.recording) {
+        return;
+    }
+
+    if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
+        Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
+
+        // compress demo on the fly if instructed to
+        if ((int)g_record_mvd->value == 2) {
+            game.mvd.compressed = true;
+            gi.AddCommandString(va("mvdrecord -z %s\n", game.mvd.filename));
+        } else {
+            gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
+        }
+        game.mvd.recording = true;
+
+        gi.cprintf(NULL, PRINT_HIGH, "Capturing MVD %s\n", game.mvd.filename);
+    }
+}
+
+/**
+ * Stop recording a multi-view demo
+ */
+void TDM_StopMVD(void)
+{
+    if (!game.mvd.recording) {
+        return;
+    }
+    gi.cprintf(NULL, PRINT_HIGH, "Stopping MVD %s\n", game.mvd.filename);
+    gi.AddCommandString("mvdstop\n");
+    memset(&game.mvd, 0x0, sizeof(server_demo_t));
+}
+
+/**
+ * Unlink a server demo
+ */
+void TDM_DeleteMVD(char *name)
+{
+    server_demo_t *d = &game.mvd;
+    char *fullname;
+
+    fullname = va("demos/%s.mvd%s", d->filename, (d->compressed) ? ".gz" : "");
+    remove(fullname);
+    gi.cprintf(NULL, PRINT_HIGH, "Deleted MVD %s\n", fullname);
 }
 
 /*
