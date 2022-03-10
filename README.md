@@ -405,7 +405,7 @@ Value | Description
 
 `g_vote_attention_sound <string>` The sound file played when vote is called and `g_vote_attention` value is greater or equal to 1, *default: misc/pc_up.wav*
 
-`g_record_mvd <integer>` Will record a multi-view server demo of each match. Only works with Q2Pro server
+`g_record_mvd <0/1/2>` Will record a multi-view server demo of each match. Only works with Q2Pro server
 
 Value | Description
 ------ | ------
