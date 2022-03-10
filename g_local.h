@@ -494,7 +494,7 @@ typedef struct
 	char        filename[MAX_STRING_CHARS]; // demo name
 } server_demo_t;
 
-#define MVD_CAPABLE (game.server_features && sv_mvd_enable->value)
+#define MVD_CAPABLE ((game.server_features & GMF_MVDSPEC) > 0)
 
 //
 // this structure is left intact through an entire game

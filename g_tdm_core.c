@@ -1157,49 +1157,57 @@ All players are ready so start the countdown
 */
 void TDM_BeginCountdown (void)
 {
-	edict_t *client;
+    edict_t *client;
 
-	//set this here so settingsstring knows about it
-	if (teaminfo[TEAM_A].players == 1 && teaminfo[TEAM_B].players == 1)
-		level.tdm_pseudo_1v1mode = true;
-	else
-		level.tdm_pseudo_1v1mode = false;
+    //set this here so settingsstring knows about it
+    if (teaminfo[TEAM_A].players == 1 && teaminfo[TEAM_B].players == 1) {
+        level.tdm_pseudo_1v1mode = true;
+    } else {
+        level.tdm_pseudo_1v1mode = false;
+    }
 
-	gi.bprintf (PRINT_HIGH, "Match Settings:\n%s", TDM_SettingsString ());
+    gi.bprintf (PRINT_HIGH, "Match Settings:\n%s", TDM_SettingsString ());
 
-	gi.bprintf (PRINT_HIGH, "All players ready! Starting countdown (%g secs)...\n", g_match_countdown->value);
+    gi.bprintf (PRINT_HIGH, "All players ready! Starting countdown (%g secs)...\n", g_match_countdown->value);
 
-	//remove any vote so it doesn't change settings mid-match :D
-	if (vote.active)
-		TDM_RemoveVote ();
+    //remove any vote so it doesn't change settings mid-match :D
+    if (vote.active) {
+        TDM_RemoveVote ();
+    }
 
-	tdm_match_status = MM_COUNTDOWN;
+    tdm_match_status = MM_COUNTDOWN;
 
-	//reset these, in case voting code called us from random match state
-	level.tdm_timeout_caller = NULL;
-	level.timeout_end_framenum = 0;
-	level.match_resume_framenum = 0;
-	level.match_end_framenum = 0;
+    //reset these, in case voting code called us from random match state
+    level.tdm_timeout_caller = NULL;
+    level.timeout_end_framenum = 0;
+    level.match_resume_framenum = 0;
+    level.match_end_framenum = 0;
 
-	//called to apply a temporary hack for people who do 1v1 on tdm mode
-	TDM_UpdateTeamNames ();
+    //called to apply a temporary hack for people who do 1v1 on tdm mode
+    TDM_UpdateTeamNames();
 
-	level.match_start_framenum = level.framenum + SECS_TO_FRAMES(g_match_countdown->value);
+    level.match_start_framenum = level.framenum + SECS_TO_FRAMES(g_match_countdown->value);
 
-	// force players to record
-	for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
-		if (client->inuse && client->client->pers.team &&
-				(g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
-			G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName(client));
-		}
-	}
+    // force players to record
+    for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
+        if (client->inuse && client->client->pers.team &&
+                (g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
+            G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName(client));
+        }
+    }
 
-	// record multi-view demo on server
-	if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
-		Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
-		gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
-		game.mvd.recording = true;
-	}
+    // record multi-view demo on server
+    if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
+        Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
+
+        // compress demo on the fly if instructed to
+        if ((int)g_record_mvd->value == 2) {
+            gi.AddCommandString(va("mvdrecord -z %s\n", game.mvd.filename));
+        } else {
+            gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
+        }
+        game.mvd.recording = true;
+    }
 }
 
 /*
@@ -1227,15 +1235,11 @@ void TDM_EndIntermission (void)
 		}
 	}
 
-	// stop multi-view demo recording on server if required
-	if (game.mvd.recording) {
-		game.mvd.matches++;
-
-		if (game.mvd.matches >= (int) g_record_mvd->value) {
-			gi.AddCommandString("mvdstop\n");
-			memset(&game.mvd, 0x0, sizeof(server_demo_t));
-		}
-	}
+    // stop multi-view demo recording on server if required
+    if (game.mvd.recording) {
+        gi.AddCommandString("mvdstop\n");
+        memset(&game.mvd, 0x0, sizeof(server_demo_t));
+    }
 
 	game.match_count++;
 
