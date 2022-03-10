@@ -1,6 +1,6 @@
 # OpenTDM
 
-OpenTDM is an open source team deathmatch and duel mod for Quake II.
+OpenTDM is an open source team deathmatch and duel mod for Quake II. Origially written by r1ch
 
 ## Client Commands
 `commands` Show available commands
@@ -405,7 +405,13 @@ Value | Description
 
 `g_vote_attention_sound <string>` The sound file played when vote is called and `g_vote_attention` value is greater or equal to 1, *default: misc/pc_up.wav*
 
-`g_record_mvd <integer>` Will record a multi-view server demo of &lt;integer&gt; matches. Only works with Q2Pro server, *default: 0*
+`g_record_mvd <integer>` Will record a multi-view server demo of each match. Only works with Q2Pro server
+
+Value | Description
+------ | ------
+0 | Don't record matches, *default*
+1 | Record every match
+2 | Record every match and compress them on the fly with zlib 
 
 `g_weapon_hud <integer>` Allow the weapon hud, *default: 1 (enabled)* Players can enable/disable the hud in their client using the `hud` command or setting the proper userflag: `set uf "256" u` 
 
