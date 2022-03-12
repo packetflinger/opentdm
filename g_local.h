@@ -553,78 +553,78 @@ typedef struct
 
 typedef struct
 {
-	// fixed data
-	vec3_t      start_origin;
-	vec3_t     start_angles;
-	vec3_t     end_origin;
-	vec3_t     end_angles;
+    // fixed data
+    vec3_t      start_origin;
+    vec3_t     start_angles;
+    vec3_t     end_origin;
+    vec3_t     end_angles;
 
-	int        sound_start;
-	int        sound_middle;
-	int        sound_end;
+    int        sound_start;
+    int        sound_middle;
+    int        sound_end;
 
-	float      accel;
-	float      speed;
-	float      decel;
-	float      distance;
+    float      accel;
+    float      speed;
+    float      decel;
+    float      distance;
 
-	float      wait;
+    float      wait;
 
-	// state data
-	int        state;
-	vec3_t     dir;
-	float      current_speed;
-	float      move_speed;
-	float      next_speed;
-	float      remaining_distance;
-	float      decel_distance;
-	void       (*endfunc)(edict_t *);
+    // state data
+    int        state;
+    vec3_t     dir;
+    float      current_speed;
+    float      move_speed;
+    float      next_speed;
+    float      remaining_distance;
+    float      decel_distance;
+    void       (*endfunc)(edict_t *);
 } moveinfo_t;
 
 
 typedef struct
 {
-	void       (*aifunc)(edict_t *self, float dist);
-	float      dist;
-	void       (*thinkfunc)(edict_t *self);
+    void       (*aifunc)(edict_t *self, float dist);
+    float      dist;
+    void       (*thinkfunc)(edict_t *self);
 } mframe_t;
 
 typedef struct
 {
-	int        firstframe;
-	int        lastframe;
-	mframe_t   *frame;
-	void       (*endfunc)(edict_t *self);
+    int        firstframe;
+    int        lastframe;
+    mframe_t   *frame;
+    void       (*endfunc)(edict_t *self);
 } mmove_t;
 
 typedef struct
 {
-	mmove_t    *currentmove;
-	int        aiflags;
-	int        nextframe;
-	float      scale;
-	void       (*stand)(edict_t *self);
-	void       (*idle)(edict_t *self);
-	void       (*search)(edict_t *self);
-	void       (*walk)(edict_t *self);
-	void       (*run)(edict_t *self);
-	void       (*dodge)(edict_t *self, edict_t *other, float eta);
-	void       (*attack)(edict_t *self);
-	void       (*melee)(edict_t *self);
-	void       (*sight)(edict_t *self, edict_t *other);
-	qboolean   (*checkattack)(edict_t *self);
-	float      pausetime;
-	float      attack_finished;
-	vec3_t     saved_goal;
-	float      search_time;
-	float      trail_time;
-	vec3_t     last_sighting;
-	int        attack_state;
-	int        lefty;
-	float      idle_time;
-	int        linkcount;
-	int        power_armor_type;
-	int        power_armor_power;
+    mmove_t    *currentmove;
+    int        aiflags;
+    int        nextframe;
+    float      scale;
+    void       (*stand)(edict_t *self);
+    void       (*idle)(edict_t *self);
+    void       (*search)(edict_t *self);
+    void       (*walk)(edict_t *self);
+    void       (*run)(edict_t *self);
+    void       (*dodge)(edict_t *self, edict_t *other, float eta);
+    void       (*attack)(edict_t *self);
+    void       (*melee)(edict_t *self);
+    void       (*sight)(edict_t *self, edict_t *other);
+    qboolean   (*checkattack)(edict_t *self);
+    float      pausetime;
+    float      attack_finished;
+    vec3_t     saved_goal;
+    float      search_time;
+    float      trail_time;
+    vec3_t     last_sighting;
+    int        attack_state;
+    int        lefty;
+    float      idle_time;
+    int        linkcount;
+    int        power_armor_type;
+    int        power_armor_power;
 } monsterinfo_t;
 
 typedef struct {
@@ -633,19 +633,14 @@ typedef struct {
     uint32_t    overall;
 } nearest_player_t;
 
-extern	game_locals_t	game;
-extern	level_locals_t	level;
-extern	game_import_t	gi;
-extern	game_export_t	globals;
-extern	spawn_temp_t	st;
+extern  game_locals_t   game;
+extern  level_locals_t  level;
+extern  game_import_t   gi;
+extern  game_export_t   globals;
+extern  spawn_temp_t    st;
 
-extern	int	sm_meat_index;
-extern	int	snd_fry;
-
-/*extern	int	jacket_armor_index;
-extern	int	combat_armor_index;
-extern	int	body_armor_index;*/
-
+extern  int sm_meat_index;
+extern  int snd_fry;
 
 // means of death
 #define MOD_UNKNOWN         0
@@ -685,199 +680,187 @@ extern	int	body_armor_index;*/
 #define MOD_FRIENDLY_FIRE   0x8000000
 //if altering any of these, be sure to update the weaponToTDMG lookup table!!
 
-extern	int	meansOfDeath;
+extern  int meansOfDeath;
 
+extern  edict_t *g_edicts;
 
-extern	edict_t			*g_edicts;
+#define FOFS(x)  (size_t)&(((edict_t *)0)->x)
+#define STOFS(x) (size_t)&(((spawn_temp_t *)0)->x)
+#define LLOFS(x) (size_t)&(((level_locals_t *)0)->x)
+#define CLOFS(x) (size_t)&(((gclient_t *)0)->x)
 
-#define	FOFS(x)  (size_t)&(((edict_t *)0)->x)
-#define	STOFS(x) (size_t)&(((spawn_temp_t *)0)->x)
-#define	LLOFS(x) (size_t)&(((level_locals_t *)0)->x)
-#define	CLOFS(x) (size_t)&(((gclient_t *)0)->x)
+extern cvar_t   *maxentities;
+extern cvar_t   *dmflags;
+extern cvar_t   *fraglimit;
+extern cvar_t   *timelimit;
+extern cvar_t   *password;
+extern cvar_t   *spectator_password;
+extern cvar_t   *g_select_empty;
+extern cvar_t   *dedicated;
 
-/*#ifdef random
-#undef random
-#endif
+extern cvar_t   *filterban;
 
-#define random()	((rand () & 0x7fff) / ((float)0x7fff))
-#define crandom()	(2.0f * (random() - 0.5f))*/
+extern cvar_t   *sv_gravity;
+extern cvar_t   *sv_maxvelocity;
 
-extern	cvar_t	*maxentities;
-//extern	cvar_t	*deathmatch;
-//extern	cvar_t	*coop;
-extern	cvar_t	*dmflags;
-//extern	cvar_t	*skill;
-extern	cvar_t	*fraglimit;
-extern	cvar_t	*timelimit;
-extern	cvar_t	*password;
-extern	cvar_t	*spectator_password;
-extern	cvar_t	*g_select_empty;
-extern	cvar_t	*dedicated;
+extern cvar_t   *gun_x, *gun_y, *gun_z;
+extern cvar_t   *sv_rollspeed;
+extern cvar_t   *sv_rollangle;
 
-extern	cvar_t	*filterban;
+extern cvar_t   *run_pitch;
+extern cvar_t   *run_roll;
+extern cvar_t   *bob_up;
+extern cvar_t   *bob_pitch;
+extern cvar_t   *bob_roll;
 
-extern	cvar_t	*sv_gravity;
-extern	cvar_t	*sv_maxvelocity;
+extern cvar_t   *sv_cheats;
+extern cvar_t   *maxclients;
 
-extern	cvar_t	*gun_x, *gun_y, *gun_z;
-extern	cvar_t	*sv_rollspeed;
-extern	cvar_t	*sv_rollangle;
+extern cvar_t   *flood_msgs;
+extern cvar_t   *flood_persecond;
+extern cvar_t   *flood_waitdelay;
 
-extern	cvar_t	*run_pitch;
-extern	cvar_t	*run_roll;
-extern	cvar_t	*bob_up;
-extern	cvar_t	*bob_pitch;
-extern	cvar_t	*bob_roll;
+extern cvar_t   *flood_waves;
+extern cvar_t   *flood_waves_perminute;
+extern cvar_t   *flood_waves_waitdelay;
 
-extern	cvar_t	*sv_cheats;
-extern	cvar_t	*maxclients;
-//extern	cvar_t	*maxspectators;
+extern cvar_t   *sv_maplist;
 
-extern	cvar_t	*flood_msgs;
-extern	cvar_t	*flood_persecond;
-extern	cvar_t	*flood_waitdelay;
+extern cvar_t   *g_team_a_name;
+extern cvar_t   *g_team_b_name;
+extern cvar_t   *g_locked_names;
 
-extern	cvar_t	*flood_waves;
-extern	cvar_t	*flood_waves_perminute;
-extern	cvar_t	*flood_waves_waitdelay;
+extern cvar_t   *g_team_a_skin;
+extern cvar_t   *g_team_b_skin;
+extern cvar_t   *g_locked_skins;
 
-extern	cvar_t	*sv_maplist;
+extern cvar_t   *g_admin_password;
+extern cvar_t   *g_admin_vote_decide;
+extern cvar_t   *g_match_time;
+extern cvar_t   *g_match_countdown;
+extern cvar_t   *g_vote_time;
+extern cvar_t   *g_vote_mask;
+extern cvar_t   *g_vote_attention;
+extern cvar_t   *g_vote_attention_sound;
+extern cvar_t   *g_ready_attention;
+extern cvar_t   *g_intermission_time;
+extern cvar_t   *g_force_screenshot;
+extern cvar_t   *g_force_record;
+extern cvar_t   *g_record_mvd;
+extern cvar_t   *g_weapon_hud;
+extern cvar_t   *g_armor_timer;
+extern cvar_t   *g_weapon_timer;
+extern cvar_t   *g_timeout_limit;
+extern cvar_t   *g_highlight_captain;
 
-extern	cvar_t	*g_team_a_name;
-extern	cvar_t	*g_team_b_name;
-extern	cvar_t	*g_locked_names;
+extern cvar_t   *g_tdmflags;
+extern cvar_t   *g_itdmflags;
+extern cvar_t   *g_1v1flags;
 
-extern	cvar_t	*g_team_a_skin;
-extern	cvar_t	*g_team_b_skin;
-extern	cvar_t	*g_locked_skins;
+extern cvar_t   *g_itemflags;
+extern cvar_t   *g_powerupflags;
 
-extern	cvar_t	*g_admin_password;
-extern	cvar_t	*g_admin_vote_decide;
-extern	cvar_t	*g_match_time;
-extern	cvar_t	*g_match_countdown;
-extern	cvar_t	*g_vote_time;
-extern	cvar_t	*g_vote_mask;
-extern	cvar_t	*g_vote_attention;
-extern	cvar_t	*g_vote_attention_sound;
-extern	cvar_t	*g_ready_attention;
-extern	cvar_t	*g_intermission_time;
-extern	cvar_t	*g_force_screenshot;
-extern	cvar_t	*g_force_record;
-extern	cvar_t	*g_record_mvd;
-extern	cvar_t	*g_weapon_hud;
-extern	cvar_t 	*g_armor_timer;
-extern	cvar_t	*g_weapon_timer;
-extern	cvar_t	*g_timeout_limit;
-extern	cvar_t  *g_highlight_captain;
+extern cvar_t   *g_tdm_allow_pick;
 
-extern	cvar_t	*g_tdmflags;
-extern	cvar_t	*g_itdmflags;
-extern	cvar_t	*g_1v1flags;
+extern cvar_t   *g_fast_weap_switch;
+extern cvar_t   *g_teleporter_nofreeze;
 
-extern	cvar_t	*g_itemflags;
-extern	cvar_t	*g_powerupflags;
+extern cvar_t   *g_overtime;
+extern cvar_t   *g_tie_mode;
+extern cvar_t   *g_gamemode;
+extern cvar_t   *g_respawn_time;
+extern cvar_t   *g_max_timeout;
+extern cvar_t   *g_1v1_timeout;
+extern cvar_t   *g_chat_mode;
+extern cvar_t   *g_idle_time;
 
-extern	cvar_t	*g_tdm_allow_pick;
+extern cvar_t   *g_http_enabled;
+extern cvar_t   *g_http_bind;
+extern cvar_t   *g_http_proxy;
+extern cvar_t   *g_http_debug;
 
-extern	cvar_t	*g_fast_weap_switch;
-extern	cvar_t	*g_teleporter_nofreeze;
+extern cvar_t   *g_http_path;
+extern cvar_t   *g_http_domain;
 
-extern	cvar_t	*g_overtime;
-extern	cvar_t	*g_tie_mode;
-extern	cvar_t	*g_gamemode;
-extern	cvar_t	*g_respawn_time;
-extern	cvar_t	*g_max_timeout;
-extern	cvar_t	*g_1v1_timeout;
-extern	cvar_t	*g_chat_mode;
-extern	cvar_t	*g_idle_time;
+extern cvar_t   *g_playerconfig_enabled;
 
-extern	cvar_t	*g_http_enabled;
-extern	cvar_t	*g_http_bind;
-extern	cvar_t	*g_http_proxy;
-extern	cvar_t	*g_http_debug;
+extern cvar_t   *g_debug_spawns;
 
-extern	cvar_t	*g_http_path;
-extern	cvar_t	*g_http_domain;
+extern cvar_t   *g_maplistfile;
+extern cvar_t   *g_motd_message;
 
-extern	cvar_t	*g_playerconfig_enabled;
+extern cvar_t  *g_max_players_per_team;
 
-extern	cvar_t	*g_debug_spawns;
+extern cvar_t   *g_bugs;
 
-extern	cvar_t	*g_maplistfile;
-extern	cvar_t	*g_motd_message;
+extern cvar_t   *g_allow_name_change_during_match;
 
-extern	cvar_t	*g_max_players_per_team;
+extern cvar_t   *g_allow_vote_config;
 
-extern	cvar_t	*g_bugs;
+extern cvar_t   *g_command_mask;
 
-extern	cvar_t	*g_allow_name_change_during_match;
+extern cvar_t   *g_auto_rejoin_match;
+extern cvar_t   *g_auto_rejoin_map;
 
-extern	cvar_t	*g_allow_vote_config;
+extern cvar_t   *g_1v1_spawn_mode;
+extern cvar_t   *g_tdm_spawn_mode;
 
-extern	cvar_t	*g_command_mask;
+extern cvar_t   *sv_mvd_enable;
 
-extern	cvar_t	*g_auto_rejoin_match;
-extern	cvar_t	*g_auto_rejoin_map;
-
-extern	cvar_t	*g_1v1_spawn_mode;
-extern	cvar_t	*g_tdm_spawn_mode;
-
-extern	cvar_t	*sv_mvd_enable;
-
-#define world	(&g_edicts[0])
+#define world   (&g_edicts[0])
 
 // item spawnflags
-#define ITEM_TRIGGER_SPAWN		0x00000001
-#define ITEM_NO_TOUCH			0x00000002
+#define ITEM_TRIGGER_SPAWN      0x00000001
+#define ITEM_NO_TOUCH           0x00000002
 // 6 bits reserved for editor flags
 // 8 bits used as power cube id bits for coop games
-#define DROPPED_ITEM			0x00010000
-#define	DROPPED_PLAYER_ITEM		0x00020000
-#define ITEM_TARGETS_USED		0x00040000
+#define DROPPED_ITEM            0x00010000
+#define	DROPPED_PLAYER_ITEM     0x00020000
+#define ITEM_TARGETS_USED       0x00040000
 
 //
 // fields are needed for spawning from the entity string
 // and saving / loading games
 //
-#define FFL_SPAWNTEMP		1
-#define FFL_NOSPAWN			2
+#define FFL_SPAWNTEMP       1
+#define FFL_NOSPAWN         2
 
 typedef enum {
-	F_INT, 
-	F_FLOAT,
-	F_LSTRING,			// string on disk, pointer in memory, TAG_LEVEL
-	F_GSTRING,			// string on disk, pointer in memory, TAG_GAME
-	F_VECTOR,
-	F_ANGLEHACK,
-	F_EDICT,			// index on disk, pointer in memory
-	F_ITEM,				// index on disk, pointer in memory
-	F_CLIENT,			// index on disk, pointer in memory
-	F_FUNCTION,
-	F_MMOVE,
-	F_IGNORE
+    F_INT,
+    F_FLOAT,
+    F_LSTRING,      // string on disk, pointer in memory, TAG_LEVEL
+    F_GSTRING,      // string on disk, pointer in memory, TAG_GAME
+    F_VECTOR,
+    F_ANGLEHACK,
+    F_EDICT,        // index on disk, pointer in memory
+    F_ITEM,         // index on disk, pointer in memory
+    F_CLIENT,       // index on disk, pointer in memory
+    F_FUNCTION,
+    F_MMOVE,
+    F_IGNORE
 } fieldtype_t;
 
 typedef struct
 {
-	char	*name;
-	size_t		ofs;
-	fieldtype_t	type;
-	int		flags;
+    char        *name;
+    size_t      ofs;
+    fieldtype_t type;
+    int         flags;
 } field_t;
 
 
-extern	field_t fields[];
-extern	const gitem_t	itemlist[];
+extern field_t          fields[];
+extern const gitem_t    itemlist[];
 
 // a sound without an ent or pos will be a local only sound
-#define	SND_VOLUME		(1<<0)		// a byte
-#define	SND_ATTENUATION	(1<<1)		// a byte
-#define	SND_POS			(1<<2)		// three coordinates
-#define	SND_ENT			(1<<3)		// a short 0-2: channel, 3-12: entity
-#define	SND_OFFSET		(1<<4)		// a byte, msec offset from frame start
+#define SND_VOLUME      (1<<0)  // a byte
+#define SND_ATTENUATION (1<<1)  // a byte
+#define SND_POS         (1<<2)  // three coordinates
+#define SND_ENT         (1<<3)  // a short 0-2: channel, 3-12: entity
+#define SND_OFFSET      (1<<4)  // a byte, msec offset from frame start
 
-#define DEFAULT_SOUND_PACKET_VOLUME	1.0f
-#define DEFAULT_SOUND_PACKET_ATTENUATION 1.0f
+#define DEFAULT_SOUND_PACKET_VOLUME         1.0f
+#define DEFAULT_SOUND_PACKET_ATTENUATION    1.0f
 
 //
 // g_cmds.c
@@ -893,7 +876,7 @@ void Cmd_DropNearestAmmo_f(edict_t *ent);
 void PrecacheItem (const gitem_t *it);
 void InitItems (void);
 void SetItemNames (void);
-const gitem_t	*FindItem (const char *pickup_name);
+const gitem_t   *FindItem (const char *pickup_name);
 //const gitem_t	*FindItemByClassname (const char *classname);
 #define	ITEM_INDEX(x) ((x)-itemlist)
 edict_t *Drop_Item (edict_t *ent, const gitem_t *item);
@@ -904,51 +887,51 @@ void SpawnItem (edict_t *ent, const gitem_t *item);
 void Think_Weapon (edict_t *ent);
 int ArmorIndex (edict_t *ent);
 int PowerArmorType (edict_t *ent);
-const gitem_t	*GetItemByIndex (int index);
+const gitem_t   *GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, const gitem_t *item, int count);
 void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 
 //
 // g_utils.c
 //
-qboolean	KillBox (edict_t *ent);
-void	G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
-edict_t *G_Find (edict_t *from, size_t fieldofs, char *match);
-edict_t *findradius (edict_t *from, vec3_t org, float rad);
-edict_t *G_PickTarget (char *targetname);
-void	G_UseTargets (edict_t *ent, edict_t *activator);
-void	G_SetMovedir (vec3_t angles, vec3_t movedir);
+qboolean    KillBox (edict_t *ent);
+void        G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
+edict_t     *G_Find (edict_t *from, size_t fieldofs, char *match);
+edict_t     *findradius (edict_t *from, vec3_t org, float rad);
+edict_t     *G_PickTarget (char *targetname);
+void        G_UseTargets (edict_t *ent, edict_t *activator);
+void        G_SetMovedir (vec3_t angles, vec3_t movedir);
 
-void	G_InitEdict (edict_t *e);
-edict_t	*G_Spawn (void);
-void	G_FreeEdict (edict_t *e);
+void        G_InitEdict (edict_t *e);
+edict_t     *G_Spawn (void);
+void        G_FreeEdict (edict_t *e);
 
-void	G_StuffCmd (edict_t *e, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
-void	G_UnicastSound (edict_t *ent, int index, qboolean reliable);
-void	G_TouchTriggers (edict_t *ent);
-void	G_TouchSolids (edict_t *ent);
-char	*G_StripQuotes (char *string);
+void        G_StuffCmd (edict_t *e, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+void        G_UnicastSound (edict_t *ent, int index, qboolean reliable);
+void        G_TouchTriggers (edict_t *ent);
+void        G_TouchSolids (edict_t *ent);
+char        *G_StripQuotes (char *string);
 
-char	*G_CopyString (const char *in);
+char        *G_CopyString (const char *in);
 
-float	*tv (float x, float y, float z);
-char	*vtos (vec3_t v);
+float       *tv (float x, float y, float z);
+char        *vtos (vec3_t v);
 
-float vectoyaw (vec3_t vec);
-void vectoangles (vec3_t vec, vec3_t angles);
+float       vectoyaw (vec3_t vec);
+void        vectoangles (vec3_t vec, vec3_t angles);
 
 //
 // g_combat.c
 //
-qboolean OnSameTeam (edict_t *ent1, edict_t *ent2);
-qboolean CanDamage (edict_t *targ, edict_t *inflictor);
-void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod);
-void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
+qboolean    OnSameTeam (edict_t *ent1, edict_t *ent2);
+qboolean    CanDamage (edict_t *targ, edict_t *inflictor);
+void        T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod);
+void        T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
 
 //
 // g_main.c
 //
-void EndDMLevel (void);
+void        EndDMLevel (void);
 
 // damage flags
 #define DAMAGE_RADIUS              0x00000001  // damage was indirect
@@ -970,13 +953,13 @@ void EndDMLevel (void);
 //
 // g_misc.c
 //
-void ThrowHead (edict_t *self, char *gibname, int damage, int type);
-void ThrowClientHead (edict_t *self, int damage);
-void ThrowGib (edict_t *self, char *gibname, int damage, int type);
-void BecomeExplosion1(edict_t *self);
+void        ThrowHead (edict_t *self, char *gibname, int damage, int type);
+void        ThrowClientHead (edict_t *self, int damage);
+void        ThrowGib (edict_t *self, char *gibname, int damage, int type);
+void        BecomeExplosion1(edict_t *self);
 
-qboolean infront (edict_t *self, edict_t *other);
-qboolean visible (edict_t *self, edict_t *other, int mask);
+qboolean    infront (edict_t *self, edict_t *other);
+qboolean    visible (edict_t *self, edict_t *other, int mask);
 
 //
 // g_weapon.c
