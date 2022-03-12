@@ -146,50 +146,26 @@ typedef enum {
 #define CS_TDM_ID_VIEW              (CS_GENERAL + 7) //per client
 #define CS_TDM_VOTE_STRING          (CS_GENERAL + 8)
 #define CS_WEAPON_HUD               (CS_GENERAL + 9)
-//#define CS_TDM_TEAM_A_PIC         (CS_GENERAL + 5)
-//#define CS_TDM_TEAM_B_PIC         (CS_GENERAL + 6)
 
-
-// otdm flags
-//i don't like the way this is done, gametype should be global, not a flag
-//#define DF_MODE_TDM       0x00010000	// 65536
-//#define DF_MODE_ITDM      0x00020000	// 131072
-//#define DF_MODE_1V1       0x00040000	// 262144
-
-// RAFAEL
-/*
-#define	DF_QUADFIRE_DROP	0x00010000	// 65536
-
-//ROGUE
-#define DF_NO_MINES         0x00020000
-#define DF_NO_STACK_DOUBLE  0x00040000
-#define DF_NO_NUKES         0x00080000
-#define DF_NO_SPHERES       0x00100000
-*/
-//ROGUE
-
-enum
-{
-	PMENU_ALIGN_LEFT,
-	PMENU_ALIGN_CENTER,
-	PMENU_ALIGN_RIGHT
+enum {
+    PMENU_ALIGN_LEFT,
+    PMENU_ALIGN_CENTER,
+    PMENU_ALIGN_RIGHT
 };
 
-typedef struct pmenu_s
-{
-	const char	*text;
-	int			align;
-	void		*arg;
-	void		(*SelectFunc)(edict_t *ent);
+typedef struct pmenu_s {
+    const char  *text;
+    int         align;
+    void        *arg;
+    void        (*SelectFunc)(edict_t *ent);
 } pmenu_t;
 
-typedef struct pmenuhnd_s
-{
-	pmenu_t			*entries;
-	int				cur;
-	int				num;
-	qboolean		dynamic;
-	qboolean		active;
+typedef struct pmenuhnd_s {
+    pmenu_t     *entries;
+    int         cur;
+    int         num;
+    qboolean    dynamic;
+    qboolean    active;
 } pmenuhnd_t;
 
 void PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, qboolean dynamic);
@@ -202,8 +178,8 @@ void PMenu_Select(edict_t *ent);
 //==================================================================
 
 // view pitching times
-#define	DAMAGE_FRAMES    SECS_TO_FRAMES(0.5f)
-#define	FALL_FRAMES      SECS_TO_FRAMES(0.3f)
+#define	DAMAGE_FRAMES               SECS_TO_FRAMES(0.5f)
+#define	FALL_FRAMES                 SECS_TO_FRAMES(0.3f)
 
 // edict->spawnflags
 // these are set with checkboxes on each entity in the map editor
@@ -214,29 +190,28 @@ void PMenu_Select(edict_t *ent);
 #define	SPAWNFLAG_NOT_COOP          0x00001000
 
 // edict->flags
-#define FL_FLY                  0x00000001
-#define FL_SWIM                 0x00000002  // implied immunity to drowining
-#define FL_IMMUNE_LASER         0x00000004
-#define FL_INWATER              0x00000008
-#define FL_GODMODE              0x00000010
-#define FL_NOTARGET             0x00000020
-#define FL_IMMUNE_SLIME         0x00000040
-#define FL_IMMUNE_LAVA          0x00000080
-#define FL_PARTIALGROUND        0x00000100  // not all corners are valid
-#define FL_WATERJUMP            0x00000200  // player jumping out of water
-#define FL_TEAMSLAVE            0x00000400  // not the first on the team
-#define FL_NO_KNOCKBACK         0x00000800
-#define FL_POWER_ARMOR          0x00001000  // power armor (if any) is active
-#define FL_NOCLIP_PROJECTILE    0x00002000  // projectile hack
-#define FL_RESPAWN              0x80000000  // used for item respawning
+#define FL_FLY                      0x00000001
+#define FL_SWIM                     0x00000002  // implied immunity to drowining
+#define FL_IMMUNE_LASER             0x00000004
+#define FL_INWATER                  0x00000008
+#define FL_GODMODE                  0x00000010
+#define FL_NOTARGET                 0x00000020
+#define FL_IMMUNE_SLIME             0x00000040
+#define FL_IMMUNE_LAVA              0x00000080
+#define FL_PARTIALGROUND            0x00000100  // not all corners are valid
+#define FL_WATERJUMP                0x00000200  // player jumping out of water
+#define FL_TEAMSLAVE                0x00000400  // not the first on the team
+#define FL_NO_KNOCKBACK             0x00000800
+#define FL_POWER_ARMOR              0x00001000  // power armor (if any) is active
+#define FL_NOCLIP_PROJECTILE        0x00002000  // projectile hack
+#define FL_RESPAWN                  0x80000000  // used for item respawning
 
-//#define	FRAMETIME		0.05f
 extern float    FRAMETIME;
 extern int      SERVER_FPS;
 
 //define for variable frametime support
-#define SECS_TO_FRAMES(seconds)	(int)((seconds)* SERVER_FPS)
-#define FRAMES_TO_SECS(frames)	(int)((frames) * FRAMETIME)
+#define SECS_TO_FRAMES(seconds)     (int)((seconds)* SERVER_FPS)
+#define FRAMES_TO_SECS(frames)      (int)((frames) * FRAMETIME)
 
 // memory tags to allow dynamic memory to be cleaned up
 #define TAG_GAME            765  // clear when unloading the dll
@@ -246,30 +221,18 @@ extern int      SERVER_FPS;
 
 #define BODY_QUEUE_SIZE     8
 
-typedef enum
-{
-	DAMAGE_NO,
-	DAMAGE_YES,       // will take damage if hit
-	DAMAGE_AIM        // auto targeting recognizes this
+typedef enum {
+    DAMAGE_NO,
+    DAMAGE_YES,       // will take damage if hit
+    DAMAGE_AIM        // auto targeting recognizes this
 } damage_t;
 
-typedef enum 
-{
-	WEAPON_READY, 
-	WEAPON_ACTIVATING,
-	WEAPON_DROPPING,
-	WEAPON_FIRING
+typedef enum {
+    WEAPON_READY,
+    WEAPON_ACTIVATING,
+    WEAPON_DROPPING,
+    WEAPON_FIRING
 } weaponstate_t;
-
-/*typedef enum
-{
-	AMMO_BULLETS,
-	AMMO_SHELLS,
-	AMMO_ROCKETS,
-	AMMO_GRENADES,
-	AMMO_CELLS,
-	AMMO_SLUGS
-} ammo_t;*/
 
 //r1: this is kind of ugly.. but meh
 #define AMMO_SHELLS    (1<<11)
@@ -279,41 +242,40 @@ typedef enum
 #define AMMO_CELLS     (1<<15)
 #define AMMO_SLUGS     (1<<16)
 
-typedef enum
-{
-	ITEM_NULL,
-	ITEM_ITEM_ARMOR_BODY,
-	ITEM_ITEM_ARMOR_COMBAT,
-	ITEM_ITEM_ARMOR_JACKET,
-	ITEM_ITEM_ARMOR_SHARD,
-	ITEM_ITEM_POWER_SCREEN,
-	ITEM_ITEM_POWER_SHIELD,
-	ITEM_WEAPON_BLASTER,
-	ITEM_WEAPON_SHOTGUN,
-	ITEM_WEAPON_SUPERSHOTGUN,
-	ITEM_WEAPON_MACHINEGUN,
-	ITEM_WEAPON_CHAINGUN,
-	ITEM_AMMO_GRENADES,
-	ITEM_WEAPON_GRENADELAUNCHER,
-	ITEM_WEAPON_ROCKETLAUNCHER,
-	ITEM_WEAPON_HYPERBLASTER,
-	ITEM_WEAPON_RAILGUN,
-	ITEM_WEAPON_BFG,
-	ITEM_AMMO_SHELLS,
-	ITEM_AMMO_BULLETS,
-	ITEM_AMMO_CELLS,
-	ITEM_AMMO_ROCKETS,
-	ITEM_AMMO_SLUGS,
-	ITEM_ITEM_QUAD,
-	ITEM_ITEM_INVULNERABILITY,
-	ITEM_ITEM_SILENCER,
-	ITEM_ITEM_BREATHER,
-	ITEM_ITEM_ENVIRO,
-	ITEM_ITEM_ANCIENT_HEAD,
-	ITEM_ITEM_ADRENALINE,
-	ITEM_ITEM_BANDOLIER,
-	ITEM_ITEM_PACK,
-	ITEM_ITEM_HEALTH,
+typedef enum {
+    ITEM_NULL,
+    ITEM_ITEM_ARMOR_BODY,
+    ITEM_ITEM_ARMOR_COMBAT,
+    ITEM_ITEM_ARMOR_JACKET,
+    ITEM_ITEM_ARMOR_SHARD,
+    ITEM_ITEM_POWER_SCREEN,
+    ITEM_ITEM_POWER_SHIELD,
+    ITEM_WEAPON_BLASTER,
+    ITEM_WEAPON_SHOTGUN,
+    ITEM_WEAPON_SUPERSHOTGUN,
+    ITEM_WEAPON_MACHINEGUN,
+    ITEM_WEAPON_CHAINGUN,
+    ITEM_AMMO_GRENADES,
+    ITEM_WEAPON_GRENADELAUNCHER,
+    ITEM_WEAPON_ROCKETLAUNCHER,
+    ITEM_WEAPON_HYPERBLASTER,
+    ITEM_WEAPON_RAILGUN,
+    ITEM_WEAPON_BFG,
+    ITEM_AMMO_SHELLS,
+    ITEM_AMMO_BULLETS,
+    ITEM_AMMO_CELLS,
+    ITEM_AMMO_ROCKETS,
+    ITEM_AMMO_SLUGS,
+    ITEM_ITEM_QUAD,
+    ITEM_ITEM_INVULNERABILITY,
+    ITEM_ITEM_SILENCER,
+    ITEM_ITEM_BREATHER,
+    ITEM_ITEM_ENVIRO,
+    ITEM_ITEM_ANCIENT_HEAD,
+    ITEM_ITEM_ADRENALINE,
+    ITEM_ITEM_BANDOLIER,
+    ITEM_ITEM_PACK,
+    ITEM_ITEM_HEALTH,
 } itemindices_t;
 
 #define GETITEM(x) (itemlist + (x))
@@ -394,29 +356,25 @@ typedef enum
 
 
 // edict->movetype values
-typedef enum
-{
-	MOVETYPE_NONE,         // never moves
-	MOVETYPE_NOCLIP,       // origin and angles change with no interaction
-	MOVETYPE_PUSH,         // no clip to world, push on box contact
-	MOVETYPE_STOP,         // no clip to world, stops on box contact
-	MOVETYPE_WALK,         // gravity
-	MOVETYPE_STEP,         // gravity, special edge handling
-	MOVETYPE_FLY,
-	MOVETYPE_TOSS,         // gravity
-	MOVETYPE_FLYMISSILE,   // extra size to monsters
-	MOVETYPE_BOUNCE
+typedef enum {
+    MOVETYPE_NONE,         // never moves
+    MOVETYPE_NOCLIP,       // origin and angles change with no interaction
+    MOVETYPE_PUSH,         // no clip to world, push on box contact
+    MOVETYPE_STOP,         // no clip to world, stops on box contact
+    MOVETYPE_WALK,         // gravity
+    MOVETYPE_STEP,         // gravity, special edge handling
+    MOVETYPE_FLY,
+    MOVETYPE_TOSS,         // gravity
+    MOVETYPE_FLYMISSILE,   // extra size to monsters
+    MOVETYPE_BOUNCE
 } movetype_t;
 
-
-
-typedef struct
-{
-	int		base_count;
-	int		max_count;
-	float	normal_protection;
-	float	energy_protection;
-	int		armor;
+typedef struct {
+    int     base_count;
+    int     max_count;
+    float   normal_protection;
+    float   energy_protection;
+    int     armor;
 } gitem_armor_t;
 
 // gitem_t->flags
@@ -450,33 +408,32 @@ typedef struct teamplayer_s teamplayer_t;
 
 typedef struct gitem_s
 {
-	const char  *classname;	// spawning name
-	qboolean    (*pickup)(struct edict_s *ent, struct edict_s *other);
-	void        (*use)(struct edict_s *ent, const struct gitem_s *item);
-	void        (*drop)(struct edict_s *ent, const struct gitem_s *item);
-	void        (*weaponthink)(struct edict_s *ent);
-	const char  *pickup_sound;
-	const char  *world_model;
-	int         world_model_flags;
-	const char  *view_model;
+    const char  *classname;	// spawning name
+    qboolean    (*pickup)(struct edict_s *ent, struct edict_s *other);
+    void        (*use)(struct edict_s *ent, const struct gitem_s *item);
+    void        (*drop)(struct edict_s *ent, const struct gitem_s *item);
+    void        (*weaponthink)(struct edict_s *ent);
+    const char  *pickup_sound;
+    const char  *world_model;
+    int         world_model_flags;
+    const char  *view_model;
 
-	// client side info
-	const char  *icon;
-	const char  *pickup_name;	// for printing on pickup
-	int         count_width;		// number of digits to display by icon
+    // client side info
+    const char  *icon;
+    const char  *pickup_name;	// for printing on pickup
+    int         count_width;		// number of digits to display by icon
 
-	int         quantity;		// for ammo how much, for weapons how much is used per shot
-	//const char	*ammo;			// for weapons
-	int         ammoindex;
-	int         flags;			// IT_* flags
+    int         quantity;		// for ammo how much, for weapons how much is used per shot
+    int         ammoindex;
+    int         flags;			// IT_* flags
 
-	int         weapmodel;		// weapon model index (for weapons)
+    int         weapmodel;		// weapon model index (for weapons)
 
-	void        *info;
-	int         tag;
+    void        *info;
+    int         tag;
 
-	const char  *precaches;		// string of all models, sounds, and images this item will use
-	const char  *shortname;
+    const char  *precaches;		// string of all models, sounds, and images this item will use
+    const char  *shortname;
 } gitem_t;
 
 /**
@@ -484,12 +441,11 @@ typedef struct gitem_s
  * MVD can record through multiple gamemaps, so we need to keep track
  * of the state.
  */
-typedef struct
-{
-	qboolean    recording;                  // are we currently recording?
-	qboolean    compressed;                 // compress the demo?
-	int         matches;                    // how many have we already recorded?
-	char        filename[MAX_STRING_CHARS]; // demo name
+typedef struct {
+    qboolean    recording;                  // are we currently recording?
+    qboolean    compressed;                 // compress the demo?
+    int         matches;                    // how many have we already recorded?
+    char        filename[MAX_STRING_CHARS]; // demo name
 } server_demo_t;
 
 #define MVD_CAPABLE ((game.server_features & GMF_MVDSPEC) > 0)
@@ -499,31 +455,29 @@ typedef struct
 // it should be initialized at dll load time, and read/written to
 // the server.ssv file for savegames
 //
-typedef struct
-{
-	gclient_t     *clients;  // [maxclients]
+typedef struct {
+    gclient_t     *clients;  // [maxclients]
 
-	// store latched cvars here that we want to get at often
-	int           maxclients;
-	int           maxentities;
+    // store latched cvars here that we want to get at often
+    int           maxclients;
+    int           maxentities;
 
-	// cross level triggers
-	int           serverflags;
+    // cross level triggers
+    int           serverflags;
 
-	// items
-	int           num_items;
+    // items
+    int           num_items;
 
-	char          gamedir[MAX_QPATH];
+    char          gamedir[MAX_QPATH];
 
-	// greater than zero indicates we're running q2pro
-	int           server_features;
+    // greater than zero indicates we're running q2pro
+    int           server_features;
 
-	// the number of matches played since mod was loaded
-	int           match_count;
+    // the number of matches played since mod was loaded
+    int           match_count;
 
-	// auto server demo stuff
-	server_demo_t mvd;
-
+    // auto server demo stuff
+    server_demo_t mvd;
 } game_locals_t;
 
 
