@@ -105,15 +105,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DF(x)       (((int)dmflags->value & DF_##x) != 0)
 
 // per-player flags, set in userinfo (extended from openffa for consistency)
-#define UF_AUTOSCREENSHOT   1		// stuff a screenshot
-#define UF_AUTORECORD       2		// force demo recording
-#define UF_LOCALFOV         4		// keep fov when chasing
-// #define UF_MUTE_PLAYERS     8		// ignore player chat
-// #define UF_MUTE_OBSERVERS   16		// ignore spec chat
-// #define UF_MUTE_MISC        32		// unused
-#define UF_PLAYERFOV        64		// unused
-#define UF_EXTENDED_LAYOUT  128		// increase layout size (unused)
-#define UF_WEAPON_HUD       256		// show weapon/ammo totals in hud
+#define UF_AUTOSCREENSHOT   1       // stuff a screenshot
+#define UF_AUTORECORD       2       // force demo recording
+#define UF_LOCALFOV         4       // keep fov when chasing
+#define UF_PLAYERFOV        64      // unused
+#define UF_EXTENDED_LAYOUT  128     // increase layout size (unused)
+#define UF_WEAPON_HUD       256     // show weapon/ammo totals in hud
 #define UF_ARMOR_TIMER      512
 #define UF_WEAPON_TIMER     1024
 
