@@ -48,21 +48,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // player_state->stats[] indexes
 #define STAT_HEALTH_ICON                0
-#define STAT_HEALTH                     1		// used by client, server
+#define STAT_HEALTH                     1   // used by client, server
 #define STAT_AMMO_ICON                  2
-#define STAT_AMMO                       3		// used by client
+#define STAT_AMMO                       3   // used by client
 #define STAT_ARMOR_ICON                 4
-#define STAT_ARMOR                      5		// used by client
+#define STAT_ARMOR                      5   // used by client
 #define STAT_SELECTED_ICON              6
 #define STAT_PICKUP_ICON                7
 #define STAT_PICKUP_STRING              8
 #define STAT_TIMER_ICON                 9
 #define STAT_TIMER                      10
 #define STAT_HELPICON                   11
-#define STAT_SELECTED_ITEM              12		// used by client
-#define STAT_LAYOUTS                    13		// used by client
-#define STAT_FRAGS                      14		// used by server
-#define STAT_FLASHES                    15		// used by client; cleared each frame, 1 = health, 2 = armor
+#define STAT_SELECTED_ITEM              12  // used by client
+#define STAT_LAYOUTS                    13  // used by client
+#define STAT_FRAGS                      14  // used by server
+#define STAT_FLASHES                    15  // used by client; cleared each frame, 1 = health, 2 = armor
 #define STAT_CHASE                      16
 #define STAT_WEAPHUD_SHELLS             17
 #define STAT_WEAPHUD_BULLETS            18
