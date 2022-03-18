@@ -445,7 +445,8 @@ typedef struct {
     qboolean    recording;                  // are we currently recording?
     qboolean    compressed;                 // compress the demo?
     int         matches;                    // how many have we already recorded?
-    char        filename[MAX_STRING_CHARS]; // demo name
+    char        filename[MAX_STRING_CHARS]; // rename to this after finished
+    char        tempname[MAX_STRING_CHARS]; // use while recording
 } server_demo_t;
 
 #define MVD_CAPABLE ((game.server_features & GMF_MVDSPEC) > 0)

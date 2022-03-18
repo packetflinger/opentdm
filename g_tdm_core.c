@@ -2634,17 +2634,19 @@ void TDM_RecordMVD(void)
 
     if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
         Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
+        Q_strncpy(game.mvd.tempname, game.mvd.filename, sizeof(game.mvd.tempname)-1);
+        game.mvd.tempname[0] = '_';
 
         // compress demo on the fly if instructed to
         if ((int)g_record_mvd->value == 2) {
             game.mvd.compressed = true;
-            gi.AddCommandString(va("mvdrecord -z %s\n", game.mvd.filename));
+            gi.AddCommandString(va("mvdrecord -z %s\n", game.mvd.tempname));
         } else {
-            gi.AddCommandString(va("mvdrecord %s\n", game.mvd.filename));
+            gi.AddCommandString(va("mvdrecord %s\n", game.mvd.tempname));
         }
         game.mvd.recording = true;
 
-        gi.cprintf(NULL, PRINT_HIGH, "Capturing MVD %s\n", game.mvd.filename);
+        gi.cprintf(NULL, PRINT_HIGH, "Capturing MVD %s\n", game.mvd.tempname);
     }
 }
 
@@ -2653,11 +2655,25 @@ void TDM_RecordMVD(void)
  */
 void TDM_StopMVD(void)
 {
+    cvar_t *mod;
+    char *cur;
+    char *final;
+    server_demo_t *d;
+
     if (!game.mvd.recording) {
         return;
     }
-    gi.cprintf(NULL, PRINT_HIGH, "Stopping MVD %s\n", game.mvd.filename);
+
+    d = &game.mvd;
+
+    gi.cprintf(NULL, PRINT_HIGH, "Stopping MVD\n");
     gi.AddCommandString("mvdstop\n");
+
+    mod = gi.cvar("game", "baseq2", 0);
+    cur = va("%s/demos/%s.mvd2%s", mod->string, d->tempname, (d->compressed) ? ".gz":"");
+    final = va("%s/demos/%s.mvd2%s", mod->string, d->filename, (d->compressed) ? ".gz":"");
+    rename(cur, final);
+
     memset(&game.mvd, 0x0, sizeof(server_demo_t));
 }
 
