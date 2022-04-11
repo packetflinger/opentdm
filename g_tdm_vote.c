@@ -1750,53 +1750,48 @@ player disconnected, so we don't need to worry about things like that - only gam
 */
 void TDM_VoteWebConfigResult (edict_t *ent, int code, tdm_config_t *config)
 {
-	//client disconnected
-	if (!ent)
-		return;
+    //client disconnected
+    if (!ent) {
+        return;
+    }
 
-	if (code == 404)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Web config '%s' was not found. Visit opentdm.org for more information on web configs.\n", tdm_vote_download.name);
-		return;
-	}
-	else if (code == 600)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unable to parse the config file. It may be corrupt.\n");
-		return;
-	}
+    if (code == 404) {
+        gi.cprintf(ent, PRINT_HIGH, "Web config '%s' was not found. Visit opentdm.org for more information on web configs.\n", tdm_vote_download.name);
+        return;
+    } else if (code == 600) {
+        gi.cprintf(ent, PRINT_HIGH, "Unable to parse the config file. It may be corrupt.\n");
+        return;
+    }
 
-	if (!config)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "The OpenTDM web config service is unavailable at the moment.\n");
-		return;
-	}
+    if (!config) {
+        gi.cprintf(ent, PRINT_HIGH, "The OpenTDM web config service is unavailable at the moment.\n");
+        return;
+    }
 
-	if (tdm_match_status != MM_WARMUP)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Web config '%s' was found, but it is too late to propose settings now.\n", tdm_vote_download.name);
-		return;
-	}
+    if (tdm_match_status != MM_WARMUP) {
+        gi.cprintf(ent, PRINT_HIGH, "Web config '%s' was found, but it is too late to propose settings now.\n", tdm_vote_download.name);
+        return;
+    }
 
-	if (!ent->client->pers.team && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Web config '%s' was found, but you are no longer on a team!\n", tdm_vote_download.name);
-		return;
-	}
+    if (!ent->client->pers.team && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Web config '%s' was found, but you are no longer on a team!\n", tdm_vote_download.name);
+        return;
+    }
 
-	if (vote.active)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Web config '%s' was found, but another vote has already started.\n", tdm_vote_download.name);
-		return;
-	}
+    if (vote.active)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Web config '%s' was found, but another vote has already started.\n", tdm_vote_download.name);
+        return;
+    }
 
-	vote = config->settings;
+    vote = config->settings;
 
-	strcpy (vote.configname, config->name);
-	vote.flags |= VOTE_WEBCONFIG;
+    strcpy(vote.configname, config->name);
+    vote.flags |= VOTE_WEBCONFIG;
 
-	TDM_SetupVote (ent);
-	TDM_AnnounceVote ();
-	TDM_CheckVote ();
+    TDM_SetupVote(ent);
+    TDM_AnnounceVote();
+    TDM_CheckVote();
 }
 
 /*
