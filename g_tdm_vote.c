@@ -2677,45 +2677,40 @@ A downloaded config finished, store it in memory temporarily
 */
 void TDM_ConfigDownloaded (tdm_download_t *download, int code, byte *buff, int len)
 {
-	tdm_config_t	*t, *last;
+    tdm_config_t *t, *last;
 
-	if (buff)
-	{
-		t = &tdm_configs;
+    if (buff) {
+        t = &tdm_configs;
 
-		while (t->next)
-		{
-			t = t->next;
-		}
+        while (t->next) {
+            t = t->next;
+        }
 
-		last = t;
-		t->next = gi.TagMalloc (sizeof(*t), TAG_GAME);
+        last = t;
+        t->next = gi.TagMalloc(sizeof(*t), TAG_GAME);
 
-		t = t->next;
+        t = t->next;
 
-		strcpy (t->name, tdm_vote_download.name);
+        strcpy(t->name, tdm_vote_download.name);
 
-		if (!TDM_ProcessText ((char *)buff, len, TDM_ParseVoteConfigLine, t))
-		{
-			gi.TagFree (t);
-			last->next = NULL;
+        if (!TDM_ProcessText((char *)buff, len, TDM_ParseVoteConfigLine, t)) {
+            gi.TagFree(t);
+            last->next = NULL;
 
-			gi.dprintf ("TDM_ConfigDownloaded: Parse failed.\n");
-			TDM_VoteWebConfigResult (tdm_vote_download.initiator, 600, NULL);
-			tdm_vote_download.inuse = false;
-			return;
-		}
+            gi.dprintf("TDM_ConfigDownloaded: Parse failed.\n");
+            TDM_VoteWebConfigResult(tdm_vote_download.initiator, 600, NULL);
+            tdm_vote_download.inuse = false;
+            return;
+        }
 
-		t->last_downloaded = time(NULL);
+        t->last_downloaded = time(NULL);
 
-		TDM_VoteWebConfigResult (tdm_vote_download.initiator, code, t);
-	}
-	else
-	{
-		TDM_VoteWebConfigResult (tdm_vote_download.initiator, code, NULL);
-	}
+        TDM_VoteWebConfigResult(tdm_vote_download.initiator, code, t);
+    } else {
+        TDM_VoteWebConfigResult(tdm_vote_download.initiator, code, NULL);
+    }
 
-	tdm_vote_download.inuse = false;
+    tdm_vote_download.inuse = false;
 }
 
 /**
