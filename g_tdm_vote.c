@@ -2631,6 +2631,12 @@ qboolean TDM_ParseVoteConfigLine (char *line, int line_number, void *param)
     } else if (!strcmp(variable, "1v1_spawnmode")) {
         c->settings.spawn_mode = atoi (p);
         c->settings.flags |= VOTE_1V1_SPAWNMODE;
+    } else if (!strcmp(variable, "armor_timer")) {
+        c->settings.armor_timer = atoi(p);
+        c->settings.flags |= VOTE_ARMOR_TIMER;
+    } else if (!strcmp(variable, "weapon_timer")) {
+        c->settings.armor_timer = atoi(p);
+        c->settings.flags |= VOTE_WEAPON_TIMER;
     } else {
         gi.dprintf ("WARNING: Unknown variable '%s' on line %d of web config. Check you are using the latest version of OpenTDM.\n", variable, line_number);
         //return false;

@@ -4,11 +4,11 @@ Core Stuff
 //web config cache
 typedef struct tdm_config_s
 {
-	struct tdm_config_s	*next;
-	char				name[32];
-	char				description[128];
-	vote_t				settings;
-	unsigned int		last_downloaded;
+    struct tdm_config_s *next;
+    char                name[32];
+    char                description[128];
+    vote_t              settings;
+    unsigned int        last_downloaded;
 } tdm_config_t;
 
 void JoinedTeam (edict_t *ent, qboolean reconnected, qboolean notify);
@@ -48,6 +48,6 @@ void TDM_RecordMVD(void);
 void TDM_StopMVD(void);
 void TDM_DeleteMVD(char *name);
 
-extern char		**tdm_maplist;
+extern char **tdm_maplist;
 
-extern tdm_download_t	tdm_vote_download;
+extern tdm_download_t tdm_vote_download;
