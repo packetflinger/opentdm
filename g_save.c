@@ -355,6 +355,9 @@ void InitGame (void)
     // max number of timeouts allowed per client (0 == unlimited)
     g_timeout_limit = gi.cvar("g_timeout_limit", "2", 0);
 
+    // whether or not to allow only team captains to call timeouts
+    g_timeout_captain = gi.cvar("g_timeout_captain", "0", 0);
+
     // play a sound when a vote is called
     g_vote_attention = gi.cvar("g_vote_attention", "0", 0);
 

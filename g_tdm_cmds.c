@@ -708,6 +708,11 @@ void TDM_Timeout_f (edict_t *ent)
 		return;
 	}
 
+    if ((int) g_timeout_captain->value && !(teaminfo[TEAM_A].captain == ent || teaminfo[TEAM_B].captain == ent)) {
+        gi.cprintf (ent, PRINT_HIGH, "Only team captains may call a time out.\n");
+        return;
+    }
+
 	if (tdm_match_status == MM_TIMEOUT)
 	{
 		if (level.match_resume_framenum)
