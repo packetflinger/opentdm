@@ -1645,99 +1645,88 @@ via libcurl, allowing a single player / tournament config to be used by every Op
 */
 qboolean TDM_VoteWebConfig (edict_t *ent)
 {
-	const char		*value;
-	size_t			len;
-	size_t			i;
-	tdm_config_t	*t, *last;
-	unsigned		current_time;
+    const char    *value;
+    size_t        len;
+    size_t        i;
+    tdm_config_t  *t, *last;
+    unsigned      current_time;
 
-	if (!((int)g_vote_mask->value & VOTE_WEBCONFIG) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for web config is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_WEBCONFIG) && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Voting for web config is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote webconfig <configname>\n");
-		return false;
-	}
+    if (!value[0]) {
+        gi.cprintf(ent, PRINT_HIGH, "Usage: vote webconfig <configname>\n");
+        return false;
+    }
 
-	len = strlen (value);
+    len = strlen (value);
 
-	if (len >= MAX_QPATH - 16)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Invalid config name.\n");
-		return false;
-	}
+    if (len >= MAX_QPATH - 16) {
+        gi.cprintf (ent, PRINT_HIGH, "Invalid config name.\n");
+        return false;
+    }
 
-	for (i = 0; i < len; i++)
-	{
-		if (!isalnum (value[i]) && value[i] != '_' && value[i] != '-')
-		{
-			gi.cprintf (ent, PRINT_HIGH, "Invalid config name.\n");
-			return false;
-		}
-	}
+    for (i = 0; i < len; i++) {
+        if (!isalnum (value[i]) && value[i] != '_' && value[i] != '-') {
+            gi.cprintf(ent, PRINT_HIGH, "Invalid config name.\n");
+            return false;
+        }
+    }
 
-	//check config cache
-	t = last = &tdm_configs;
+    //check config cache
+    t = last = &tdm_configs;
 
-	current_time = time(NULL);
+    current_time = time(NULL);
 
-	while (t->next)
-	{
-		t = t->next;
+    while (t->next) {
+        t = t->next;
 
-		//found it!
-		if (!Q_stricmp (t->name, value))
-		{
-			//check freshness (6 hours max)
-			if (current_time - t->last_downloaded > (3600 * 6))
-			{
-				//too old, have to redownload
-				last->next = t->next;
-				gi.TagFree (t);
-				t = last;
-			}
-			else
-			{				
-				//it's fresh, use it immediately
-				vote = t->settings;
+        //found it!
+        if (!Q_stricmp(t->name, value)) {
+            //check freshness (6 hours max)
+            if (current_time - t->last_downloaded > (3600 * 6)) {
+                //too old, have to redownload
+                last->next = t->next;
+                gi.TagFree (t);
+                t = last;
+            } else {
+                //it's fresh, use it immediately
+                vote = t->settings;
 
-				strcpy (vote.configname, t->name);
-				vote.flags |= VOTE_WEBCONFIG;
+                strcpy(vote.configname, t->name);
+                vote.flags |= VOTE_WEBCONFIG;
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
-		last = t;
-	}
+        last = t;
+    }
 
-	//prevent new player from overwriting old request
-	if (tdm_vote_download.inuse)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Another config download is pending, please try again later.\n");
-		return false;
-	}
+    //prevent new player from overwriting old request
+    if (tdm_vote_download.inuse) {
+        gi.cprintf(ent, PRINT_HIGH, "Another config download is pending, please try again later.\n");
+        return false;
+    }
 
-	//Com_sprintf (tdm_vote_download.path , sizeof(tdm_vote_download.path ), "configs/%s.cfg", value);
-	Com_sprintf (tdm_vote_download.path , sizeof(tdm_vote_download.path ), "%s.cfg", value);
-	tdm_vote_download.initiator = ent;
-	tdm_vote_download.type = DL_CONFIG;
-	Q_strncpy (tdm_vote_download.name, value, sizeof(tdm_vote_download.name)-1);
-	tdm_vote_download.onFinish = TDM_ConfigDownloaded;
-	tdm_vote_download.inuse = true;
-	tdm_vote_download.unique_id = ent->client->pers.uniqueid;
+    Com_sprintf(tdm_vote_download.path , sizeof(tdm_vote_download.path ), "%s.cfg", value);
+    tdm_vote_download.initiator = ent;
+    tdm_vote_download.type = DL_CONFIG;
+    Q_strncpy(tdm_vote_download.name, value, sizeof(tdm_vote_download.name)-1);
+    tdm_vote_download.onFinish = TDM_ConfigDownloaded;
+    tdm_vote_download.inuse = true;
+    tdm_vote_download.unique_id = ent->client->pers.uniqueid;
 
-	if (HTTP_QueueDownload (&tdm_vote_download))
-		gi.cprintf (ent, PRINT_HIGH, "Fetching web config '%s', please wait...\n", value);
+    if (HTTP_QueueDownload(&tdm_vote_download)) {
+        gi.cprintf(ent, PRINT_HIGH, "Fetching web config '%s', please wait...\n", value);
+    }
 
-	//we never legitimately start a vote yet, it's handled when the config is actually downloaded
-	return false;
+    //we never legitimately start a vote yet, it's handled when the config is actually downloaded
+    return false;
 }
 
 /*
