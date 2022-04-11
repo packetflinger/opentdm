@@ -2566,107 +2566,77 @@ Parse a votable config.
 */
 qboolean TDM_ParseVoteConfigLine (char *line, int line_number, void *param)
 {
-	tdm_config_t	*c;
-	char			*p, *variable;
+    tdm_config_t *c;
+    char         *p,
+                 *variable;
 
-	c = (tdm_config_t *)param;
+    c = (tdm_config_t *)param;
 
-	p = strchr (line, '\t');
-	if (!p)
-	{
-		gi.dprintf ("WARNING: Malformed line %d '%s'\n", line_number, line);
-		return false;
-	}
+    p = strchr(line, '\t');
+    if (!p) {
+        gi.dprintf("WARNING: Malformed line %d '%s'\n", line_number, line);
+        return false;
+    }
 
-	p[0] = 0;
-	p++;
+    p[0] = 0;
+    p++;
 
-	variable = line;
+    variable = line;
 
-	if (!p[0])
-	{
-		gi.dprintf ("WARNING: Malformed line %d '%s'\n", line_number, line);
-		return false;
-	}
+    if (!p[0]) {
+        gi.dprintf("WARNING: Malformed line %d '%s'\n", line_number, line);
+        return false;
+    }
 
-	//no validation is done here to keep things small - these should be validated serverside
-	//already. yes, we're trusting the server not to lie to us :).
-	if (!strcmp (variable, "timelimit"))
-	{
-		c->settings.newtimelimit = atoi (p);
-		c->settings.flags |= VOTE_TIMELIMIT;
-	}
-	else if (!strcmp (variable, "gamemode"))
-	{
-		c->settings.gamemode = atoi(p);
-		c->settings.flags |= VOTE_GAMEMODE;
-	}
-	else if (!strcmp (variable, "tiemode"))
-	{
-		c->settings.tiemode = atoi(p);
-		c->settings.flags |= VOTE_TIEMODE;
-	}
-	else if (!strcmp (variable, "switchmode"))
-	{
-		c->settings.switchmode = atoi(p);
-		c->settings.flags |= VOTE_SWITCHMODE;
-	}
-	else if (!strcmp (variable, "telemode"))
-	{
-		c->settings.telemode = atoi(p);
-		c->settings.flags |= VOTE_TELEMODE;
-	}
-	else if (!strcmp (variable, "map"))
-	{
-		Q_strncpy (c->settings.newmap, p, sizeof(c->settings.newmap)-1);
-		c->settings.flags |= VOTE_MAP;
-	}
-	else if (!strcmp (variable, "overtime"))
-	{
-		c->settings.overtimemins = atoi(p);
-		c->settings.flags |= VOTE_OVERTIME;
-	}
-	else if (!strcmp (variable, "weapons"))
-	{
-		c->settings.newweaponflags = atoi(p);
-		c->settings.flags |= VOTE_WEAPONS;
-	}
-	else if (!strcmp (variable, "powerups"))
-	{
-		c->settings.newpowerupflags = atoi(p);
-		c->settings.flags |= VOTE_POWERUPS;
-	}
-	else if (!strcmp (variable, "chat"))
-	{
-		c->settings.newchatmode = atoi(p);
-		c->settings.flags |= VOTE_CHAT;
-	}
-	else if (!strcmp (variable, "description"))
-	{
-		Q_strncpy (c->description, p, sizeof(c->description)-1);
-	}
-	else if (!strcmp (variable, "bugs"))
-	{
-		c->settings.bugs = atoi (p);
-		c->settings.flags |= VOTE_BUGS;
-	}
-	else if (!strcmp (variable, "tdm_spawnmode"))
-	{
-		c->settings.spawn_mode = atoi (p);
-		c->settings.flags |= VOTE_TDM_SPAWNMODE;
-	}
-	else if (!strcmp (variable, "1v1_spawnmode"))
-	{
-		c->settings.spawn_mode = atoi (p);
-		c->settings.flags |= VOTE_1V1_SPAWNMODE;
-	}
-	else
-	{
-		gi.dprintf ("WARNING: Unknown variable '%s' on line %d of web config. Check you are using the latest version of OpenTDM.\n", variable, line_number);
-		//return false;
-	}
+    //no validation is done here to keep things small - these should be validated serverside
+    //already. yes, we're trusting the server not to lie to us :).
+    if (!strcmp(variable, "timelimit")) {
+        c->settings.newtimelimit = atoi(p);
+        c->settings.flags |= VOTE_TIMELIMIT;
+    } else if (!strcmp(variable, "gamemode")) {
+        c->settings.gamemode = atoi(p);
+        c->settings.flags |= VOTE_GAMEMODE;
+    } else if (!strcmp(variable, "tiemode")) {
+        c->settings.tiemode = atoi(p);
+        c->settings.flags |= VOTE_TIEMODE;
+    } else if (!strcmp(variable, "switchmode")) {
+        c->settings.switchmode = atoi(p);
+        c->settings.flags |= VOTE_SWITCHMODE;
+    } else if (!strcmp(variable, "telemode")) {
+        c->settings.telemode = atoi(p);
+        c->settings.flags |= VOTE_TELEMODE;
+    } else if (!strcmp(variable, "map")) {
+        Q_strncpy (c->settings.newmap, p, sizeof(c->settings.newmap)-1);
+        c->settings.flags |= VOTE_MAP;
+    } else if (!strcmp(variable, "overtime")) {
+        c->settings.overtimemins = atoi(p);
+        c->settings.flags |= VOTE_OVERTIME;
+    } else if (!strcmp(variable, "weapons")) {
+        c->settings.newweaponflags = atoi(p);
+        c->settings.flags |= VOTE_WEAPONS;
+    } else if (!strcmp(variable, "powerups")) {
+        c->settings.newpowerupflags = atoi(p);
+        c->settings.flags |= VOTE_POWERUPS;
+    } else if (!strcmp(variable, "chat")) {
+        c->settings.newchatmode = atoi(p);
+        c->settings.flags |= VOTE_CHAT;
+    } else if(!strcmp (variable, "description")) {
+        Q_strncpy(c->description, p, sizeof(c->description)-1);
+    } else if (!strcmp (variable, "bugs")) {
+        c->settings.bugs = atoi (p);
+        c->settings.flags |= VOTE_BUGS;
+    } else if (!strcmp(variable, "tdm_spawnmode")) {
+        c->settings.spawn_mode = atoi (p);
+        c->settings.flags |= VOTE_TDM_SPAWNMODE;
+    } else if (!strcmp(variable, "1v1_spawnmode")) {
+        c->settings.spawn_mode = atoi (p);
+        c->settings.flags |= VOTE_1V1_SPAWNMODE;
+    } else {
+        gi.dprintf ("WARNING: Unknown variable '%s' on line %d of web config. Check you are using the latest version of OpenTDM.\n", variable, line_number);
+        //return false;
+    }
 
-	return true;
+    return true;
 }
 
 /*
