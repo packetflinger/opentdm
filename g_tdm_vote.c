@@ -2274,7 +2274,7 @@ void TDM_Vote_f (edict_t *ent)
     else if (!Q_stricmp (cmd, "weapontimer"))
         started_new_vote = TDM_VoteWeaponTimer(ent);
     else if (!Q_stricmp (cmd, "timeoutlimit"))
-            started_new_vote = TDM_VoteTimeoutLimit(ent);
+        started_new_vote = TDM_VoteTimeoutLimit(ent);
     else if (!Q_stricmp (cmd, "yes"))
         TDM_Vote_X (ent, VOTE_YES, "YES");
     else if (!Q_stricmp (cmd, "no"))
