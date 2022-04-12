@@ -33,70 +33,70 @@ void VoteMenuKick (edict_t *ent);
 void VoteMenuChat (edict_t *ent);
 void VoteMenuBugs (edict_t *ent);
 
-#define VOTE_MENU_GAMEMODE	0x1
-#define VOTE_MENU_MAP		0x2
-#define VOTE_MENU_CONFIG	0x4
-#define VOTE_MENU_TIMELIMIT	0x8
-#define VOTE_MENU_OVERTIME	0x10
-#define VOTE_MENU_POWERUPS	0x20
-#define VOTE_MENU_BFG		0x40
-#define VOTE_MENU_KICK		0x80
-#define VOTE_MENU_CHAT		0x100
-#define VOTE_MENU_BUGS		0x200
+#define VOTE_MENU_GAMEMODE  0x1
+#define VOTE_MENU_MAP       0x2
+#define VOTE_MENU_CONFIG    0x4
+#define VOTE_MENU_TIMELIMIT 0x8
+#define VOTE_MENU_OVERTIME  0x10
+#define VOTE_MENU_POWERUPS  0x20
+#define VOTE_MENU_BFG       0x40
+#define VOTE_MENU_KICK      0x80
+#define VOTE_MENU_CHAT      0x100
+#define VOTE_MENU_BUGS      0x200
 
-#define VOTE_MENU_ALL		0xFFFFFFFFU 
+#define VOTE_MENU_ALL       0xFFFFFFFFU
 
 typedef struct weaponvote_s
 {
-	const char		*names[2];
-	unsigned		value;
-	int				itemindex;
+    const char  *names[2];
+    unsigned    value;
+    int         itemindex;
 } weaponinfo_t;
 
 typedef struct powerupvote_s
 {
-	const char		*names[1];
-	unsigned		value;
-	int				itemindex;
+    const char  *names[1];
+    unsigned    value;
+    int         itemindex;
 } powerupinfo_t;
 
 typedef struct armorvote_s
 {
-	const char		*names[2];
-	unsigned		value;
-	int				itemindex;
+    const char  *names[2];
+    unsigned    value;
+    int         itemindex;
 } armorinfo_t;
 
-#define WEAPON_MAX		10
-#define POWERUP_MAX		7
+#define WEAPON_MAX      10
+#define POWERUP_MAX     7
 #define ARMOR_MAX       4
 
 extern const weaponinfo_t   weaponvotes[WEAPON_MAX];
 extern const powerupinfo_t  powerupvotes[POWERUP_MAX];
 extern const armorinfo_t    armorvotes[ARMOR_MAX];
 
-extern vote_t	vote;
+extern vote_t   vote;
 
-extern char			**tdm_configlist;
+extern char     **tdm_configlist;
 
-#define WEAPON_SHOTGUN			(1<<1)
-#define	WEAPON_SSHOTGUN			(1<<2)
-#define	WEAPON_MACHINEGUN		(1<<3)
-#define	WEAPON_CHAINGUN			(1<<4)
-#define WEAPON_GRENADES			(1<<5)
-#define WEAPON_GRENADELAUNCHER	(1<<6)
-#define	WEAPON_ROCKETLAUNCHER	(1<<7)
-#define WEAPON_RAILGUN			(1<<8)
-#define WEAPON_BFG10K			(1<<9)
-#define	WEAPON_HYPERBLASTER		(1<<10)
+#define WEAPON_SHOTGUN          (1<<1)
+#define	WEAPON_SSHOTGUN         (1<<2)
+#define	WEAPON_MACHINEGUN       (1<<3)
+#define	WEAPON_CHAINGUN         (1<<4)
+#define WEAPON_GRENADES         (1<<5)
+#define WEAPON_GRENADELAUNCHER  (1<<6)
+#define	WEAPON_ROCKETLAUNCHER   (1<<7)
+#define WEAPON_RAILGUN          (1<<8)
+#define WEAPON_BFG10K           (1<<9)
+#define	WEAPON_HYPERBLASTER     (1<<10)
 
-#define POWERUP_QUAD			(1<<1)
-#define POWERUP_INVULN			(1<<2)
-#define POWERUP_POWERSHIELD		(1<<3)
-#define POWERUP_POWERSCREEN		(1<<4)
-#define POWERUP_SILENCER		(1<<5)
-#define POWERUP_REBREATHER		(1<<6)
-#define POWERUP_ENVIROSUIT		(1<<7)
+#define POWERUP_QUAD            (1<<1)
+#define POWERUP_INVULN          (1<<2)
+#define POWERUP_POWERSHIELD     (1<<3)
+#define POWERUP_POWERSCREEN     (1<<4)
+#define POWERUP_SILENCER        (1<<5)
+#define POWERUP_REBREATHER      (1<<6)
+#define POWERUP_ENVIROSUIT      (1<<7)
 
 #define ITEM_ARMOR_JACKET       (1<<1)
 #define ITEM_ARMOR_COMBAT       (1<<2)
