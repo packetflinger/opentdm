@@ -2136,177 +2136,161 @@ Vote command handler. Create new vote.
 */
 void TDM_Vote_f (edict_t *ent)
 {
-	const char	*cmd;
-	qboolean	started_new_vote;
+    const char  *cmd;
+    qboolean    started_new_vote;
 
-	if ((!Q_stricmp (gi.argv(0), "yes") || !Q_stricmp (gi.argv(0), "no")) &&
-			(!vote.active || (!ent->client->pers.team && !ent->client->pers.admin)))
-	{
-		Cmd_Say_f (ent, false, true);
-		return;
-	}
-	
-	if (!Q_stricmp (gi.argv(0), "yes") || !Q_stricmp (gi.argv(0), "no"))
-	{
-		cmd = gi.argv(0);
-	}
-	else
-	{
-		if (gi.argc() < 2)
-		{
-			if (vote.active)
-			{
-				gi.cprintf (ent, PRINT_HIGH, "Vote options: %s.\n", vote.vote_string);
-				return;
-			}
+    if ((!Q_stricmp (gi.argv(0), "yes") || !Q_stricmp (gi.argv(0), "no")) &&
+            (!vote.active || (!ent->client->pers.team && !ent->client->pers.admin))) {
+        Cmd_Say_f (ent, false, true);
+        return;
+    }
 
-			gi.cprintf (ent, PRINT_HIGH,
-				"Usage: vote <setting> <value>\n"
-				" Options:\n"
-				"  timelimit <minutes>\n"
-				"  map <mapname>\n"
-				"  kick <player/id>\n"
-				"  powerups <powerupmods> (eg: +invul, -quad)\n"
-				"  weapons <weaponmods> (eg: +all -bfg)\n"
-				"  gamemode <tdm/1v1/itdm>\n"
-				"  tiemode <none/ot/sd>\n"
-				"  telemode <normal/nofreeze>\n"
-				"  switchmode <normal/fast/faster/insane/extreme>\n"
-				"  overtime <minutes>\n"
-				"  config <configname>\n"
-				"  webconfig <configname>\n"
-				"  chat <all/players>\n"
-				"  restart\n"
-				"  bugs <0/1/2>\n"
-				"  shuffle\n"
-				"  armortimer <0/1>\n"
-				"  weapontimer <0/1>\n"
-				"  timeoutlimit <integer> (per player; 0 == unlimited)\n"
-				);
-			return;
-		}
+    if (!Q_stricmp (gi.argv(0), "yes") || !Q_stricmp (gi.argv(0), "no")) {
+        cmd = gi.argv(0);
+    } else {
+        if (gi.argc() < 2) {
+            if (vote.active) {
+                gi.cprintf (ent, PRINT_HIGH, "Vote options: %s.\n", vote.vote_string);
+                return;
+            }
 
-		cmd = gi.argv(1);
-	}
+            gi.cprintf (ent, PRINT_HIGH,
+                "Usage: vote <setting> <value>\n"
+                " Options:\n"
+                "  timelimit <minutes>\n"
+                "  map <mapname>\n"
+                "  kick <player/id>\n"
+                "  powerups <powerupmods> (eg: +invul, -quad)\n"
+                "  weapons <weaponmods> (eg: +all -bfg)\n"
+                "  gamemode <tdm/1v1/itdm>\n"
+                "  tiemode <none/ot/sd>\n"
+                "  telemode <normal/nofreeze>\n"
+                "  switchmode <normal/fast/faster/insane/extreme>\n"
+                "  overtime <minutes>\n"
+                "  config <configname>\n"
+                "  webconfig <configname>\n"
+                "  chat <all/players>\n"
+                "  restart\n"
+                "  bugs <0/1/2>\n"
+                "  shuffle\n"
+                "  armortimer <0/1>\n"
+                "  weapontimer <0/1>\n"
+                "  timeoutlimit <integer> (per player; 0 == unlimited)\n"
+                );
+            return;
+        }
 
-	// allow the initiator (or admin) to cancel the vote
-	if (vote.active && !Q_stricmp(cmd, "cancel")) {
-		if (ent == vote.initiator || ent->client->pers.admin) {
-			gi.bprintf(PRINT_HIGH, "%s cancelled the vote\n", ent->client->pers.netname);
-			TDM_RemoveVote();
-		} else {
-			gi.cprintf(ent, PRINT_HIGH,
-				"Only %s or an admin can cancel the current vote\n",
-				vote.initiator->client->pers.netname
-			);
-		}
-		return;
-	}
+        cmd = gi.argv(1);
+    }
 
-	//global 'disallow voting' check
-	if (!(int)g_vote_mask->value && !ent->client->pers.admin && Q_stricmp (cmd, "yes") && Q_stricmp (cmd, "no"))
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Proposing new settings is not allowed on this server.\n");
-		return;
-	}
+    // allow the initiator (or admin) to cancel the vote
+    if (vote.active && !Q_stricmp(cmd, "cancel")) {
+        if (ent == vote.initiator || ent->client->pers.admin) {
+            gi.bprintf(PRINT_HIGH, "%s cancelled the vote\n", ent->client->pers.netname);
+            TDM_RemoveVote();
+        } else {
+            gi.cprintf(ent, PRINT_HIGH,
+                "Only %s or an admin can cancel the current vote\n",
+                vote.initiator->client->pers.netname
+            );
+        }
+        return;
+    }
 
-	//allow some commands mid-game
-	if (tdm_match_status != MM_WARMUP)
-	{
-		if (!Q_stricmp (cmd, "timelimit") || !Q_stricmp (cmd, "tl") || !Q_stricmp (cmd, "restart") ||
-				!Q_stricmp (cmd, "yes") || !Q_stricmp (cmd, "no") || !Q_stricmp (cmd, "kick") || !Q_stricmp (cmd, "abort"))
-		{
-			if (!(tdm_match_status >= MM_PLAYING && tdm_match_status < MM_SCOREBOARD))
-			{
-				gi.cprintf (ent, PRINT_HIGH, "You can only vote for a timelimit change or restart during a match.\n");
-				return;
-			}
-		}
-		else
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You can only propose new settings during warmup.\n");
-			return;
-		}
-	}
+    //global 'disallow voting' check
+    if (!(int)g_vote_mask->value && !ent->client->pers.admin && Q_stricmp (cmd, "yes") && Q_stricmp (cmd, "no")) {
+        gi.cprintf (ent, PRINT_HIGH, "Proposing new settings is not allowed on this server.\n");
+        return;
+    }
 
-	if (!ent->client->pers.team && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "You must be on a team to vote or propose new settings.\n");
-		return;
-	}
+    //allow some commands mid-game
+    if (tdm_match_status != MM_WARMUP) {
+        if (!Q_stricmp (cmd, "timelimit") || !Q_stricmp (cmd, "tl") || !Q_stricmp (cmd, "restart") ||
+                !Q_stricmp (cmd, "yes") || !Q_stricmp (cmd, "no") || !Q_stricmp (cmd, "kick") || !Q_stricmp (cmd, "abort")) {
+            if (!(tdm_match_status >= MM_PLAYING && tdm_match_status < MM_SCOREBOARD)) {
+                gi.cprintf (ent, PRINT_HIGH, "You can only vote for a timelimit change or restart during a match.\n");
+                return;
+            }
+        } else {
+            gi.cprintf (ent, PRINT_HIGH, "You can only propose new settings during warmup.\n");
+            return;
+        }
+    }
 
-	//if initiator wants to change vote reset the vote and start again
-	if (vote.active && vote.initiator != ent && Q_stricmp (cmd, "yes") && Q_stricmp (cmd, "no"))
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Another vote is already in progress.\n");
-		return;
-	}
+    if (!ent->client->pers.team && !ent->client->pers.admin) {
+        gi.cprintf (ent, PRINT_HIGH, "You must be on a team to vote or propose new settings.\n");
+        return;
+    }
 
-	if (!ent->client->pers.admin && ent == vote.last_initiator && level.framenum - vote.last_vote_end_frame < SECS_TO_FRAMES(10))
-	{
-		gi.cprintf (ent, PRINT_HIGH, "You must wait a short time before proposing another vote.\n");
-		return;
-	}
+    //if initiator wants to change vote reset the vote and start again
+    if (vote.active && vote.initiator != ent && Q_stricmp (cmd, "yes") && Q_stricmp (cmd, "no")) {
+        gi.cprintf (ent, PRINT_HIGH, "Another vote is already in progress.\n");
+        return;
+    }
 
-	started_new_vote = false;
+    if (!ent->client->pers.admin && ent == vote.last_initiator && level.framenum - vote.last_vote_end_frame < SECS_TO_FRAMES(10)) {
+        gi.cprintf (ent, PRINT_HIGH, "You must wait a short time before proposing another vote.\n");
+        return;
+    }
 
-	if (!Q_stricmp (cmd, "timelimit") || !Q_stricmp (cmd, "tl"))
-		started_new_vote = TDM_VoteTimeLimit (ent);
-	else if (!Q_stricmp (cmd, "map"))
-		started_new_vote = TDM_VoteMap (ent);
-	else if (!Q_stricmp (cmd, "weapons"))
-		started_new_vote = TDM_VoteWeapons (ent);
-	else if (!Q_stricmp (cmd, "kick"))
-		started_new_vote = TDM_VoteKick (ent);
-	else if (!Q_stricmp (cmd, "powerups"))
-		started_new_vote = TDM_VotePowerups (ent);
-	else if (!Q_stricmp (cmd, "gamemode") || !Q_stricmp (cmd, "mode"))
-		started_new_vote = TDM_VoteGameMode (ent);
-	else if (!Q_stricmp (cmd, "tiemode"))
-		started_new_vote = TDM_VoteTieMode (ent);
-	else if (!Q_stricmp (cmd, "telemode"))
-		started_new_vote = TDM_VoteTeleMode (ent);
-	else if (!Q_stricmp (cmd, "switchmode"))
-		started_new_vote = TDM_VoteSwitchMode (ent);
-	else if (!Q_stricmp (cmd, "overtime") || !Q_stricmp (cmd, "ot"))
-		started_new_vote = TDM_VoteOverTimeLimit (ent);
-	else if (!Q_stricmp (cmd, "config"))
-		started_new_vote = TDM_VoteConfig (ent);
-	else if (!Q_stricmp (cmd, "webconfig"))
-		started_new_vote = TDM_VoteWebConfig (ent);
-	else if (!Q_stricmp (cmd, "chat"))
-		started_new_vote = TDM_VoteChat (ent);
-	else if (!Q_stricmp (cmd, "restart"))
-		started_new_vote = TDM_VoteRestart (ent);
-	else if (!Q_stricmp (cmd, "abort"))
-		started_new_vote = TDM_VoteAbort (ent);
-	else if (!Q_stricmp (cmd, "bugs"))
-		started_new_vote = TDM_VoteBugs (ent);
-	else if (!Q_stricmp (cmd, "shuffle") || !Q_stricmp (cmd, "randomize"))
-		started_new_vote = TDM_VoteShuffle (ent);
-	else if (!Q_stricmp (cmd, "armortimer"))
-		started_new_vote = TDM_VoteArmorTimer(ent);
-	else if (!Q_stricmp (cmd, "weapontimer"))
-		started_new_vote = TDM_VoteWeaponTimer(ent);
-	else if (!Q_stricmp (cmd, "timeoutlimit"))
-			started_new_vote = TDM_VoteTimeoutLimit(ent);
-	else if (!Q_stricmp (cmd, "yes"))
-		TDM_Vote_X (ent, VOTE_YES, "YES");
-	else if (!Q_stricmp (cmd, "no"))
-		TDM_Vote_X (ent, VOTE_NO, "NO");
-	else
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unknown vote action '%s'\n", cmd);
-		return;
-	}
+    started_new_vote = false;
 
-	if (started_new_vote)
-	{
-		TDM_SetupVote (ent);
-		TDM_AnnounceVote ();
-	}
+    if (!Q_stricmp (cmd, "timelimit") || !Q_stricmp (cmd, "tl"))
+        started_new_vote = TDM_VoteTimeLimit (ent);
+    else if (!Q_stricmp (cmd, "map"))
+        started_new_vote = TDM_VoteMap (ent);
+    else if (!Q_stricmp (cmd, "weapons"))
+        started_new_vote = TDM_VoteWeapons (ent);
+    else if (!Q_stricmp (cmd, "kick"))
+        started_new_vote = TDM_VoteKick (ent);
+    else if (!Q_stricmp (cmd, "powerups"))
+        started_new_vote = TDM_VotePowerups (ent);
+    else if (!Q_stricmp (cmd, "gamemode") || !Q_stricmp (cmd, "mode"))
+        started_new_vote = TDM_VoteGameMode (ent);
+    else if (!Q_stricmp (cmd, "tiemode"))
+        started_new_vote = TDM_VoteTieMode (ent);
+    else if (!Q_stricmp (cmd, "telemode"))
+        started_new_vote = TDM_VoteTeleMode (ent);
+    else if (!Q_stricmp (cmd, "switchmode"))
+        started_new_vote = TDM_VoteSwitchMode (ent);
+    else if (!Q_stricmp (cmd, "overtime") || !Q_stricmp (cmd, "ot"))
+        started_new_vote = TDM_VoteOverTimeLimit (ent);
+    else if (!Q_stricmp (cmd, "config"))
+        started_new_vote = TDM_VoteConfig (ent);
+    else if (!Q_stricmp (cmd, "webconfig"))
+        started_new_vote = TDM_VoteWebConfig (ent);
+    else if (!Q_stricmp (cmd, "chat"))
+        started_new_vote = TDM_VoteChat (ent);
+    else if (!Q_stricmp (cmd, "restart"))
+        started_new_vote = TDM_VoteRestart (ent);
+    else if (!Q_stricmp (cmd, "abort"))
+        started_new_vote = TDM_VoteAbort (ent);
+    else if (!Q_stricmp (cmd, "bugs"))
+        started_new_vote = TDM_VoteBugs (ent);
+    else if (!Q_stricmp (cmd, "shuffle") || !Q_stricmp (cmd, "randomize"))
+        started_new_vote = TDM_VoteShuffle (ent);
+    else if (!Q_stricmp (cmd, "armortimer"))
+        started_new_vote = TDM_VoteArmorTimer(ent);
+    else if (!Q_stricmp (cmd, "weapontimer"))
+        started_new_vote = TDM_VoteWeaponTimer(ent);
+    else if (!Q_stricmp (cmd, "timeoutlimit"))
+            started_new_vote = TDM_VoteTimeoutLimit(ent);
+    else if (!Q_stricmp (cmd, "yes"))
+        TDM_Vote_X (ent, VOTE_YES, "YES");
+    else if (!Q_stricmp (cmd, "no"))
+        TDM_Vote_X (ent, VOTE_NO, "NO");
+    else
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Unknown vote action '%s'\n", cmd);
+        return;
+    }
 
-	TDM_CheckVote();
+    if (started_new_vote) {
+        TDM_SetupVote (ent);
+        TDM_AnnounceVote ();
+    }
+
+    TDM_CheckVote();
 }
 
 /*
