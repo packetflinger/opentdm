@@ -894,18 +894,18 @@ char *TDM_SettingsString (void)
 	}
 	strcat (settings, "\n\n");
 
-	strcat(settings, "Armor timer enabled:   ");
-	strcat(settings, TDM_SetColorText(va("%s", ((int)g_armor_timer->value > 0) ? "yes" : "no")));
+	strcat(settings, "Armor timer:      ");
+	strcat(settings, TDM_SetColorText(va("%s", ((int)g_armor_timer->value > 0) ? "enabled" : "disabled")));
 	strcat(settings, "\n");
 
-	strcat(settings, "Weapon timer enabled:  ");
-	strcat(settings, TDM_SetColorText(va("%s", ((int)g_weapon_timer->value > 0) ? "yes" : "no")));
+	strcat(settings, "Weapon timer:     ");
+	strcat(settings, TDM_SetColorText(va("%s", ((int)g_weapon_timer->value > 0) ? "enabled" : "disabled")));
 	strcat(settings, "\n\n");
 
-	strcat (settings, va("'%s' skin: ", teaminfo[TEAM_A].name));
+	strcat (settings, va("'%s' skin:  ", teaminfo[TEAM_A].name));
 	strcat (settings, TDM_SetColorText(va("%s\n", teaminfo[TEAM_A].skin)));
 
-	strcat (settings, va("'%s' skin: ", teaminfo[TEAM_B].name));
+	strcat (settings, va("'%s' skin:  ", teaminfo[TEAM_B].name));
 	strcat (settings, TDM_SetColorText(va("%s\n", teaminfo[TEAM_B].skin)));
 
 	strcat (settings, "\n");
@@ -917,13 +917,16 @@ char *TDM_SettingsString (void)
 	strcat (settings, TDM_SetColorText(va("%s\n", telemode_text[(int)g_teleporter_nofreeze->value])));
 
 	strcat (settings, "Gameplay bugs:    ");
-	strcat (settings, TDM_SetColorText(va("%s\n", bugs_text[(int)g_bugs->value])));
+	strcat (settings, TDM_SetColorText(va("%s\n\n", bugs_text[(int)g_bugs->value])));
+
+	strcat (settings, "Timeouts:         ");
+	strcat (settings, TDM_SetColorText(va("%s\n", ((int)g_timeout_captain->value > 0) ? "captains only" : "all players")));
 
 	strcat (settings, "Timeout limits:   ");
 	if (g_timeout_limit->value) {
-		strcat (settings, TDM_SetColorText(va("%d per player\n", (int)g_timeout_limit->value)));
+		strcat (settings, TDM_SetColorText(va("%d per player\n\n", (int)g_timeout_limit->value)));
 	} else {
-		strcat (settings, TDM_SetColorText(va("unlimited\n")));
+		strcat (settings, TDM_SetColorText(va("unlimited\n\n")));
 	}
 
 	if (TDM_Is1V1())

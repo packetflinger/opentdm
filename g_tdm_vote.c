@@ -279,6 +279,12 @@ void TDM_ApplyVote (void)
 		gi.bprintf(PRINT_HIGH, "Per-player timeout limit set to %d\n", vote.timeoutlimit);
 	}
 
+    if (vote.flags & VOTE_TIMEOUT_CAPTAIN) {
+        sprintf(value, "%d", vote.timeoutcaptain);
+        g_timeout_limit = gi.cvar_set("g_timeout_captain", va("%d", vote.timeoutcaptain));
+        gi.bprintf(PRINT_HIGH, "%s\n", (value) ? "Captains only can call timeout" : "Any player can call timeout");
+    }
+
 	if (vote.flags & VOTE_ABORT)
 	{
 abort:
@@ -594,6 +600,18 @@ static void TDM_AnnounceVote (void)
 			strcat(what, "disable weapon timer");
 		}
 	}
+
+    if (vote.flags & VOTE_TIMEOUT_CAPTAIN) {
+        if (what[0]) {
+            strcat (what, ", ");
+        }
+
+        if (vote.timeoutcaptain) {
+            strcat(what, "only captains can timeout");
+        } else {
+            strcat(what, "players can timeout");
+        }
+    }
 
 	if (vote.flags & VOTE_TIMEOUT_LIMIT) {
 		if (what[0]) {
@@ -2100,6 +2118,30 @@ qboolean TDM_VoteWeaponTimer(edict_t *ent) {
 	return true;
 }
 
+qboolean TDM_VoteTimeoutCaptain(edict_t *ent) {
+    const char *value;
+
+    if (!((int) g_vote_mask->value & VOTE_TIMEOUT_CAPTAIN) && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Voting timeout behavior is not allowed in server config\n");
+        return false;
+    }
+
+    value = gi.argv(2);
+    if (!value[0]) {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1>\n  (0=everyone allowed, 1=captains only)\n", gi.argv(1));
+        return false;
+    }
+
+    if (!Q_stricmp(value, "1") || !Q_stricmp(value, "yes")) {
+        vote.timeoutcaptain = 1;
+    } else {
+        vote.timeoutcaptain = 0;
+    }
+
+    vote.flags |= VOTE_TIMEOUT_CAPTAIN;
+    return true;
+}
+
 qboolean TDM_VoteTimeoutLimit(edict_t *ent) {
 	const char *value;
 	int intvalue;
@@ -2176,6 +2218,7 @@ void TDM_Vote_f (edict_t *ent)
                 "  armortimer <0/1>\n"
                 "  weapontimer <0/1>\n"
                 "  timeoutlimit <integer> (per player; 0 == unlimited)\n"
+                "  timeoutcaptain <0/1>\n"
                 );
             return;
         }
@@ -2275,6 +2318,8 @@ void TDM_Vote_f (edict_t *ent)
         started_new_vote = TDM_VoteWeaponTimer(ent);
     else if (!Q_stricmp (cmd, "timeoutlimit"))
         started_new_vote = TDM_VoteTimeoutLimit(ent);
+    else if (!Q_stricmp(cmd, "timeoutcaptain"))
+        started_new_vote = TDM_VoteTimeoutCaptain(ent);
     else if (!Q_stricmp (cmd, "yes"))
         TDM_Vote_X (ent, VOTE_YES, "YES");
     else if (!Q_stricmp (cmd, "no"))
@@ -2621,6 +2666,9 @@ qboolean TDM_ParseVoteConfigLine (char *line, int line_number, void *param)
     } else if (!strcmp(variable, "weapon_timer")) {
         c->settings.armor_timer = atoi(p);
         c->settings.flags |= VOTE_WEAPON_TIMER;
+    } else if (!strcmp(variable, "timeout_captain")) {
+        c->settings.timeoutcaptain = atoi(p);
+        c->settings.flags |= VOTE_TIMEOUT_CAPTAIN;
     } else {
         gi.dprintf ("WARNING: Unknown variable '%s' on line %d of web config. Check you are using the latest version of OpenTDM.\n", variable, line_number);
         //return false;

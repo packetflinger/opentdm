@@ -126,3 +126,4 @@ extern char     **tdm_configlist;
 #define VOTE_ARMOR_TIMER        0x100000
 #define VOTE_WEAPON_TIMER       0x200000
 #define VOTE_TIMEOUT_LIMIT      0x400000
+#define VOTE_TIMEOUT_CAPTAIN    0x800000

@@ -1254,6 +1254,7 @@ typedef struct vote_s
     int             armor_timer;
     int             weapon_timer;
     int             timeoutlimit;
+    int             timeoutcaptain;
 } vote_t;
 
 typedef struct vote_menu_s
