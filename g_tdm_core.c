@@ -1114,41 +1114,42 @@ const char *TDM_MakeDemoName (edict_t *ent)
 
 char *TDM_MakeServerDemoName(void)
 {
-	int			i;
-	size_t		len;
-	struct tm	*ts;
-	time_t		t;
-	cvar_t		*demohostname;
-	static char	string[1400];
+    int         i;
+    size_t      len;
+    struct tm   *ts;
+    time_t      t;
+    cvar_t      *demohostname;
+    static char string[1400];
 
-	demohostname = gi.cvar("g_demo_hostname", "noname", 0);
+    demohostname = gi.cvar("g_demo_hostname", "noname", 0);
 
-	t = time (NULL);
-	ts = localtime (&t);
+    t = time(NULL);
+    ts = localtime(&t);
 
-	// servershortname_date-time_map
-	Com_sprintf (string, sizeof(string), "%s_%d%02d%02d-%02d%02d%02d_%s",
-		demohostname->string,
-		ts->tm_year + 1900,
-		ts->tm_mon + 1,
-		ts->tm_mday,
-		ts->tm_hour,
-		ts->tm_min,
-		ts->tm_sec,
-		level.mapname
-	);
+    // servershortname_date-time_map
+    Com_sprintf(string, sizeof(string), "%s_%d%02d%02d-%02d%02d%02d_%s",
+        demohostname->string,
+        ts->tm_year + 1900,
+        ts->tm_mon + 1,
+        ts->tm_mday,
+        ts->tm_hour,
+        ts->tm_min,
+        ts->tm_sec,
+        level.mapname
+    );
 
-	// filter not allowed characters
-	len = strlen(string);
+    // filter not allowed characters
+    len = strlen(string);
 
-	for (i = 0; i < len; i++) {
-		if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
-				string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
-				string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ')
-			string[i] = '_';
-	}
+    for (i = 0; i < len; i++) {
+        if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
+                string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
+                string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ') {
+            string[i] = '_';
+        }
+    }
 
-	return string;
+    return string;
 }
 /*
 ==============
