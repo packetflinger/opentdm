@@ -1126,15 +1126,16 @@ char *TDM_MakeServerDemoName(void)
 	t = time (NULL);
 	ts = localtime (&t);
 
-	// team1-team2_server_map_date-time
-	Com_sprintf (string, sizeof(string), "%s_%d%02d%02d-%02d%02d%02d",
+	// servershortname_date-time_map
+	Com_sprintf (string, sizeof(string), "%s_%d%02d%02d-%02d%02d%02d_%s",
 		demohostname->string,
 		ts->tm_year + 1900,
 		ts->tm_mon + 1,
 		ts->tm_mday,
 		ts->tm_hour,
 		ts->tm_min,
-		ts->tm_sec
+		ts->tm_sec,
+		level.mapname
 	);
 
 	// filter not allowed characters
