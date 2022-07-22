@@ -282,7 +282,7 @@ void TDM_ApplyVote (void)
     if (vote.flags & VOTE_TIMEOUT_CAPTAIN) {
         sprintf(value, "%d", vote.timeoutcaptain);
         g_timeout_limit = gi.cvar_set("g_timeout_captain", va("%d", vote.timeoutcaptain));
-        gi.bprintf(PRINT_HIGH, "%s\n", (value) ? "Captains only can call timeout" : "Any player can call timeout");
+        gi.bprintf(PRINT_HIGH, "%s\n", (vote.timeoutcaptain) ? "Captains only can call timeout" : "Any player can call timeout");
     }
 
 	if (vote.flags & VOTE_ABORT)
