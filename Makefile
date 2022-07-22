@@ -37,8 +37,8 @@ RCFLAGS += -DOPENTDM_VERSION='\"$(VER)\"' -DOPENTDM_REVISION=$(REV)
 ifdef CONFIG_HTTP
     CURL_CFLAGS ?= $(shell pkg-config libcurl --cflags)
     CURL_LIBS ?= $(shell pkg-config libcurl --libs)
-    CFLAGS += -DHAVE_CURL $(CURL_CFLAGS)
-    LIBS += $(CURL_LIBS)
+    CFLAGS += -DHAVE_CURL $(CURL_CFLAGS) -DCURL_STATICLIB
+    LIBS += deps/$(CPU)/libcurl.a-7.82.0
 endif
 
 OBJS := g_chase.o g_cmds.o g_combat.o g_func.o g_items.o g_main.o g_misc.o \
