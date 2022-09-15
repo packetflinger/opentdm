@@ -131,9 +131,10 @@ typedef enum {
 
 #define IGNORING(ent, x)    ((ent->client->pers.ignore & IGNORE_CHAT_##x) != 0)
 
-#define GAMEMODE_TDM   0
-#define GAMEMODE_ITDM  1
-#define GAMEMODE_1V1   2
+#define GAMEMODE_TDM    0
+#define GAMEMODE_ITDM   1
+#define GAMEMODE_1V1    2
+#define GAMEMODE_KOTH   3
 
 #define CS_TDM_SPECTATOR_STRINGS    (CS_GENERAL + MAX_CLIENTS)
 #define CS_TDM_TEAM_A_NAME          (CS_GENERAL + 0)
