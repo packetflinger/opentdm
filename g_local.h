@@ -644,6 +644,8 @@ extern  spawn_temp_t    st;
 extern  int sm_meat_index;
 extern  int snd_fry;
 
+extern gclient_t *challengerQueue;
+
 // means of death
 #define MOD_UNKNOWN         0
 #define MOD_BLASTER         1
@@ -755,10 +757,12 @@ extern cvar_t   *g_weapon_timer;
 extern cvar_t   *g_timeout_limit;
 extern cvar_t   *g_timeout_captain;
 extern cvar_t   *g_highlight_captain;
+extern cvar_t *g_queuesize;
 
 extern cvar_t   *g_tdmflags;
 extern cvar_t   *g_itdmflags;
 extern cvar_t   *g_1v1flags;
+extern cvar_t *g_queueflags;
 
 extern cvar_t   *g_itemflags;
 extern cvar_t   *g_powerupflags;

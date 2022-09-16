@@ -246,7 +246,7 @@ void InitGame (void)
     // stuff record command at start of match and stop at intermission
     g_force_record = gi.cvar("g_force_record", "0", 0);
 
-    // TDM, 1v1, Insta
+    // TDM, 1v1, Insta, KOTH
     g_gamemode = gi.cvar("g_gamemode", "0", CVAR_LATCH);
     g_gamemode->modified = false;
 
@@ -315,6 +315,12 @@ void InitGame (void)
 
     // powerups removed (bitmask)
     g_powerupflags = gi.cvar("g_powerupflags", "0", 0);
+
+    // dmflags for koth mode
+    g_queueflags = gi.cvar("q_queueflags", "0", CVAR_NONE);
+
+    // the max number of players in the challenger queue
+    g_queuesize = gi.cvar("g_queuesize", "10", CVAR_LATCH);
 
     // whether server should record multi-view demo of matches
     g_record_mvd = gi.cvar("g_record_mvd", "0", 0);

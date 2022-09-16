@@ -103,10 +103,12 @@ cvar_t	*g_weapon_timer;
 cvar_t	*g_timeout_limit;
 cvar_t  *g_timeout_captain;
 cvar_t	*g_highlight_captain;
+cvar_t *g_queuesize;
 
 cvar_t	*g_tdmflags;
 cvar_t	*g_itdmflags;
 cvar_t	*g_1v1flags;
+cvar_t *g_queueflags;
 
 cvar_t	*g_itemflags;
 cvar_t	*g_powerupflags;
@@ -156,6 +158,8 @@ cvar_t	*g_1v1_spawn_mode;
 cvar_t	*g_tdm_spawn_mode;
 
 cvar_t	*sv_mvd_enable;
+
+gclient_t *challengerQueue;
 
 void SpawnEntities (const char *mapname, const char *entities, const char *spawnpoint);
 void ClientThink (edict_t *ent, usercmd_t *cmd);
