@@ -969,18 +969,22 @@ A config was execed, update our internal state.
 */
 void TDM_SV_ApplySettings_f (void)
 {
-	if (g_gamemode->latched_string) //can't use latched_string directly, cvar_forceset frees it
-		gi.cvar_forceset ("g_gamemode", va ("%d", atoi(g_gamemode->latched_string)));
+    if (g_gamemode->latched_string) { //can't use latched_string directly, cvar_forceset frees it
+        gi.cvar_forceset ("g_gamemode", va ("%d", atoi(g_gamemode->latched_string)));
+    }
 
-	if (g_gamemode->value == GAMEMODE_ITDM)
-		dmflags = gi.cvar_set ("dmflags", g_itdmflags->string);
-	else if (g_gamemode->value == GAMEMODE_TDM)
-		dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
-	else if (g_gamemode->value == GAMEMODE_1V1)
-		dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
+    if (g_gamemode->value == GAMEMODE_ITDM) {
+        dmflags = gi.cvar_set ("dmflags", g_itdmflags->string);
+    } else if (g_gamemode->value == GAMEMODE_TDM) {
+        dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
+    } else if (g_gamemode->value == GAMEMODE_1V1) {
+        dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
+    } else if (g_gamemode->value == GAMEMODE_KOTH) {
+        dmflags = gi.cvar_set ("dmflags", g_queueflags->string);
+    }
 
-	TDM_ResetGameState ();
-	TDM_UpdateConfigStrings (true);
+    TDM_ResetGameState ();
+    TDM_UpdateConfigStrings (true);
 }
 
 /*
@@ -1080,6 +1084,12 @@ void TDM_Teamname_f (edict_t *ent)
 		return;
 	}
 
+    if (g_gamemode->value == GAMEMODE_KOTH)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "This command is unavailable in KOTH mode.\n");
+        return;
+    }
+
 	if (teaminfo[ent->client->pers.team].captain != ent && !ent->client->pers.admin)
 	{
 		gi.cprintf (ent, PRINT_HIGH, "Only team captains or admins can change teamname.\n");
@@ -1177,6 +1187,12 @@ void TDM_Lockteam_f (edict_t *ent, qboolean lock)
 		gi.cprintf (ent, PRINT_HIGH, "This command is unavailable in 1v1 mode.\n");
 		return;
 	}
+
+	if (g_gamemode->value == GAMEMODE_KOTH)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "This command is unavailable in KOTH mode.\n");
+        return;
+    }
 
 	if (teaminfo[ent->client->pers.team].captain != ent && !ent->client->pers.admin)
 	{
@@ -1553,6 +1569,12 @@ void TDM_KickPlayer_f (edict_t *ent)
 		return;
 	}
 
+	if (g_gamemode->value == GAMEMODE_KOTH)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "This command is unavailable in KOTH mode.\n");
+        return;
+    }
+
 	if (teaminfo[ent->client->pers.team].captain != ent && !ent->client->pers.admin)
 	{
 		gi.cprintf (ent, PRINT_HIGH, "Only team captains or admins can kick players.\n");
@@ -1663,6 +1685,12 @@ void TDM_Captain_f (edict_t *ent)
 		gi.cprintf (ent, PRINT_HIGH, "This command is unavailable in 1v1 mode.\n");
 		return;
 	}
+
+	if (g_gamemode->value == GAMEMODE_KOTH)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "This command is unavailable in KOTH mode.\n");
+        return;
+    }
 
 	if (gi.argc() < 2)
 	{

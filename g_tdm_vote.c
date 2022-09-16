@@ -158,6 +158,8 @@ void TDM_ApplyVote (void)
 			dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
 		else if (vote.gamemode == GAMEMODE_1V1)
 			dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
+		else if (vote.gamemode == GAMEMODE_KOTH)
+		    dmflags = gi.cvar_set ("dmflags", g_queueflags->string);
 
 		//we force it here since we're in warmup and we know what we're doing.
 		//g_gamemode is latched otherwise to prevent server op from changing it
@@ -165,7 +167,7 @@ void TDM_ApplyVote (void)
 		gi.cvar_forceset ("g_gamemode", va ("%d", vote.gamemode));
 
 		//0000129: Possible to start 1v1 with more than 2 players 
-		if (vote.gamemode == GAMEMODE_1V1)
+		if (vote.gamemode == GAMEMODE_1V1 || vote.gamemode == GAMEMODE_KOTH)
 		{
 			edict_t	*ent;
 			int		i;
@@ -466,6 +468,8 @@ static void TDM_AnnounceVote (void)
 			strcat (what, "mode ITDM");
 		else if (vote.gamemode == GAMEMODE_1V1)
 			strcat (what, "mode 1v1");
+		else if (vote.gamemode == GAMEMODE_KOTH)
+		    strcat (what, "mode KOTH");
 	}
 
 	if (vote.flags & VOTE_TIEMODE)
@@ -1134,6 +1138,8 @@ qboolean TDM_VoteGameMode (edict_t *ent)
 		gamemode = GAMEMODE_ITDM;
 	else if (!Q_stricmp (value, "1v1") || !Q_stricmp (value, "duel"))
 		gamemode = GAMEMODE_1V1;
+	else if (!Q_stricmp (value, "koth") || !Q_stricmp (value, "queue"))
+	    gamemode = GAMEMODE_KOTH;
 	else
 	{
 		gi.cprintf (ent, PRINT_HIGH, "Unknown game mode: %s\n", value);

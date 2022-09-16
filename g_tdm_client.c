@@ -175,6 +175,12 @@ qboolean CanJoin (edict_t *ent, unsigned team)
 		return false;
 	}
 
+	if (g_gamemode->value == GAMEMODE_KOTH && teaminfo[team].captain)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Only one player is allowed on each team in KOTH mode.\n");
+        return false;
+    }
+
 	if (ent->client->pers.mvdclient)
 	{
 		gi.cprintf (ent, PRINT_HIGH, "MVD clients cannot join a team.\n");

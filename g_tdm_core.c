@@ -1552,6 +1552,8 @@ void TDM_UpdateServerInfo (void)
 		gi.cvar_forceset("match_type", "Duel");
 	else if (g_gamemode->value == GAMEMODE_ITDM)
 		gi.cvar_forceset("match_type", "ITDM");
+	else if (g_gamemode->value == GAMEMODE_KOTH)
+	        gi.cvar_forceset("match_type", "KOTH");
 	else
 		gi.cvar_forceset("match_type", "N/A");
 }
@@ -1980,6 +1982,13 @@ if two players start a 1v1 game while in game mode TDM.
 void TDM_UpdateTeamNames (void)
 {
 	edict_t	*ent;
+	if (g_gamemode->value == GAMEMODE_KOTH) {
+	    Q_strncpy(teaminfo[TEAM_A].name, "Champion", 8);
+	    Q_strncpy(teaminfo[TEAM_B].name, "Challenger", 10);
+
+	    g_team_a_name->modified = true;
+	    g_team_b_name->modified = true;
+	}
 
 	if (g_gamemode->value == GAMEMODE_1V1)
 	{
@@ -2113,6 +2122,8 @@ void TDM_ResetVotableVariables (void)
 		dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
 	else if (g_gamemode->value == GAMEMODE_1V1)
 		dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
+	else if (g_gamemode->value == GAMEMODE_KOTH)
+	        dmflags = gi.cvar_set ("dmflags", g_queueflags->string);
 
 	gi.AddCommandString ("exec defaults.cfg\nsv applysettings\n");
 
