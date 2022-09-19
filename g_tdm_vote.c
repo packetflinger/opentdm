@@ -643,29 +643,29 @@ Reset vote and all players' votes.
 */
 void TDM_RemoveVote (void)
 {
-	edict_t	*ent;
-	edict_t	*initiator;
+    edict_t	*ent;
+    edict_t	*initiator;
 
-	//only track failed votes for anti-spam
-	if (vote.success != VOTE_SUCCESS)
-		initiator = vote.initiator;
-	else
-		initiator = NULL;
+    //only track failed votes for anti-spam
+    if (vote.success != VOTE_SUCCESS)
+        initiator = vote.initiator;
+    else
+        initiator = NULL;
 
-	memset (&vote, 0, sizeof(vote));
+    memset (&vote, 0, sizeof(vote));
 
-	vote.last_initiator = initiator;
-	vote.last_vote_end_frame = level.framenum;
+    vote.last_initiator = initiator;
+    vote.last_vote_end_frame = level.framenum;
 
-	for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-	{
-		if (!ent->inuse)
-			continue;
-		
-		ent->client->resp.vote = VOTE_HOLD;
-	}
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
+    {
+        if (!ent->inuse)
+            continue;
 
-	TDM_UpdateVoteConfigString ();
+        ent->client->resp.vote = VOTE_HOLD;
+    }
+
+    TDM_UpdateVoteConfigString ();
 }
 
 /*
@@ -676,57 +676,57 @@ Vote to change the timelimit.
 */
 qboolean TDM_VoteTimeLimit (edict_t *ent)
 {
-	const char		*value;
-	unsigned		limit;
+    const char		*value;
+    unsigned		limit;
 
-	if (!((int)g_vote_mask->value & VOTE_TIMELIMIT) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for timelimit is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_TIMELIMIT) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for timelimit is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <mins>\n", gi.argv(0));
-		return false;
-	}
+    value = gi.argv(2);
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <mins>\n", gi.argv(0));
+        return false;
+    }
 
-	limit = strtoul (value, NULL, 10);
+    limit = strtoul (value, NULL, 10);
 
-	//one day should be sufficient.. :)
-	if (limit < 1 || limit > 1440)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Invalid timelimit value.\n");
-		return false;
-	}
+    //one day should be sufficient.. :)
+    if (limit < 1 || limit > 1440)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Invalid timelimit value.\n");
+        return false;
+    }
 
-	//check current timelimit
-	if (g_match_time->value == limit * 60)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Timelimit is already at %d minute%s.\n", limit, limit == 1 ? "" : "s");
-		return false;
-	}
+    //check current timelimit
+    if (g_match_time->value == limit * 60)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Timelimit is already at %d minute%s.\n", limit, limit == 1 ? "" : "s");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (limit == vote.newtimelimit)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that timelimit.\n");
-			return false;
-		}
+    if (vote.active)
+    {
+        if (limit == vote.newtimelimit)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that timelimit.\n");
+            return false;
+        }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;			
-		
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-	vote.flags |= VOTE_TIMELIMIT;
-	vote.newtimelimit = limit;
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	return true;
+    vote.flags |= VOTE_TIMELIMIT;
+    vote.newtimelimit = limit;
+
+    return true;
 }
 
 /*
@@ -737,53 +737,53 @@ Vote to change the map. Causes an intermission for reasons unknown :).
 */
 qboolean TDM_VoteMap (edict_t *ent)
 {
-	const char	*value;
+    const char	*value;
 
-	if (!((int)g_vote_mask->value & VOTE_MAP) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for map is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_MAP) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for map is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		if (tdm_maplist != NULL)
-			TDM_WriteMaplist (ent);
-			
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote map <mapname>\n");
-		return false;
-	}
+    if (!value[0])
+    {
+        if (tdm_maplist != NULL)
+            TDM_WriteMaplist (ent);
 
-	if (!TDM_Checkmap (ent, value))
-		return false;
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote map <mapname>\n");
+        return false;
+    }
 
-	if (!strcmp (level.mapname, value))
-	{
-		gi.cprintf (ent, PRINT_HIGH, "You're already playing on %s!\n", value);
-		return false;
-	}
+    if (!TDM_Checkmap (ent, value))
+        return false;
 
-	if (vote.active)
-	{
-		if (!strcmp (vote.newmap , value))
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for %s.\n", value);
-			return false;
-		}
+    if (!strcmp (level.mapname, value))
+    {
+        gi.cprintf (ent, PRINT_HIGH, "You're already playing on %s!\n", value);
+        return false;
+    }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
+    if (vote.active)
+    {
+        if (!strcmp (vote.newmap , value))
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for %s.\n", value);
+            return false;
+        }
 
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-	strcpy (vote.newmap, value);
-	vote.flags |= VOTE_MAP;
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	return true;
+    strcpy (vote.newmap, value);
+    vote.flags |= VOTE_MAP;
+
+    return true;
 }
 
 /*
@@ -794,133 +794,133 @@ Vote to set which weapons are allowed.
 */
 qboolean TDM_VoteWeapons (edict_t *ent)
 {
-	char		modifier;
-	unsigned	flags;
-	int			i, j;
-	qboolean	found;
-	const char	*value;
+    char		modifier;
+    unsigned	flags;
+    int			i, j;
+    qboolean	found;
+    const char	*value;
 
-	if (!((int)g_vote_mask->value & VOTE_WEAPONS) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for weapons is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_WEAPONS) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for weapons is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote weapons <+/-><rg,cg,rl,..>\n");
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote weapons <+/-><rg,cg,rl,..>\n");
+        return false;
+    }
 
-	//example weapons string, -ssg -bfg +rl
-	//special string "all" sets all, eg -all +rg
-	flags = (unsigned)g_itemflags->value;
+    //example weapons string, -ssg -bfg +rl
+    //special string "all" sets all, eg -all +rg
+    flags = (unsigned)g_itemflags->value;
 
-	for (i = 2; i < gi.argc(); i++)
-	{
-		value = gi.argv (i);
+    for (i = 2; i < gi.argc(); i++)
+    {
+        value = gi.argv (i);
 
-		if (!value[0])
-			break;
+        if (!value[0])
+            break;
 
-		modifier = value[0];
-		if (modifier == '+' || modifier == '-')
-			value++;
-		else
-			modifier = '+';
+        modifier = value[0];
+        if (modifier == '+' || modifier == '-')
+            value++;
+        else
+            modifier = '+';
 
-		found = false;
+        found = false;
 
-		for (j = 0; j < sizeof(weaponvotes) / sizeof(weaponvotes[0]); j++)
-		{
-			if (!Q_stricmp (value, weaponvotes[j].names[0]) ||
-				!Q_stricmp (value, weaponvotes[j].names[1]))
-			{
-				if (modifier == '-')
-					flags |= weaponvotes[j].value;
-				else if (modifier == '+')
-					flags &= ~weaponvotes[j].value;
+        for (j = 0; j < sizeof(weaponvotes) / sizeof(weaponvotes[0]); j++)
+        {
+            if (!Q_stricmp (value, weaponvotes[j].names[0]) ||
+                !Q_stricmp (value, weaponvotes[j].names[1]))
+            {
+                if (modifier == '-')
+                    flags |= weaponvotes[j].value;
+                else if (modifier == '+')
+                    flags &= ~weaponvotes[j].value;
 
-				found = true;
-				break;
-			}
-		}
+                found = true;
+                break;
+            }
+        }
 
-		if (!found)
-		{
-			if (!Q_stricmp (value, "all"))
-			{
-				if (modifier == '-')
-					flags = 0xFFFFFFFFU;
-				else
-					flags = 0;
-			}
-			else
-			{
-				gi.cprintf (ent, PRINT_HIGH, "Unknown weapon '%s'\n", value);
-				return false;
-			}
-		}
-	}
+        if (!found)
+        {
+            if (!Q_stricmp (value, "all"))
+            {
+                if (modifier == '-')
+                    flags = 0xFFFFFFFFU;
+                else
+                    flags = 0;
+            }
+            else
+            {
+                gi.cprintf (ent, PRINT_HIGH, "Unknown weapon '%s'\n", value);
+                return false;
+            }
+        }
+    }
 
-	if ((flags & WEAPON_SHOTGUN) && (flags & WEAPON_SSHOTGUN))
-		flags |= AMMO_SHELLS;
-	else
-		flags &= ~AMMO_SHELLS;
+    if ((flags & WEAPON_SHOTGUN) && (flags & WEAPON_SSHOTGUN))
+        flags |= AMMO_SHELLS;
+    else
+        flags &= ~AMMO_SHELLS;
 
-	if ((flags & WEAPON_MACHINEGUN) && (flags & WEAPON_CHAINGUN))
-		flags |= AMMO_BULLETS;
-	else
-		flags &= ~AMMO_BULLETS;
+    if ((flags & WEAPON_MACHINEGUN) && (flags & WEAPON_CHAINGUN))
+        flags |= AMMO_BULLETS;
+    else
+        flags &= ~AMMO_BULLETS;
 
-	if ((flags & WEAPON_GRENADES) && (flags & WEAPON_GRENADELAUNCHER))
-		flags |= AMMO_GRENADES;
-	else
-		flags &= ~AMMO_GRENADES;
+    if ((flags & WEAPON_GRENADES) && (flags & WEAPON_GRENADELAUNCHER))
+        flags |= AMMO_GRENADES;
+    else
+        flags &= ~AMMO_GRENADES;
 
-	if (flags & WEAPON_ROCKETLAUNCHER)
-		flags |= AMMO_ROCKETS;
-	else
-		flags &= ~AMMO_ROCKETS;
+    if (flags & WEAPON_ROCKETLAUNCHER)
+        flags |= AMMO_ROCKETS;
+    else
+        flags &= ~AMMO_ROCKETS;
 
-	if (flags & WEAPON_RAILGUN)
-		flags |= AMMO_SLUGS;
-	else
-		flags &= ~AMMO_SLUGS;
+    if (flags & WEAPON_RAILGUN)
+        flags |= AMMO_SLUGS;
+    else
+        flags &= ~AMMO_SLUGS;
 
-	if ((flags & WEAPON_BFG10K) && (flags & WEAPON_HYPERBLASTER) &&
-		((unsigned)g_powerupflags->value & POWERUP_POWERSCREEN) && ((unsigned)g_powerupflags->value & POWERUP_POWERSHIELD))
-		flags |= AMMO_CELLS;
-	else
-		flags &= ~AMMO_CELLS;
+    if ((flags & WEAPON_BFG10K) && (flags & WEAPON_HYPERBLASTER) &&
+        ((unsigned)g_powerupflags->value & POWERUP_POWERSCREEN) && ((unsigned)g_powerupflags->value & POWERUP_POWERSHIELD))
+        flags |= AMMO_CELLS;
+    else
+        flags &= ~AMMO_CELLS;
 
-	if (flags == (unsigned)g_itemflags->value)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That weapon config is already set!\n");
-		return false;
-	}
+    if (flags == (unsigned)g_itemflags->value)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That weapon config is already set!\n");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (flags == vote.newweaponflags)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that weapon config.\n");
-			return false;
-		}
+    if (vote.active)
+    {
+        if (flags == vote.newweaponflags)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that weapon config.\n");
+            return false;
+        }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	vote.newweaponflags = flags;
-	vote.flags |= VOTE_WEAPONS;
+    vote.newweaponflags = flags;
+    vote.flags |= VOTE_WEAPONS;
 
-	return true;
+    return true;
 }
 
 /*
@@ -931,60 +931,60 @@ Vote to kick someone from the server.
 */
 qboolean TDM_VoteKick (edict_t *ent)
 {
-	edict_t		*victim;
-	const char	*value;
+    edict_t		*victim;
+    const char	*value;
 
-	if (!((int)g_vote_mask->value & VOTE_KICK) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for player kick is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_KICK) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for player kick is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote kick <name/id>\n");
-		TDM_PrintPlayers (ent);
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote kick <name/id>\n");
+        TDM_PrintPlayers (ent);
+        return false;
+    }
 
-	if (LookupPlayer (gi.argv(2), &victim, ent))
-	{
-		if (victim->client->pers.admin)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You can't kick an admin!\n");
-			return false;
-		}
+    if (LookupPlayer (gi.argv(2), &victim, ent))
+    {
+        if (victim->client->pers.admin)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You can't kick an admin!\n");
+            return false;
+        }
 
-		if (victim == ent)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You can't kick yourself!\n");
-			return false;
-		}
+        if (victim == ent)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You can't kick yourself!\n");
+            return false;
+        }
 
-		if (vote.active)
-		{
-			if (victim == vote.victim)
-			{
-				gi.cprintf (ent, PRINT_HIGH, "You've already started a vote to kick %s.\n", vote.victim->client->pers.netname);
-				return false;
-			}
+        if (vote.active)
+        {
+            if (victim == vote.victim)
+            {
+                gi.cprintf (ent, PRINT_HIGH, "You've already started a vote to kick %s.\n", vote.victim->client->pers.netname);
+                return false;
+            }
 
-			if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-				return false;
+            if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+                return false;
 
-			gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-			TDM_RemoveVote ();
-		}
+            gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+            TDM_RemoveVote ();
+        }
 
-		vote.victim = victim;
-		vote.flags |= VOTE_KICK;
+        vote.victim = victim;
+        vote.flags |= VOTE_KICK;
 
-		return true;
-	}
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 /*
@@ -995,112 +995,112 @@ Vote to change the allowed powerups.
 */
 qboolean TDM_VotePowerups (edict_t *ent)
 {
-	char		modifier;
-	unsigned	flags;
-	int			i, j;
-	qboolean	found;
-	const char	*value;
+    char		modifier;
+    unsigned	flags;
+    int			i, j;
+    qboolean	found;
+    const char	*value;
 
-	if (!((int)g_vote_mask->value & VOTE_POWERUPS) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for powerups is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_POWERUPS) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for powerups is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote powerups <+/-><quad,invul,ps,..>\n");
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote powerups <+/-><quad,invul,ps,..>\n");
+        return false;
+    }
 
-	flags = (unsigned)g_powerupflags->value;
+    flags = (unsigned)g_powerupflags->value;
 
-	//example powerups string, -quad -invul +silencer
-	//special string "all" sets all, eg -all +quad
+    //example powerups string, -quad -invul +silencer
+    //special string "all" sets all, eg -all +quad
 
-	for (i = 2; i < gi.argc(); i++)
-	{
-		value = gi.argv (i);
+    for (i = 2; i < gi.argc(); i++)
+    {
+        value = gi.argv (i);
 
-		if (!value[0])
-			break;
+        if (!value[0])
+            break;
 
-		// wision: consider 1 as +all and 0 as -all
-		if (!Q_stricmp (value, "1"))
-		{
-			value = "+all";
-		}
-		else if (!Q_stricmp (value, "0"))
-		{
-			value = "-all";
-		}
-		
-		modifier = value[0];
-		if (modifier == '+' || modifier == '-')
-			value++;
-		else
-			modifier = '+';
+        // wision: consider 1 as +all and 0 as -all
+        if (!Q_stricmp (value, "1"))
+        {
+            value = "+all";
+        }
+        else if (!Q_stricmp (value, "0"))
+        {
+            value = "-all";
+        }
 
-		found = false;
+        modifier = value[0];
+        if (modifier == '+' || modifier == '-')
+            value++;
+        else
+            modifier = '+';
 
-		for (j = 0; j < sizeof(powerupvotes) / sizeof(powerupvotes[0]); j++)
-		{
-			if (!Q_stricmp (value, powerupvotes[j].names[0]))
-			{
-				if (modifier == '-')
-					flags |= powerupvotes[j].value;
-				else if (modifier == '+')
-					flags &= ~powerupvotes[j].value;
+        found = false;
 
-				found = true;
-				break;
-			}
-		}
+        for (j = 0; j < sizeof(powerupvotes) / sizeof(powerupvotes[0]); j++)
+        {
+            if (!Q_stricmp (value, powerupvotes[j].names[0]))
+            {
+                if (modifier == '-')
+                    flags |= powerupvotes[j].value;
+                else if (modifier == '+')
+                    flags &= ~powerupvotes[j].value;
 
-		if (!found)
-		{
-			if (!Q_stricmp (value, "all"))
-			{
-				if (modifier == '-')
-					flags = 0xFFFFFFFFU;
-				else
-					flags = 0;
-			}
-			else
-			{
-				gi.cprintf (ent, PRINT_HIGH, "Unknown powerup '%s'\n", value);
-				return false;
-			}
-		}
-	}
+                found = true;
+                break;
+            }
+        }
 
-	if ((unsigned)g_powerupflags->value == flags)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That powerup config is already set!\n");
-		return false;
-	}
+        if (!found)
+        {
+            if (!Q_stricmp (value, "all"))
+            {
+                if (modifier == '-')
+                    flags = 0xFFFFFFFFU;
+                else
+                    flags = 0;
+            }
+            else
+            {
+                gi.cprintf (ent, PRINT_HIGH, "Unknown powerup '%s'\n", value);
+                return false;
+            }
+        }
+    }
 
-	if (vote.active)
-	{
-		if (flags == vote.newpowerupflags)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that powerup config.\n");
-			return false;
-		}
-		
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
-		
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+    if ((unsigned)g_powerupflags->value == flags)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That powerup config is already set!\n");
+        return false;
+    }
 
-	vote.newpowerupflags = flags;
-	vote.flags |= VOTE_POWERUPS;
+    if (vote.active)
+    {
+        if (flags == vote.newpowerupflags)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that powerup config.\n");
+            return false;
+        }
 
-	return true;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
+
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
+
+    vote.newpowerupflags = flags;
+    vote.flags |= VOTE_POWERUPS;
+
+    return true;
 }
 
 /*
@@ -1112,60 +1112,60 @@ cause a dump of all clients back to spectator mode and menu.
 */
 qboolean TDM_VoteGameMode (edict_t *ent)
 {
-	int			gamemode;
-	const char	*value;
+    int			gamemode;
+    const char	*value;
 
-	if (!((int)g_vote_mask->value & VOTE_GAMEMODE) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for game mode is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_GAMEMODE) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for game mode is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <tdm/itdm/1v1>\n", gi.argv(1));
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <tdm/itdm/1v1>\n", gi.argv(1));
+        return false;
+    }
 
-	if (!Q_stricmp (value, "tdm"))
-		gamemode = GAMEMODE_TDM;
-	else if(!Q_stricmp (value, "itdm"))
-		gamemode = GAMEMODE_ITDM;
-	else if (!Q_stricmp (value, "1v1") || !Q_stricmp (value, "duel"))
-		gamemode = GAMEMODE_1V1;
-	else
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unknown game mode: %s\n", value);
-		return false;
-	}
+    if (!Q_stricmp (value, "tdm"))
+        gamemode = GAMEMODE_TDM;
+    else if(!Q_stricmp (value, "itdm"))
+        gamemode = GAMEMODE_ITDM;
+    else if (!Q_stricmp (value, "1v1") || !Q_stricmp (value, "duel"))
+        gamemode = GAMEMODE_1V1;
+    else
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Unknown game mode: %s\n", value);
+        return false;
+    }
 
-	if ((int)g_gamemode->value == gamemode)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That game mode is already set!\n");
-		return false;
-	}
+    if ((int)g_gamemode->value == gamemode)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That game mode is already set!\n");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (vote.gamemode == gamemode)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that game mode.\n");
-			return false;
-		}
-		
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;	
-		
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+    if (vote.active)
+    {
+        if (vote.gamemode == gamemode)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that game mode.\n");
+            return false;
+        }
 
-	vote.flags |= VOTE_GAMEMODE;
-	vote.gamemode = gamemode;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-	return true;
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
+
+    vote.flags |= VOTE_GAMEMODE;
+    vote.gamemode = gamemode;
+
+    return true;
 }
 
 /*
@@ -1176,60 +1176,60 @@ Vote how ties are decided.
 */
 qboolean TDM_VoteTieMode (edict_t *ent)
 {
-	int			tiemode;
-	const char	*value;
+    int tiemode;
+    const char *value;
 
-	if (!((int)g_vote_mask->value & VOTE_TIEMODE) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for tie mode is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_TIEMODE) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for tie mode is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote tiemode <none/ot/sd>\n  none: game ties after timelimit\n  ot: overtime added until a winner\n  sd: sudden death, first frag wins\n");
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote tiemode <none/ot/sd>\n  none: game ties after timelimit\n  ot: overtime added until a winner\n  sd: sudden death, first frag wins\n");
+        return false;
+    }
 
-	if (!Q_stricmp (value, "ot") || !Q_stricmp (value, "overtime"))
-		tiemode = 1;
-	else if (!Q_stricmp (value, "sd") || !Q_stricmp (value, "sudden death"))
-		tiemode = 2;
-	else if (!Q_stricmp (value, "none") || !Q_stricmp (value, "tie") || !Q_stricmp (value, "normal"))
-		tiemode = 0;
-	else
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unknown mode: %s\n", value);
-		return false;
-	}
+    if (!Q_stricmp (value, "ot") || !Q_stricmp (value, "overtime"))
+        tiemode = 1;
+    else if (!Q_stricmp (value, "sd") || !Q_stricmp (value, "sudden death"))
+        tiemode = 2;
+    else if (!Q_stricmp (value, "none") || !Q_stricmp (value, "tie") || !Q_stricmp (value, "normal"))
+        tiemode = 0;
+    else
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Unknown mode: %s\n", value);
+        return false;
+    }
 
-	if (g_tie_mode->value == tiemode)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That tie mode is already set!\n");
-		return false;
-	}
+    if (g_tie_mode->value == tiemode)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That tie mode is already set!\n");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (tiemode == vote.tiemode)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that tie mode.\n");
-			return false;
-		}
+    if (vote.active)
+    {
+        if (tiemode == vote.tiemode)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that tie mode.\n");
+            return false;
+        }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	vote.flags |= VOTE_TIEMODE;
-	vote.tiemode = tiemode;
+    vote.flags |= VOTE_TIEMODE;
+    vote.tiemode = tiemode;
 
-	return true;
+    return true;
 }
 
 /*
@@ -1240,58 +1240,58 @@ Vote how teleporter freezing is handled.
 */
 qboolean TDM_VoteTeleMode (edict_t *ent)
 {
-	int			telemode;
-	const char	*value;
+    int			telemode;
+    const char	*value;
 
-	if (!((int)g_vote_mask->value & VOTE_TELEMODE) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for teleporter mode is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_TELEMODE) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for teleporter mode is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote telemode <normal/nofreeze>\n  normal: teleporters act like regular Q2, you freeze briefly on exit\n  nofreeze: teleporters act like Q3, your velocity is maintained on exit\n");
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote telemode <normal/nofreeze>\n  normal: teleporters act like regular Q2, you freeze briefly on exit\n  nofreeze: teleporters act like Q3, your velocity is maintained on exit\n");
+        return false;
+    }
 
-	if (!Q_stricmp (value, "normal") || !Q_stricmp (value, "freeze") || !Q_stricmp (value, "q2"))
-		telemode = 0;
-	else if (!Q_stricmp (value, "nofreeze") || !Q_stricmp (value, "q3"))
-		telemode = 1;
-	else
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unknown mode: %s\n", value);
-		return false;
-	}
+    if (!Q_stricmp (value, "normal") || !Q_stricmp (value, "freeze") || !Q_stricmp (value, "q2"))
+        telemode = 0;
+    else if (!Q_stricmp (value, "nofreeze") || !Q_stricmp (value, "q3"))
+        telemode = 1;
+    else
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Unknown mode: %s\n", value);
+        return false;
+    }
 
-	if (g_teleporter_nofreeze->value == telemode)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That teleporter mode is already set!\n");
-		return false;
-	}
+    if (g_teleporter_nofreeze->value == telemode)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That teleporter mode is already set!\n");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (telemode == vote.telemode)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that teleporter mode.\n");
-			return false;
-		}
+    if (vote.active)
+    {
+        if (telemode == vote.telemode)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that teleporter mode.\n");
+            return false;
+        }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	vote.flags |= VOTE_TELEMODE;
-	vote.telemode = telemode;
+    vote.flags |= VOTE_TELEMODE;
+    vote.telemode = telemode;
 
-	return true;
+    return true;
 }
 
 /*
@@ -1302,64 +1302,64 @@ Vote how weapon switch is handled.
 */
 qboolean TDM_VoteSwitchMode (edict_t *ent)
 {
-	int			switchmode;
-	const char	*value;
+    int			switchmode;
+    const char	*value;
 
-	if (!((int)g_vote_mask->value & VOTE_SWITCHMODE) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for weapon switch mode is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_SWITCHMODE) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for weapon switch mode is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote switchmode <normal/fast/instant/insane/extreme>\n  normal: regular Q2 weapon switch speed\n  fast: weapon dropping animation is skipped\n  instant: weapon dropping / ready animations are skipped\n  insane: all non-firing animations are skipped\n  extreme: same as insane, but allow switch during firing\n");
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote switchmode <normal/fast/instant/insane/extreme>\n  normal: regular Q2 weapon switch speed\n  fast: weapon dropping animation is skipped\n  instant: weapon dropping / ready animations are skipped\n  insane: all non-firing animations are skipped\n  extreme: same as insane, but allow switch during firing\n");
+        return false;
+    }
 
-	if (!Q_stricmp (value, "fast") || !Q_stricmp (value, "faster"))
-		switchmode = 1;
-	else if (!Q_stricmp (value, "instant"))
-		switchmode = 2;
-	else if (!Q_stricmp (value, "insane"))
-		switchmode = 3;
-	else if (!Q_stricmp (value, "extreme"))
-		switchmode = 4;
-	else if (!Q_stricmp (value, "normal") || !Q_stricmp (value, "slow") || !Q_stricmp (value, "default") || !Q_stricmp (value, "q2"))
-		switchmode = 0;
-	else
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unknown switch mode: %s\n", value);
-		return false;
-	}
+    if (!Q_stricmp (value, "fast") || !Q_stricmp (value, "faster"))
+        switchmode = 1;
+    else if (!Q_stricmp (value, "instant"))
+        switchmode = 2;
+    else if (!Q_stricmp (value, "insane"))
+        switchmode = 3;
+    else if (!Q_stricmp (value, "extreme"))
+        switchmode = 4;
+    else if (!Q_stricmp (value, "normal") || !Q_stricmp (value, "slow") || !Q_stricmp (value, "default") || !Q_stricmp (value, "q2"))
+        switchmode = 0;
+    else
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Unknown switch mode: %s\n", value);
+        return false;
+    }
 
-	if (g_fast_weap_switch->value == switchmode)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That weapon switch mode is already set!\n");
-		return false;
-	}
+    if (g_fast_weap_switch->value == switchmode)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That weapon switch mode is already set!\n");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (switchmode == vote.switchmode)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that weapon switch mode.\n");
-			return false;
-		}
+    if (vote.active)
+    {
+        if (switchmode == vote.switchmode)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that weapon switch mode.\n");
+            return false;
+        }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	vote.switchmode = switchmode;
-	vote.flags |= VOTE_SWITCHMODE;
+    vote.switchmode = switchmode;
+    vote.flags |= VOTE_SWITCHMODE;
 
-	return true;
+    return true;
 }
 
 /*
@@ -1370,55 +1370,55 @@ Vote how many minutes overtime mode adds.
 */
 qboolean TDM_VoteOverTimeLimit (edict_t *ent)
 {
-	unsigned	limit;
-	const char	*value;
+    unsigned limit;
+    const char *value;
 
-	if (!((int)g_vote_mask->value & VOTE_OVERTIME) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for overtime is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_OVERTIME) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for overtime is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <mins>\n", gi.argv(1));
-		return false;
-	}
+    value = gi.argv(2);
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <mins>\n", gi.argv(1));
+        return false;
+    }
 
-	limit = atoi (value);
-	if (limit < 1 || limit > 1440)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Invalid value.\n");
-		return false;
-	}
+    limit = atoi (value);
+    if (limit < 1 || limit > 1440)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Invalid value.\n");
+        return false;
+    }
 
-	//check current timelimit
-	if (g_overtime->value == limit * 60)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Overtime is already at %d minute%s.\n", limit, limit == 1 ? "" : "s");
-		return false;
-	}
+    //check current timelimit
+    if (g_overtime->value == limit * 60)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Overtime is already at %d minute%s.\n", limit, limit == 1 ? "" : "s");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (limit == vote.overtimemins)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that overtime limit.\n");
-			return false;
-		}
+    if (vote.active)
+    {
+        if (limit == vote.overtimemins)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that overtime limit.\n");
+            return false;
+        }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	vote.flags |= VOTE_OVERTIME;
-	vote.overtimemins = limit;
+    vote.flags |= VOTE_OVERTIME;
+    vote.overtimemins = limit;
 
-	return true;
+    return true;
 }
 
 /*
@@ -1429,104 +1429,104 @@ Read available configs.
 */
 void TDM_CreateConfiglist (void)
 {
-	int				i, j= 0;
-	int				len;
-	int				entries_num = 100;
-	cvar_t			*gamedir;
-	qboolean		valid;
-	char			path[MAX_QPATH + 1];
-	const char		*filename;
-	const char		*configname;
+    int         i, j= 0;
+    int         len;
+    int         entries_num = 100;
+    cvar_t      *gamedir;
+    qboolean    valid;
+    char        path[MAX_QPATH + 1];
+    const char  *filename;
+    const char  *configname;
 
-	if (tdm_configlist)
-	{
-		gi.TagFree (tdm_configlist);
-		tdm_configlist = NULL;
-	}
+    if (tdm_configlist)
+    {
+        gi.TagFree (tdm_configlist);
+        tdm_configlist = NULL;
+    }
 
-	tdm_configlist = gi.TagMalloc (sizeof(char *) * entries_num, TAG_GAME);
+    tdm_configlist = gi.TagMalloc (sizeof(char *) * entries_num, TAG_GAME);
 
-	gamedir = gi.cvar ("gamedir", NULL, 0);
+    gamedir = gi.cvar ("gamedir", NULL, 0);
 
-	snprintf (path, sizeof(path)-1, "./%s/configs/*.cfg", gamedir->string);
-	path[sizeof(path)-1] = '\0';
+    snprintf (path, sizeof(path)-1, "./%s/configs/*.cfg", gamedir->string);
+    path[sizeof(path)-1] = '\0';
 
-	filename = Sys_FindFirst (path);
+    filename = Sys_FindFirst (path);
 
-	while (filename)
-	{
-		valid = true;
+    while (filename)
+    {
+        valid = true;
 
-		configname = strrchr (filename, '/');
-		if (!configname)
-			configname = filename;
-		else
-			configname++;
+        configname = strrchr (filename, '/');
+        if (!configname)
+            configname = filename;
+        else
+            configname++;
 
-		len = strlen (configname);
+        len = strlen (configname);
 
-		if (Q_stricmp (configname + len - 4, ".cfg"))
-			continue;
+        if (Q_stricmp (configname + len - 4, ".cfg"))
+            continue;
 
-		for (i = 0; i < len; i++)
-		{
-			if (!isalnum (configname[i]) && configname[i] != '_' && configname[i] != '-' && configname[i] != '.')
-			{
-				valid = false;
-				break;
-			}
-		}
+        for (i = 0; i < len; i++)
+        {
+            if (!isalnum (configname[i]) && configname[i] != '_' && configname[i] != '-' && configname[i] != '.')
+            {
+                valid = false;
+                break;
+            }
+        }
 
-		if (!valid)
-			continue;
+        if (!valid)
+            continue;
 
-		tdm_configlist[j] = gi.TagMalloc (strlen(configname) + 1, TAG_GAME);
-		strcpy (tdm_configlist[j], configname);
-		j++;
+        tdm_configlist[j] = gi.TagMalloc (strlen(configname) + 1, TAG_GAME);
+        strcpy (tdm_configlist[j], configname);
+        j++;
 
-		// realloc
-		if (j % entries_num == 0)
-		{
-			char	**tmp;
+        // realloc
+        if (j % entries_num == 0)
+        {
+            char	**tmp;
 
-			tmp = gi.TagMalloc (sizeof(char *) * (j + entries_num), TAG_GAME);
-			memcpy (tmp, tdm_configlist, j * sizeof(char *));
+            tmp = gi.TagMalloc (sizeof(char *) * (j + entries_num), TAG_GAME);
+            memcpy (tmp, tdm_configlist, j * sizeof(char *));
 
-			gi.TagFree (tdm_configlist);
-			tdm_configlist = tmp;
-		}
+            gi.TagFree (tdm_configlist);
+            tdm_configlist = tmp;
+        }
 
-		filename = Sys_FindNext ();
-	}
-	
-	// close before return
-	Sys_FindClose ();
+        filename = Sys_FindNext ();
+    }
 
-	// no valid configs, no config list!
-	if (j == 0)
-	{
-		gi.TagFree (tdm_configlist);
-		tdm_configlist = NULL;
-	}
-	else
-	{
-		tdm_configlist[j] = NULL;
+    // close before return
+    Sys_FindClose ();
 
-		//now generate static string
-		tdm_configlist_string[0] = '\0';
-		j = 0;
+    // no valid configs, no config list!
+    if (j == 0)
+    {
+        gi.TagFree (tdm_configlist);
+        tdm_configlist = NULL;
+    }
+    else
+    {
+        tdm_configlist[j] = NULL;
 
-		for (i = 0; tdm_configlist[i] != NULL; i++)
-		{
-			if (strlen(tdm_configlist[i]) + j >= sizeof(tdm_configlist_string)-16)
-			{
-				strcat (tdm_configlist_string, "  ...\n");
-				return;
-			}
-			sprintf (tdm_configlist_string + j, "  %s\n", tdm_configlist[i]);
-			j = strlen (tdm_configlist_string);
-		}
-	}
+        //now generate static string
+        tdm_configlist_string[0] = '\0';
+        j = 0;
+
+        for (i = 0; tdm_configlist[i] != NULL; i++)
+        {
+            if (strlen(tdm_configlist[i]) + j >= sizeof(tdm_configlist_string)-16)
+            {
+                strcat (tdm_configlist_string, "  ...\n");
+                return;
+            }
+            sprintf (tdm_configlist_string + j, "  %s\n", tdm_configlist[i]);
+            j = strlen (tdm_configlist_string);
+        }
+    }
 }
 
 /*
@@ -1538,121 +1538,83 @@ get applied at once.
 */
 qboolean TDM_VoteConfig (edict_t *ent)
 {
-	char			*value;
-	char			path[MAX_QPATH];
-	char			configname[MAX_QPATH];
-	size_t			len;
-	size_t			i;
-	FILE			*confFile;
+    char    *value;
+    char    path[MAX_QPATH];
+    char    configname[MAX_QPATH];
+    size_t  len;
+    size_t  i;
+    FILE    *confFile;
 
-	// FIXME: remove this?
-	if (!g_allow_vote_config->value)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting config is disabled.\n");
-		return false;
-	}
+    // FIXME: remove this?
+    if (!g_allow_vote_config->value)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting config is disabled.\n");
+        return false;
+    }
 
-	if (!((int)g_vote_mask->value & VOTE_CONFIG) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for config is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_CONFIG) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for config is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
-	if (!value[0])
-	{
-		if (tdm_configlist)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "Available configs:\n"
-				"------------------\n"
-				"%s\n"
-				"Usage: vote config <configname>\n", tdm_configlist_string);
-		}
-		else
-			gi.cprintf (ent, PRINT_HIGH, "No configs are available.\n");
-//			gi.cprintf (ent, PRINT_HIGH, "Usage: vote config <configname>\n");
+    value = gi.argv(2);
+    if (!value[0])
+    {
+        if (tdm_configlist)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "Available configs:\n"
+                "------------------\n"
+                "%s\n"
+                "Usage: vote config <configname>\n", tdm_configlist_string);
+        }
+        else
+            gi.cprintf (ent, PRINT_HIGH, "No configs are available.\n");
 
-		return false;
-	}
+        return false;
+    }
 
-	len = strlen (value);
+    len = strlen (value);
 
-	if (len >= MAX_QPATH - 16)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Invalid config name.\n");
-		return false;
-	}
+    if (len >= MAX_QPATH - 16)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Invalid config name.\n");
+        return false;
+    }
 
-	//strip .cfg before sanitizing
-	if (!Q_stricmp (value + len - 4, ".cfg"))
-	{
-		len -= 4;
-		*(value + len) = '\0';
-	}
+    //strip .cfg before sanitizing
+    if (!Q_stricmp (value + len - 4, ".cfg"))
+    {
+        len -= 4;
+        *(value + len) = '\0';
+    }
 
-	for (i = 0; i < len; i++)
-	{
-		if (!isalnum (value[i]) && value[i] != '_' && value[i] != '-')
-		{
-			gi.cprintf (ent, PRINT_HIGH, "Invalid config name.\n");
-			return false;
-		}
-	}
+    for (i = 0; i < len; i++)
+    {
+        if (!isalnum (value[i]) && value[i] != '_' && value[i] != '-')
+        {
+            gi.cprintf (ent, PRINT_HIGH, "Invalid config name.\n");
+            return false;
+        }
+    }
 
-	Com_sprintf (configname, sizeof(configname), "%s.cfg", value);
+    Com_sprintf (configname, sizeof(configname), "%s.cfg", value);
 
-	Com_sprintf (path, sizeof(path), "./%s/configs/%s", game.gamedir, configname);
+    Com_sprintf (path, sizeof(path), "./%s/configs/%s", game.gamedir, configname);
 
-	confFile = fopen (path, "rb");
-	if (!confFile)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Config '%s' not found on server.\n", configname);
-		return false;
-	}
+    confFile = fopen (path, "rb");
+    if (!confFile)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Config '%s' not found on server.\n", configname);
+        return false;
+    }
 
-	fclose (confFile);
+    fclose (confFile);
 
-	/*if (fseek (confFile, 0, SEEK_END))
-	{
-		fclose (confFile);
-		gi.cprintf (ent, PRINT_HIGH, "Invalid config file.\n");
-		return false;
-	}
+    strcpy (vote.configname, configname);
+    vote.flags |= VOTE_CONFIG;
 
-	len = ftell (confFile);
-
-	if (len > 8192)
-	{
-		fclose (confFile);
-		gi.cprintf (ent, PRINT_HIGH, "Invalid config file.\n");
-		return false;
-	}
-
-	rewind (confFile);
-
-	buff = gi.TagMalloc (len + 1, TAG_GAME);
-
-	fread (buff, len, 1, confFile);
-
-	fclose (confFile);
-
-	memset (&config, 0, sizeof(config));
-
-	if (!TDM_ProcessText (buff, len, TDM_ParseVoteConfigLine, &config))
-	{
-		gi.TagFree (buff);
-		gi.cprintf (ent, PRINT_HIGH, "Unable to parse config file.\n");
-		return false;
-	}
-
-	gi.TagFree (buff);
-
-	vote = config.settings;*/
-
-	strcpy (vote.configname, configname);
-	vote.flags |= VOTE_CONFIG;
-
-	return true;
+    return true;
 }		
 
 /*
@@ -1810,58 +1772,58 @@ Vote how chat is allowed.
 */
 qboolean TDM_VoteChat (edict_t *ent)
 {
-	int			chatmode;
-	const char	*value;
+    int chatmode;
+    const char *value;
 
-	if (!((int)g_vote_mask->value & VOTE_CHAT) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for chat mode is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_CHAT) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for chat mode is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote chat <all/players>\n");
-		return false;
-	}
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote chat <all/players>\n");
+        return false;
+    }
 
-	if (!Q_stricmp (value, "players") || !Q_stricmp (value, "team") || !Q_stricmp (value, "nospec") || !Q_stricmp (value, "whisper") || !Q_stricmp (value, "1"))
-		chatmode = 1;
-	else if (!Q_stricmp (value, "all") || !Q_stricmp (value, "everyone") || !Q_stricmp (value, "speak") || !Q_stricmp (value, "0"))
-		chatmode = 0;
-	else
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unknown chat mode: %s\n", value);
-		return false;
-	}
+    if (!Q_stricmp (value, "players") || !Q_stricmp (value, "team") || !Q_stricmp (value, "nospec") || !Q_stricmp (value, "whisper") || !Q_stricmp (value, "1"))
+        chatmode = 1;
+    else if (!Q_stricmp (value, "all") || !Q_stricmp (value, "everyone") || !Q_stricmp (value, "speak") || !Q_stricmp (value, "0"))
+        chatmode = 0;
+    else
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Unknown chat mode: %s\n", value);
+        return false;
+    }
 
-	if (g_chat_mode->value == chatmode)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That chat mode is already set!\n");
-		return false;
-	}
+    if (g_chat_mode->value == chatmode)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That chat mode is already set!\n");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (chatmode == vote.newchatmode)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that chat mode.\n");
-			return false;
-		}
+    if (vote.active)
+    {
+        if (chatmode == vote.newchatmode)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that chat mode.\n");
+            return false;
+        }
 
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
 
-	vote.newchatmode = chatmode;
-	vote.flags |= VOTE_CHAT;
+    vote.newchatmode = chatmode;
+    vote.flags |= VOTE_CHAT;
 
-	return true;
+    return true;
 }
 
 /*
@@ -1872,33 +1834,33 @@ Vote to restart the match.
 */
 qboolean TDM_VoteRestart (edict_t *ent)
 {
-	if (!((int)g_vote_mask->value & VOTE_RESTART) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for match restart is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_RESTART) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for match restart is not allowed on this server.\n");
+        return false;
+    }
 
-	if (tdm_match_status < MM_PLAYING || tdm_match_status >= MM_SCOREBOARD)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "No match to restart!\n");
-		return false;
-	}
+    if (tdm_match_status < MM_PLAYING || tdm_match_status >= MM_SCOREBOARD)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "No match to restart!\n");
+        return false;
+    }
 
-	if (!ent->client->pers.team && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Only players in the match can vote for a restart.\n");
-		return false;
-	}
+    if (!ent->client->pers.team && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Only players in the match can vote for a restart.\n");
+        return false;
+    }
 
-	if (tdm_match_status == MM_TIMEOUT && TDM_Is1V1() && level.tdm_timeout_caller && !level.tdm_timeout_caller->client)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "You can't restart a 1v1 match without your opponent present. If you don't wish to wait, type \"win\" in the console to force the match to end.\n");
-		return false;
-	}
+    if (tdm_match_status == MM_TIMEOUT && TDM_Is1V1() && level.tdm_timeout_caller && !level.tdm_timeout_caller->client)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "You can't restart a 1v1 match without your opponent present. If you don't wish to wait, type \"win\" in the console to force the match to end.\n");
+        return false;
+    }
 
-	vote.flags |= VOTE_RESTART;
+    vote.flags |= VOTE_RESTART;
 
-	return true;
+    return true;
 }
 
 /*
@@ -1909,27 +1871,27 @@ Vote to abort the match.
 */
 qboolean TDM_VoteAbort (edict_t *ent)
 {
-	if (!((int)g_vote_mask->value & VOTE_ABORT) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for match abort is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_ABORT) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for match abort is not allowed on this server.\n");
+        return false;
+    }
 
-	if (tdm_match_status < MM_PLAYING || tdm_match_status >= MM_SCOREBOARD)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "No match to abort!\n");
-		return false;
-	}
+    if (tdm_match_status < MM_PLAYING || tdm_match_status >= MM_SCOREBOARD)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "No match to abort!\n");
+        return false;
+    }
 
-	if (!ent->client->pers.team && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Only players in the match can vote for an abort.\n");
-		return false;
-	}
+    if (!ent->client->pers.team && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Only players in the match can vote for an abort.\n");
+        return false;
+    }
 
-	vote.flags |= VOTE_ABORT;
+    vote.flags |= VOTE_ABORT;
 
-	return true;
+    return true;
 }
 
 /*
@@ -1940,59 +1902,59 @@ Vote to change g_bugs settings.
 */
 qboolean TDM_VoteBugs (edict_t *ent)
 {
-	int			bugs;
-	const char	*value;
+    int bugs;
+    const char *value;
 
-	if (!((int)g_vote_mask->value & VOTE_BUGS) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for gameplay bugs is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_BUGS) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for gameplay bugs is not allowed on this server.\n");
+        return false;
+    }
 
-	value = gi.argv(2);
-	if (!value[0])
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1/2>\n", gi.argv(1));
-		return false;
-	}
+    value = gi.argv(2);
+    if (!value[0])
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1/2>\n", gi.argv(1));
+        return false;
+    }
 
-	if (!Q_stricmp (value, "0"))
-		bugs = 0;
-	else if(!Q_stricmp (value, "1"))
-		bugs = 1;
-	else if (!Q_stricmp (value, "2"))
-		bugs = 2;
-	else
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Unknown gameplay bugs settings: %s\n", value);
-		return false;
-	}
+    if (!Q_stricmp (value, "0"))
+        bugs = 0;
+    else if(!Q_stricmp (value, "1"))
+        bugs = 1;
+    else if (!Q_stricmp (value, "2"))
+        bugs = 2;
+    else
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Unknown gameplay bugs settings: %s\n", value);
+        return false;
+    }
 
-	if ((int)g_bugs->value == bugs)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "That gameplay bugs settings is already set!\n");
-		return false;
-	}
+    if ((int)g_bugs->value == bugs)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "That gameplay bugs settings is already set!\n");
+        return false;
+    }
 
-	if (vote.active)
-	{
-		if (vote.bugs == bugs)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that gameplay bugs settings.\n");
-			return false;
-		}
-		
-		if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-			return false;	
-		
-		gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
-		TDM_RemoveVote ();
-	}
+    if (vote.active)
+    {
+        if (vote.bugs == bugs)
+        {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for that gameplay bugs settings.\n");
+            return false;
+        }
 
-	vote.flags |= VOTE_BUGS;
-	vote.bugs = bugs;
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+            return false;
 
-	return true;
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote ();
+    }
+
+    vote.flags |= VOTE_BUGS;
+    vote.bugs = bugs;
+
+    return true;
 }
 
 /*
@@ -2003,29 +1965,29 @@ Vote yes or no.
 */
 void TDM_Vote_X (edict_t *ent, player_vote_t x, const char *whatisit)
 {
-	if (!vote.active)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "No vote in progress.\n");
-		return;
-	}
+    if (!vote.active)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "No vote in progress.\n");
+        return;
+    }
 
-	if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
-		return;
-	
-	if (ent->client->resp.vote == VOTE_HOLD)
-	{
-		ent->client->resp.vote = x;
-		gi.bprintf (PRINT_HIGH, "%s voted %s.\n", ent->client->pers.netname, whatisit);
-	}
-	else if (ent->client->resp.vote == x)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "You have already voted %s.\n", whatisit);
-	}
-	else if (ent->client->resp.vote != x)
-	{
-		ent->client->resp.vote = x;
-		gi.bprintf (PRINT_HIGH, "%s changed his vote to %s.\n", ent->client->pers.netname, whatisit);
-	}
+    if (TDM_RateLimited (ent, SECS_TO_FRAMES(2)))
+        return;
+
+    if (ent->client->resp.vote == VOTE_HOLD)
+    {
+        ent->client->resp.vote = x;
+        gi.bprintf (PRINT_HIGH, "%s voted %s.\n", ent->client->pers.netname, whatisit);
+    }
+    else if (ent->client->resp.vote == x)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "You have already voted %s.\n", whatisit);
+    }
+    else if (ent->client->resp.vote != x)
+    {
+        ent->client->resp.vote = x;
+        gi.bprintf (PRINT_HIGH, "%s changed his vote to %s.\n", ent->client->pers.netname, whatisit);
+    }
 }
 
 /*
@@ -2036,11 +1998,11 @@ A player started a vote, set up common vote stuff.
 */
 void TDM_SetupVote (edict_t *ent)
 {
-	vote.initiator = ent;
-	vote.end_frame = level.framenum + SECS_TO_FRAMES(g_vote_time->value);
-	vote.active = true;
+    vote.initiator = ent;
+    vote.end_frame = level.framenum + SECS_TO_FRAMES(g_vote_time->value);
+    vote.active = true;
 
-	ent->client->resp.vote = VOTE_YES;
+    ent->client->resp.vote = VOTE_YES;
 }
 
 /**
@@ -2048,75 +2010,75 @@ void TDM_SetupVote (edict_t *ent)
  */
 qboolean TDM_VoteShuffle(edict_t *ent)
 {
-	if (!((int)g_vote_mask->value & VOTE_SHUFFLE) && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Voting for player shuffling is not allowed on this server.\n");
-		return false;
-	}
+    if (!((int)g_vote_mask->value & VOTE_SHUFFLE) && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for player shuffling is not allowed on this server.\n");
+        return false;
+    }
 
-	if (tdm_match_status != MM_WARMUP)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "You can't shuffle players while a match is in progress\n");
-		return false;
-	}
+    if (tdm_match_status != MM_WARMUP)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "You can't shuffle players while a match is in progress\n");
+        return false;
+    }
 
-	if (!ent->client->pers.team && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Only team players can vote for a shuffle.\n");
-		return false;
-	}
+    if (!ent->client->pers.team && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Only team players can vote for a shuffle.\n");
+        return false;
+    }
 
-	vote.flags |= VOTE_SHUFFLE;
+    vote.flags |= VOTE_SHUFFLE;
 
-	return true;
+    return true;
 }
 
 qboolean TDM_VoteArmorTimer(edict_t *ent) {
-	const char *value;
+    const char *value;
 
-	if (!((int) g_vote_mask->value & VOTE_ARMOR_TIMER) && !ent->client->pers.admin) {
-		gi.cprintf(ent, PRINT_HIGH, "Voting armor timer is not allowed in server config\n");
-		return false;
-	}
+    if (!((int) g_vote_mask->value & VOTE_ARMOR_TIMER) && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Voting armor timer is not allowed in server config\n");
+        return false;
+    }
 
-	value = gi.argv(2);
-	if (!value[0]) {
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1>\n", gi.argv(1));
-		return false;
-	}
+    value = gi.argv(2);
+    if (!value[0]) {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1>\n", gi.argv(1));
+        return false;
+    }
 
-	if (!Q_stricmp(value, "1") || !Q_stricmp(value, "yes")) {
-		vote.armor_timer = 1;
-	} else {
-		vote.armor_timer = 0;
-	}
+    if (!Q_stricmp(value, "1") || !Q_stricmp(value, "yes")) {
+        vote.armor_timer = 1;
+    } else {
+        vote.armor_timer = 0;
+    }
 
-	vote.flags |= VOTE_ARMOR_TIMER;
-	return true;
+    vote.flags |= VOTE_ARMOR_TIMER;
+    return true;
 }
 
 qboolean TDM_VoteWeaponTimer(edict_t *ent) {
-	const char *value;
+    const char *value;
 
-	if (!((int) g_vote_mask->value & VOTE_WEAPON_TIMER) && !ent->client->pers.admin) {
-		gi.cprintf(ent, PRINT_HIGH, "Voting weapon timer is not allowed in server config\n");
-		return false;
-	}
+    if (!((int) g_vote_mask->value & VOTE_WEAPON_TIMER) && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Voting weapon timer is not allowed in server config\n");
+        return false;
+    }
 
-	value = gi.argv(2);
-	if (!value[0]) {
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1>\n", gi.argv(1));
-		return false;
-	}
+    value = gi.argv(2);
+    if (!value[0]) {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0/1>\n", gi.argv(1));
+        return false;
+    }
 
-	if (!Q_stricmp(value, "1") || !Q_stricmp(value, "yes")) {
-		vote.weapon_timer = 1;
-	} else {
-		vote.weapon_timer = 0;
-	}
+    if (!Q_stricmp(value, "1") || !Q_stricmp(value, "yes")) {
+        vote.weapon_timer = 1;
+    } else {
+        vote.weapon_timer = 0;
+    }
 
-	vote.flags |= VOTE_WEAPON_TIMER;
-	return true;
+    vote.flags |= VOTE_WEAPON_TIMER;
+    return true;
 }
 
 qboolean TDM_VoteTimeoutCaptain(edict_t *ent) {
@@ -2144,32 +2106,32 @@ qboolean TDM_VoteTimeoutCaptain(edict_t *ent) {
 }
 
 qboolean TDM_VoteTimeoutLimit(edict_t *ent) {
-	const char *value;
-	int intvalue;
+    const char *value;
+    int intvalue;
 
-	if (!((int) g_vote_mask->value & VOTE_TIMEOUT_LIMIT) && !ent->client->pers.admin) {
-		gi.cprintf(ent, PRINT_HIGH, "Voting timeout limits is not allowed in the server config\n");
-		return false;
-	}
+    if (!((int) g_vote_mask->value & VOTE_TIMEOUT_LIMIT) && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Voting timeout limits is not allowed in the server config\n");
+        return false;
+    }
 
-	value = gi.argv(2);
+    value = gi.argv(2);
 
-	if (!value[0]) {
-		gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0..9>\n", gi.argv(1));
-		return false;
-	}
+    if (!value[0]) {
+        gi.cprintf (ent, PRINT_HIGH, "Usage: vote %s <0..9>\n", gi.argv(1));
+        return false;
+    }
 
-	intvalue = atoi(value);
+    intvalue = atoi(value);
 
-	if (intvalue < 0 || intvalue > 100) {
-		gi.cprintf(ent, PRINT_HIGH, "Sane values please, 0-100...\n");
-		return false;
-	}
+    if (intvalue < 0 || intvalue > 100) {
+        gi.cprintf(ent, PRINT_HIGH, "Sane values please, 0-100...\n");
+        return false;
+    }
 
-	vote.timeoutlimit = intvalue;
-	vote.flags |= VOTE_TIMEOUT_LIMIT;
+    vote.timeoutlimit = intvalue;
+    vote.flags |= VOTE_TIMEOUT_LIMIT;
 
-	return true;
+    return true;
 }
 /*
 ==============
@@ -2347,70 +2309,70 @@ Check vote for success or failure.
 */
 void TDM_CheckVote (void)
 {
-	int		vote_hold = 0;
-	int		vote_yes = 0;
-	int		vote_no = 0;
-	edict_t	*ent;
+    int vote_hold = 0;
+    int vote_yes = 0;
+    int vote_no = 0;
+    edict_t *ent;
 
-	//vote is already applying, we're getting called mid-apply so fail
-	if (vote.applying)
-		return;
+    //vote is already applying, we're getting called mid-apply so fail
+    if (vote.applying)
+        return;
 
-	if ((vote.flags & VOTE_KICK) && !vote.victim->inuse)
-	{
-		gi.bprintf (PRINT_HIGH, "Vote canceled.\n");
-		TDM_RemoveVote ();
-		return;
-	}
+    if ((vote.flags & VOTE_KICK) && !vote.victim->inuse)
+    {
+        gi.bprintf (PRINT_HIGH, "Vote canceled.\n");
+        TDM_RemoveVote ();
+        return;
+    }
 
-	for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-	{
-		if (!ent->inuse)
-			continue;
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
+    {
+        if (!ent->inuse)
+            continue;
 
-		if (!ent->client->pers.team && !ent->client->pers.admin)
-			continue;
+        if (!ent->client->pers.team && !ent->client->pers.admin)
+            continue;
 
-		if (ent->client->resp.vote == VOTE_YES)
-		{
-			vote_yes++;
-			if (ent->client->pers.admin && g_admin_vote_decide->value)
-			{
-				vote_no = vote_hold = 0;
-				break;
-			}
-		}
-		else if (ent->client->resp.vote == VOTE_NO)
-		{
- 			vote_no++;
-			if (ent->client->pers.admin && g_admin_vote_decide->value)
-			{
-				vote_yes = vote_hold = 0;
-				break;
-			}
-		}
-		else if (ent->client->resp.vote == VOTE_HOLD)
- 			vote_hold++;
-	}
+        if (ent->client->resp.vote == VOTE_YES)
+        {
+            vote_yes++;
+            if (ent->client->pers.admin && g_admin_vote_decide->value)
+            {
+                vote_no = vote_hold = 0;
+                break;
+            }
+        }
+        else if (ent->client->resp.vote == VOTE_NO)
+        {
+            vote_no++;
+            if (ent->client->pers.admin && g_admin_vote_decide->value)
+            {
+                vote_yes = vote_hold = 0;
+                break;
+            }
+        }
+        else if (ent->client->resp.vote == VOTE_HOLD)
+            vote_hold++;
+    }
 
-	if (vote_yes > vote_hold + vote_no)
-		vote.success = VOTE_SUCCESS;
-	else if (vote_no > vote_hold + vote_yes)
-		vote.success = VOTE_NOT_SUCCESS;
-	else
-		vote.success = VOTE_NOT_ENOUGH_VOTES;
+    if (vote_yes > vote_hold + vote_no)
+        vote.success = VOTE_SUCCESS;
+    else if (vote_no > vote_hold + vote_yes)
+        vote.success = VOTE_NOT_SUCCESS;
+    else
+        vote.success = VOTE_NOT_ENOUGH_VOTES;
 
-	if (vote.success == VOTE_SUCCESS)
-	{
-		gi.bprintf (PRINT_HIGH, "Vote passed!\n");
-		TDM_ApplyVote ();
-		TDM_RemoveVote ();
-	}
-	else if (vote.success == VOTE_NOT_SUCCESS)
-	{
-		gi.bprintf (PRINT_HIGH, "Vote failed.\n");
-		TDM_RemoveVote();
-	}
+    if (vote.success == VOTE_SUCCESS)
+    {
+        gi.bprintf (PRINT_HIGH, "Vote passed!\n");
+        TDM_ApplyVote ();
+        TDM_RemoveVote ();
+    }
+    else if (vote.success == VOTE_NOT_SUCCESS)
+    {
+        gi.bprintf (PRINT_HIGH, "Vote failed.\n");
+        TDM_RemoveVote();
+    }
 }
 
 /*
@@ -2421,171 +2383,171 @@ Call vote from vote menu.
 */
 void TDM_VoteMenuApply (edict_t *ent)
 {
-	qboolean	newvote = false;
-	int			overtime;
+    qboolean newvote = false;
+    int overtime;
 
-	if (vote.active)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Another vote is already in progress.\n");
-		return;
-	}
+    if (vote.active)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Another vote is already in progress.\n");
+        return;
+    }
 
-	//global 'disallow voting' check
-	if (!(int)g_vote_mask->value)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Proposing new settings is not allowed on this server.\n");
-		return;
-	}
+    //global 'disallow voting' check
+    if (!(int)g_vote_mask->value)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Proposing new settings is not allowed on this server.\n");
+        return;
+    }
 
-	if (!ent->client->pers.team && !ent->client->pers.admin)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "Spectators cannot vote.\n");
-		return;
-	}
+    if (!ent->client->pers.team && !ent->client->pers.admin)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "Spectators cannot vote.\n");
+        return;
+    }
 
-	if (tdm_match_status != MM_PLAYING && tdm_match_status != MM_WARMUP)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "You can propose new settings only during warmup.\n");
-		return;
-	}
+    if (tdm_match_status != MM_PLAYING && tdm_match_status != MM_WARMUP)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "You can propose new settings only during warmup.\n");
+        return;
+    }
 
-	if (ent->client->pers.votemenu_values.timelimit != ((unsigned)g_match_time->value / 60))
-	{
-		vote.newtimelimit = ent->client->pers.votemenu_values.timelimit;
-		vote.flags |= VOTE_TIMELIMIT;
-		newvote = true;
-	}
+    if (ent->client->pers.votemenu_values.timelimit != ((unsigned)g_match_time->value / 60))
+    {
+        vote.newtimelimit = ent->client->pers.votemenu_values.timelimit;
+        vote.flags |= VOTE_TIMELIMIT;
+        newvote = true;
+    }
 
-	// things above this can be voted during the match
-	if (tdm_match_status != MM_WARMUP)
-	{
-		goto done;
-	}
+    // things above this can be voted during the match
+    if (tdm_match_status != MM_WARMUP)
+    {
+        goto done;
+    }
 
-	if (ent->client->pers.votemenu_values.map[0] != '\0' && ent->client->pers.votemenu_values.map[0] != '-' &&
-			strcmp (ent->client->pers.votemenu_values.map, level.mapname))
-	{
-		strcpy (vote.newmap, ent->client->pers.votemenu_values.map);
-		vote.flags |= VOTE_MAP;
-		newvote = true;
-	}
+    if (ent->client->pers.votemenu_values.map[0] != '\0' && ent->client->pers.votemenu_values.map[0] != '-' &&
+            strcmp (ent->client->pers.votemenu_values.map, level.mapname))
+    {
+        strcpy (vote.newmap, ent->client->pers.votemenu_values.map);
+        vote.flags |= VOTE_MAP;
+        newvote = true;
+    }
 
-	if ((ent->client->pers.votemenu_values.bfg && ((int)g_itemflags->value & WEAPON_BFG10K)) ||
-			(!ent->client->pers.votemenu_values.bfg && (~(int)g_itemflags->value & WEAPON_BFG10K)))
-	{
-		vote.newweaponflags = (int)g_itemflags->value;
+    if ((ent->client->pers.votemenu_values.bfg && ((int)g_itemflags->value & WEAPON_BFG10K)) ||
+            (!ent->client->pers.votemenu_values.bfg && (~(int)g_itemflags->value & WEAPON_BFG10K)))
+    {
+        vote.newweaponflags = (int)g_itemflags->value;
 
-		if (ent->client->pers.votemenu_values.bfg)
-			vote.newweaponflags &= ~WEAPON_BFG10K;
-		else
-			vote.newweaponflags |= WEAPON_BFG10K;
+        if (ent->client->pers.votemenu_values.bfg)
+            vote.newweaponflags &= ~WEAPON_BFG10K;
+        else
+            vote.newweaponflags |= WEAPON_BFG10K;
 
-		vote.flags |= VOTE_WEAPONS;
-		newvote = true;
-	}
+        vote.flags |= VOTE_WEAPONS;
+        newvote = true;
+    }
 
-	if ((ent->client->pers.votemenu_values.powerups && (int)g_powerupflags->value != 0) ||
-			(!ent->client->pers.votemenu_values.powerups && !(int)g_powerupflags->value))
-	{
-		if (ent->client->pers.votemenu_values.powerups)
-			vote.newpowerupflags = 0;
-		else
-			vote.newpowerupflags = 0xFFFFFFFFU;
+    if ((ent->client->pers.votemenu_values.powerups && (int)g_powerupflags->value != 0) ||
+            (!ent->client->pers.votemenu_values.powerups && !(int)g_powerupflags->value))
+    {
+        if (ent->client->pers.votemenu_values.powerups)
+            vote.newpowerupflags = 0;
+        else
+            vote.newpowerupflags = 0xFFFFFFFFU;
 
-		vote.flags |= VOTE_POWERUPS;
-		newvote = true;
-	}
+        vote.flags |= VOTE_POWERUPS;
+        newvote = true;
+    }
 
-	if (ent->client->pers.votemenu_values.chat != (unsigned)g_chat_mode->value)
-	{
-		vote.newchatmode = ent->client->pers.votemenu_values.chat;
-		vote.flags |= VOTE_CHAT;
-		newvote = true;
-	}
+    if (ent->client->pers.votemenu_values.chat != (unsigned)g_chat_mode->value)
+    {
+        vote.newchatmode = ent->client->pers.votemenu_values.chat;
+        vote.flags |= VOTE_CHAT;
+        newvote = true;
+    }
 
-	if (ent->client->pers.votemenu_values.bugs != (unsigned)g_bugs->value)
-	{
-		vote.bugs = ent->client->pers.votemenu_values.bugs;
-		vote.flags |= VOTE_BUGS;
-		newvote = true;
-	}
+    if (ent->client->pers.votemenu_values.bugs != (unsigned)g_bugs->value)
+    {
+        vote.bugs = ent->client->pers.votemenu_values.bugs;
+        vote.flags |= VOTE_BUGS;
+        newvote = true;
+    }
 
-	if (ent->client->pers.votemenu_values.gamemode != (unsigned)g_gamemode->value)
-	{
-		vote.gamemode = ent->client->pers.votemenu_values.gamemode;
-		vote.flags |= VOTE_GAMEMODE;
-		newvote = true;
-	}
+    if (ent->client->pers.votemenu_values.gamemode != (unsigned)g_gamemode->value)
+    {
+        vote.gamemode = ent->client->pers.votemenu_values.gamemode;
+        vote.flags |= VOTE_GAMEMODE;
+        newvote = true;
+    }
 
-	if (g_tie_mode->value == 1)
-		overtime = ((int)g_overtime->value / 60);
-	else if (g_tie_mode->value == 2)
-		overtime = -1;
-	else
-		overtime = 0;
+    if (g_tie_mode->value == 1)
+        overtime = ((int)g_overtime->value / 60);
+    else if (g_tie_mode->value == 2)
+        overtime = -1;
+    else
+        overtime = 0;
 
-	if (ent->client->pers.votemenu_values.overtime != overtime)
-	{
-		if (ent->client->pers.votemenu_values.overtime == -1)
-		{
-			vote.tiemode = 2;
-			vote.flags |= VOTE_TIEMODE;
-			newvote = true;
-		}
-		else if (ent->client->pers.votemenu_values.overtime == 0)
-		{
-			vote.tiemode = 0;
-			vote.flags |= VOTE_TIEMODE;
-			newvote = true;
-		}
-		else if (ent->client->pers.votemenu_values.overtime > 0)
-		{
-			if (g_tie_mode->value != 1)
-			{
-				vote.tiemode = 1;
-				vote.flags |= VOTE_TIEMODE;
-			}
+    if (ent->client->pers.votemenu_values.overtime != overtime)
+    {
+        if (ent->client->pers.votemenu_values.overtime == -1)
+        {
+            vote.tiemode = 2;
+            vote.flags |= VOTE_TIEMODE;
+            newvote = true;
+        }
+        else if (ent->client->pers.votemenu_values.overtime == 0)
+        {
+            vote.tiemode = 0;
+            vote.flags |= VOTE_TIEMODE;
+            newvote = true;
+        }
+        else if (ent->client->pers.votemenu_values.overtime > 0)
+        {
+            if (g_tie_mode->value != 1)
+            {
+                vote.tiemode = 1;
+                vote.flags |= VOTE_TIEMODE;
+            }
 
-			vote.overtimemins = ent->client->pers.votemenu_values.overtime;
-			vote.flags |= VOTE_OVERTIME;
-			newvote = true;
-		}
-	}
+            vote.overtimemins = ent->client->pers.votemenu_values.overtime;
+            vote.flags |= VOTE_OVERTIME;
+            newvote = true;
+        }
+    }
 
-	// let this be in the end so we can check if it's the only vote option
-	if (ent->client->pers.votemenu_values.config[0] && ent->client->pers.votemenu_values.config[0] != '-')
-	{
-		if (newvote)
-			gi.cprintf (ent, PRINT_HIGH, "You cannot propose vote config with other options.\n");
-		else
-		{
-			strcpy (vote.configname, ent->client->pers.votemenu_values.config);
-			vote.flags |= VOTE_CONFIG;
-			newvote = true;
-		}
-	}
+    // let this be in the end so we can check if it's the only vote option
+    if (ent->client->pers.votemenu_values.config[0] && ent->client->pers.votemenu_values.config[0] != '-')
+    {
+        if (newvote)
+            gi.cprintf (ent, PRINT_HIGH, "You cannot propose vote config with other options.\n");
+        else
+        {
+            strcpy (vote.configname, ent->client->pers.votemenu_values.config);
+            vote.flags |= VOTE_CONFIG;
+            newvote = true;
+        }
+    }
 
-	if (ent->client->pers.votemenu_values.kick != NULL)
-	{
-		if (newvote)
-			gi.cprintf (ent, PRINT_HIGH, "You cannot propose vote kick with other options.\n");
-		else
-		{
-			vote.victim = ent->client->pers.votemenu_values.kick;
-			vote.flags |= VOTE_KICK;
-			newvote = true;
-		}
-	}
-	
+    if (ent->client->pers.votemenu_values.kick != NULL)
+    {
+        if (newvote)
+            gi.cprintf (ent, PRINT_HIGH, "You cannot propose vote kick with other options.\n");
+        else
+        {
+            vote.victim = ent->client->pers.votemenu_values.kick;
+            vote.flags |= VOTE_KICK;
+            newvote = true;
+        }
+    }
+
 done:
-	PMenu_Close (ent);
+    PMenu_Close (ent);
 
-	if (newvote)
-	{
-		TDM_SetupVote (ent);
-		TDM_AnnounceVote ();
-		TDM_CheckVote();
-	}
+    if (newvote)
+    {
+        TDM_SetupVote (ent);
+        TDM_AnnounceVote ();
+        TDM_CheckVote();
+    }
 }
 
 /*
@@ -2726,92 +2688,92 @@ void TDM_ConfigDownloaded (tdm_download_t *download, int code, byte *buff, int l
  * Convert string like "-all +rg +cg" to a bitmask
  */
 int TDM_WeaponStringToBitmask(const char *str) {
-	int mask;
-	char modifier;
-	char s[MAX_STRING_CHARS];
-	char *token;
-	int i;
+    int mask;
+    char modifier;
+    char s[MAX_STRING_CHARS];
+    char *token;
+    int i;
 
-	Q_strncpy(s, str, sizeof(s)-1);
-	mask = 0;
-	token = strtok(s, " ");
+    Q_strncpy(s, str, sizeof(s)-1);
+    mask = 0;
+    token = strtok(s, " ");
 
-	while (token) {
-		modifier = token[0];
+    while (token) {
+        modifier = token[0];
 
-		if (modifier == '+' || modifier == '-') {
-			token++;
-		} else {
-			modifier = '+';
-		}
+        if (modifier == '+' || modifier == '-') {
+            token++;
+        } else {
+            modifier = '+';
+        }
 
-		for (i=0; i<WEAPON_MAX; i++) {
-			if (!Q_stricmp(token, "all")) {
-				if (modifier == '+') {
-					mask = 0x7fffffffU;
-				} else {
-					mask = 0;
-				}
-			}
+        for (i=0; i<WEAPON_MAX; i++) {
+            if (!Q_stricmp(token, "all")) {
+                if (modifier == '+') {
+                    mask = 0x7fffffffU;
+                } else {
+                    mask = 0;
+                }
+            }
 
-			if (!Q_stricmp(token, weaponvotes[i].names[0]) || !Q_stricmp(token, weaponvotes[i].names[1])) {
-				if (modifier == '+') {
-					mask |= weaponvotes[i].value;
-				} else if (modifier == '-') {
-					mask &= ~weaponvotes[i].value;
-				}
-			}
-		}
+            if (!Q_stricmp(token, weaponvotes[i].names[0]) || !Q_stricmp(token, weaponvotes[i].names[1])) {
+                if (modifier == '+') {
+                    mask |= weaponvotes[i].value;
+                } else if (modifier == '-') {
+                    mask &= ~weaponvotes[i].value;
+                }
+            }
+        }
 
-		token = strtok(NULL, " ");
-	}
+        token = strtok(NULL, " ");
+    }
 
-	return mask;
+    return mask;
 }
 
 /**
  * Convert armor string ("+all -ya", "-all +body +combat", "-all +ra") to a bitmask
  */
 int TDM_ArmorStringToBitmask(const char *str) {
-	int mask;
-	char modifier;
-	char s[MAX_STRING_CHARS];
-	char *token;
-	int i;
+    int mask;
+    char modifier;
+    char s[MAX_STRING_CHARS];
+    char *token;
+    int i;
 
-	Q_strncpy(s, str, sizeof(s)-1);
-	mask = 0;
-	token = strtok(s, " ");
+    Q_strncpy(s, str, sizeof(s)-1);
+    mask = 0;
+    token = strtok(s, " ");
 
-	while (token) {
-		modifier = token[0];
+    while (token) {
+        modifier = token[0];
 
-		if (modifier == '+' || modifier == '-') {
-			token++;
-		} else {
-			modifier = '+';
-		}
+        if (modifier == '+' || modifier == '-') {
+            token++;
+        } else {
+            modifier = '+';
+        }
 
-		for (i=0; i<ARMOR_MAX; i++) {
-			if (!Q_stricmp(token, "all")) {
-				if (modifier == '+') {
-					mask = 0x7fffffffU;
-				} else {
-					mask = 0;
-				}
-			}
+        for (i=0; i<ARMOR_MAX; i++) {
+            if (!Q_stricmp(token, "all")) {
+                if (modifier == '+') {
+                    mask = 0x7fffffffU;
+                } else {
+                    mask = 0;
+                }
+            }
 
-			if (!Q_stricmp(token, armorvotes[i].names[0]) || !Q_stricmp(token, armorvotes[i].names[1])) {
-				if (modifier == '+') {
-					mask |= armorvotes[i].value;
-				} else if (modifier == '-') {
-					mask &= ~armorvotes[i].value;
-				}
-			}
-		}
+            if (!Q_stricmp(token, armorvotes[i].names[0]) || !Q_stricmp(token, armorvotes[i].names[1])) {
+                if (modifier == '+') {
+                    mask |= armorvotes[i].value;
+                } else if (modifier == '-') {
+                    mask &= ~armorvotes[i].value;
+                }
+            }
+        }
 
-		token = strtok(NULL, " ");
-	}
+        token = strtok(NULL, " ");
+    }
 
-	return mask;
+    return mask;
 }
