@@ -225,8 +225,12 @@ Player joined Team A via menu
 */
 void JoinTeam1 (edict_t *ent)
 {
-	if (!CanJoin (ent, TEAM_A))
+	if (!CanJoin (ent, TEAM_A)) {
+	    if ((int)g_gamemode->value == GAMEMODE_KOTH) {
+	        Queue_Add(getEntOffset(ent));
+	    }
 		return;
+	}
 
 	if (ent->client->pers.team)
 		TDM_LeftTeam (ent, true);
@@ -243,8 +247,12 @@ Player joined Team B via menu
 */
 void JoinTeam2 (edict_t *ent)
 {
-	if (!CanJoin (ent, TEAM_B))
+	if (!CanJoin (ent, TEAM_B)) {
+	    if ((int)g_gamemode->value == GAMEMODE_KOTH) {
+            Queue_Add(getEntOffset(ent));
+        }
 		return;
+	}
 
 	if (ent->client->pers.team)
 		TDM_LeftTeam (ent, true);

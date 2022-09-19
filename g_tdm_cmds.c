@@ -2644,40 +2644,26 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
  * Just for testing stuff
  */
 void TDM_Test_f(edict_t *ent) {
-	/*
-	gi.cprintf(ent, PRINT_HIGH,
-			"player_state_t       %lu\n"
-			"client_persistent_t  %lu\n"
-			"client_respawn_t     %lu\n"
-			"pmove_state_t        %lu\n"
-			"qboolean             %lu\n"
-			"gitem_t              %lu\n"
-			"int                  %lu\n"
-			"vec3_t               %lu\n"
-			"float                %lu\n"
-			"weaponstate_t        %lu\n"
-			"unsigned             %lu\n"
-			"grenade_state_t      %lu\n"
-			"edict_t              %lu\n"
-			"gclient_t            %lu\n",
-			sizeof(player_state_t),
-			sizeof(client_persistent_t),
-			sizeof(client_respawn_t),
-			sizeof(pmove_state_t),
-			sizeof(qboolean),
-			sizeof(gitem_t),
-			sizeof(int),
-			sizeof(vec3_t),
-			sizeof(float),
-			sizeof(weaponstate_t),
-			sizeof(unsigned),
-			sizeof(grenade_state_t),
-			sizeof(edict_t),
-			sizeof(gclient_t)
-	);
-	*/
+    char *op = gi.argv(1);
 
-	gi.cprintf(ent, PRINT_HIGH, "weapon offset: %lu", offsetof(gclient_t, weapon));
+    if (!Q_stricmp(op, "add")) {
+        char *id = gi.argv(2);
+        int toadd = atoi(id);
+
+        if (Queue_Add(toadd)) {
+            gi.cprintf(ent, PRINT_HIGH, "Adding %d to the queue...\n", toadd);
+        } else {
+            gi.cprintf(ent, PRINT_HIGH, "Unable to add to the queue...\n");
+        }
+        return;
+    }
+
+    if (!Q_stricmp(op, "show")) {
+        gi.cprintf(ent, PRINT_HIGH, "Challenger Queue:\n\nPosition\tID\n");
+        for (int i=0; i<clq.occupancy; i++) {
+            gi.cprintf(ent, PRINT_HIGH, "%d\t%d\n", i, clq.queue[i]);
+        }
+    }
 }
 
 

@@ -2846,8 +2846,6 @@ void TDM_Init (void)
 	else if (g_gamemode->value == GAMEMODE_KOTH)
 	    dmflags = gi.cvar_set ("dmflags", g_queueflags->string);
 
-	challengerQueue = gi.TagMalloc((int)g_queuesize->value * sizeof(gclient_t), TAG_GAME);
-
 #ifdef OPENTDM_REVISION
 	//show opentdm version to browsers
 	gi.cvar ("revision", va("%d", OPENTDM_REVISION), CVAR_SERVERINFO|CVAR_NOSET);
@@ -2858,6 +2856,8 @@ void TDM_Init (void)
 
 	TDM_CreateMaplist ();
 	TDM_CreateConfiglist ();
+
+	Queue_Init();
 }
 
 /*
