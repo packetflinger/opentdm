@@ -2058,6 +2058,39 @@ void TDM_Ready_f (edict_t *ent)
 	TDM_CheckMatchStart ();
 }
 
+void TDM_ServerDemoRecord_f(edict_t *ent) {
+    if (!ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Referee-only command\n");
+        return;
+    }
+
+    if (game.mvd.recording) {
+        gi.cprintf(ent, PRINT_HIGH, "Already recording a multi-view demo\n");
+        return;
+    }
+
+    if (MVD_CAPABLE){
+        TDM_RecordMVD();
+        gi.cprintf(ent, PRINT_HIGH, "Now recording multi-view demo\n");
+    }
+}
+
+void TDM_ServerDemoStop_f(edict_t *ent) {
+    if (!ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Referee-only command\n");
+        return;
+    }
+
+    if (!game.mvd.recording) {
+        gi.cprintf(ent, PRINT_HIGH, "Not recording a multi-view demo\n");
+        return;
+    }
+
+    if (MVD_CAPABLE){
+        TDM_StopMVD();
+        gi.cprintf(ent, PRINT_HIGH, "Recording multi-view demo stopped\n");
+    }
+}
 /*
 ==============
 TDM_Motd_f
@@ -2858,6 +2891,16 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
 			TDM_Shuffle_f (ent);
 			return true;
 		}
+		else if (!Q_stricmp(cmd, "serverdemorecord"))
+		{
+		    //TDM_ServerDemoRecord_f(ent);
+		    return true;
+		}
+		else if (!Q_stricmp(cmd, "serverdemostop"))
+        {
+            //TDM_ServerDemoStop_f(ent);
+            return true;
+        }
 	}
 
 	// let's allow voting during the timeout
