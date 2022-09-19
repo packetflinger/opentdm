@@ -680,14 +680,6 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 			"yb -50 "
 		"endif "
 
-		// timer (quad, armor, rebreather, envirosuit)
-		"if 9 "
-			"xv 246 "
-			"num 2 10 "
-			"xv 296 "
-			"pic 9 "
-		"endif "
-
 		//  help / weapon icon
 		"if 11 "
 			"xv 148 "
