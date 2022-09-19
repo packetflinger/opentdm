@@ -569,182 +569,182 @@ void TDM_Disconnected (edict_t *ent)
 
 const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 {
-	char		*spec_statusbar;
-	int			id_x, id_y;
+    char *spec_statusbar;
+    int id_x, id_y;
 
-	// opentdm default
-	id_x = -100;
-	id_y = -80;
+    // opentdm default
+    id_x = -100;
+    id_y = -80;
 
-	if (player) {
-		id_x += player->client->pers.config.id_x;
-		id_y += player->client->pers.config.id_y;
-	}
+    if (player) {
+        id_x += player->client->pers.config.id_x;
+        id_y += player->client->pers.config.id_y;
+    }
 
-	spec_statusbar = va (
-		// First team name
-		"xr -%d "
-		"yb -96 "
-		"string \"%s\" "
+    spec_statusbar = va (
+        // First team name
+        "xr -%d "
+        "yb -96 "
+        "string \"%s\" "
 
-		// Second team name
-		"xr -%d "
-		"yb -48 "
-		"string \"%s\" "
+        // Second team name
+        "xr -%d "
+        "yb -48 "
+        "string \"%s\" "
 
-		// First team score / status
-		"xr -66 "
-		"yb -120 "
-		"num 4 23 "
+        // First team score / status
+        "xr -66 "
+        "yb -120 "
+        "num 4 23 "
 
-		// Second team score / status
-		"yb -72 "
-		"num 4 24 "
+        // Second team score / status
+        "yb -72 "
+        "num 4 24 "
 
-		// Match status
-		"xv 205 "
-		"yb -48 "
-		"stat_string 26 "
+        // Match status
+        "xv 205 "
+        "yb -48 "
+        "stat_string 26 "
 
-		// Time value
-		"yb -39 "
-		"stat_string 31 "
+        // Time value
+        "yb -39 "
+        "stat_string 31 "
 
-		// Timeout message
-		"if 25 "
-			"xr -58 "
-			"yt 50 "
-			"string \"Timeout\" "
+        // Timeout message
+        "if 25 "
+            "xr -58 "
+            "yt 50 "
+            "string \"Timeout\" "
 
-			// Timeout value
-			"xr -42 "
-			"yt 58 "
-			"stat_string 25 "
-		"endif "
+            // Timeout value
+            "xr -42 "
+            "yt 58 "
+            "stat_string 25 "
+        "endif "
 
-		// spectator
-		"xv 0 "
-		"yb -58 "
-		"string2 \"SPECTATOR MODE\" "
+        // spectator
+        "xv 0 "
+        "yb -58 "
+        "string2 \"SPECTATOR MODE\" "
 
-		// chase camera
-		"if 16 "
-			"xv 0 "
-			"yb -68 "
-			"string \"Chasing\" "
-			"xv 64 "
-			"stat_string 16 "
-		"endif "
+        // chase camera
+        "if 16 "
+            "xv 0 "
+            "yb -68 "
+            "string \"Chasing\" "
+            "xv 64 "
+            "stat_string 16 "
+        "endif "
 
-		"yb -24 "
+        "yb -24 "
 
-		"if 16 "
-			// health
-			"xv 0 "
-			"hnum "
-			"xv 50 "
-			"pic 0 "
-		"endif "
+        "if 16 "
+            // health
+            "xv 0 "
+            "hnum "
+            "xv 50 "
+            "pic 0 "
+        "endif "
 
-		// ammo
-		"if 2 "
-			"xv 100 "
-			"anum "
-			"xv 150 "
-			"pic 2 "
-		"endif "
+        // ammo
+        "if 2 "
+            "xv 100 "
+            "anum "
+            "xv 150 "
+            "pic 2 "
+        "endif "
 
-		// armor
-		"if 4 "
-			"xv 200 "
-			"rnum "
-			"xv 250 "
-			"pic 4 "
-		"endif "
+        // armor
+        "if 4 "
+            "xv 200 "
+            "rnum "
+            "xv 250 "
+            "pic 4 "
+        "endif "
 
-		// selected item
-		"if 6 "
-			"xv 296 "
-			"pic 6 "
-		"endif "
+        // selected item
+        "if 6 "
+            "xv 296 "
+            "pic 6 "
+        "endif "
 
-		"yb -50 "
+        "yb -50 "
 
-		// picked up item
-		"if 7 "
-			"xv 0 "
-			"pic 7 "
-			"xv 26 "
-			"yb -42 "
-			"stat_string 8 "
-			"yb -50 "
-		"endif "
+        // picked up item
+        "if 7 "
+            "xv 0 "
+            "pic 7 "
+            "xv 26 "
+            "yb -42 "
+            "stat_string 8 "
+            "yb -50 "
+        "endif "
 
-		//  help / weapon icon
-		"if 11 "
-			"xv 148 "
-			"pic 11 "
-		"endif "
+        //  help / weapon icon
+        "if 11 "
+            "xv 148 "
+            "pic 11 "
+        "endif "
 
-			// picked up item
-			"if 7 "
-				"xv 0 "
-				"pic 7 "
-				"xv 26 "
-				"yb -42 "
-				"stat_string 8 "
-				"yb -50 "
-			"endif "
+        // picked up item
+        "if 7 "
+            "xv 0 "
+            "pic 7 "
+            "xv 26 "
+            "yb -42 "
+            "stat_string 8 "
+            "yb -50 "
+        "endif "
 
-			// timer (quad, armor, rebreather, envirosuit)
-			"if 9 "
-				"xv 276 "
-				"num 2 10 "
-				"xv 310 "
-				"pic 9 "
-			"endif "
+        // timer (quad, armor, rebreather, envirosuit)
+        "if 9 "
+            "xv 276 "
+            "num 2 10 "
+            "xv 310 "
+            "pic 9 "
+        "endif "
 
-			//  help / weapon icon
-			"if 11 "
-				"xv 148 "
-				"pic 11 "
-			"endif "
+        //  help / weapon icon
+        "if 11 "
+            "xv 148 "
+            "pic 11 "
+        "endif "
 
-			// timer (pent/weapon)
-			"if 30 "
-				"yb -80 "
-				"xv 276 "
-				"num 2 30 "
-				"xv 310 "
-				"pic 29 "
-			"endif "
+        // timer (pent/weapon)
+        "if 30 "
+            "yb -80 "
+            "xv 276 "
+            "num 2 30 "
+            "xv 310 "
+            "pic 29 "
+        "endif "
 
-		// frags
-		"if 14 "
-			"xr	-50 "
-			"yt 2 "
-			"num 3 14 "
-		"endif "
+        // frags
+        "if 14 "
+            "xr	-50 "
+            "yt 2 "
+            "num 3 14 "
+        "endif "
 
-		// player id view
-		"if 27 "
-			"xv %d "
-			"yb %d "
-			"stat_string 27 "
-		"endif "
+        // player id view
+        "if 27 "
+            "xv %d "
+            "yb %d "
+            "stat_string 27 "
+        "endif "
 
-		// vote notice
-		"if 28 "
-			"xl 10 "
-			"yb -180 "
-			"stat_string 28 "
-		"endif",
-		(int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
-		(int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
-		id_x, id_y
-	);
+        // vote notice
+        "if 28 "
+            "xl 10 "
+            "yb -180 "
+            "stat_string 28 "
+        "endif",
+        (int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
+        (int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
+        id_x, id_y
+    );
 
-	return spec_statusbar;
+    return spec_statusbar;
 }
 
 /*
@@ -755,227 +755,227 @@ Create player's own customized dm_statusbar.
 */
 const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 {
-	char		*dm_statusbar;
-	char		weaponhud[1400];	// the weapon icons
-	char		ammohud[1400];		// the ammo counts
-	int			id_x, id_y;
-	int			hud_x, hud_y;
+    char *dm_statusbar;
+    char weaponhud[1400];   // the weapon icons
+    char ammohud[1400];     // the ammo counts
+    int id_x, id_y;
+    int hud_x, hud_y;
 
-	// opentdm default
-	id_x = -100;
-	id_y = -80;
-	hud_y = 0;
-	hud_x = -25;
+    // opentdm default
+    id_x = -100;
+    id_y = -80;
+    hud_y = 0;
+    hud_x = -25;
 
-	if (SHOWWEAPONHUD(player)) {
+    if (SHOWWEAPONHUD(player)) {
 
-		id_x += player->client->pers.config.id_x;
-		id_y += player->client->pers.config.id_y;
+        id_x += player->client->pers.config.id_x;
+        id_y += player->client->pers.config.id_y;
 
-		hud_x += player->client->pers.weaponhud_offset_x;
-		hud_y += player->client->pers.weaponhud_offset_y;
+        hud_x += player->client->pers.weaponhud_offset_x;
+        hud_y += player->client->pers.weaponhud_offset_y;
 
-		weaponhud[0] = 0;
-		ammohud[0] = 0;
+        weaponhud[0] = 0;
+        ammohud[0] = 0;
 
-		// set x position at first for all weapon icons, to save the chars since CS max is 1000
-		strcpy(weaponhud, va("xr %d ", hud_x));
+        // set x position at first for all weapon icons, to save the chars since CS max is 1000
+        strcpy(weaponhud, va("xr %d ", hud_x));
 
-		// set x position for ammo quantities ^
-		strcpy(ammohud, va("xr %d ", hud_x - 50));
+        // set x position for ammo quantities ^
+        strcpy(ammohud, va("xr %d ", hud_x - 50));
 
-		// super/shotgun
-		if (player->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
-			strcat(weaponhud, va("yv %d picn w_sshotgun ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
-			hud_y += 25;
-		} else if (player->client->inventory[ITEM_WEAPON_SHOTGUN]) {
-			strcat(weaponhud, va("yv %d picn w_shotgun ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
-			hud_y += 25;
-		}
+        // super/shotgun
+        if (player->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
+            strcat(weaponhud, va("yv %d picn w_sshotgun ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
+            hud_y += 25;
+        } else if (player->client->inventory[ITEM_WEAPON_SHOTGUN]) {
+            strcat(weaponhud, va("yv %d picn w_shotgun ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
+            hud_y += 25;
+        }
 
-		// chaingun/machinegun
-		if (player->client->inventory[ITEM_WEAPON_CHAINGUN]) {
-			strcat(weaponhud, va("yv %d picn w_chaingun ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
-			hud_y += 25;
-		} else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
-			strcat(weaponhud, va("yv %d picn w_machinegun ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
-			hud_y += 25;
-		}
+        // chaingun/machinegun
+        if (player->client->inventory[ITEM_WEAPON_CHAINGUN]) {
+            strcat(weaponhud, va("yv %d picn w_chaingun ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
+            hud_y += 25;
+        } else if (player->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
+            strcat(weaponhud, va("yv %d picn w_machinegun ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
+            hud_y += 25;
+        }
 
-		// hand grenades/launcher
-		if (player->client->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
-			strcat(weaponhud, va("yv %d picn w_glauncher ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
-			hud_y += 25;
-		} else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
-			//strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
-			strcat(weaponhud, va("yv %d picn a_grenades ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
-			hud_y += 25;
-		}
+        // hand grenades/launcher
+        if (player->client->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
+            strcat(weaponhud, va("yv %d picn w_glauncher ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
+            hud_y += 25;
+        } else if (player->client->inventory[ITEM_AMMO_GRENADES]) {
+            //strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
+            strcat(weaponhud, va("yv %d picn a_grenades ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
+            hud_y += 25;
+        }
 
-		// hyper blaster
-		if (player->client->inventory[ITEM_WEAPON_HYPERBLASTER]) {
-			strcat(weaponhud, va("yv %d picn w_hyperblaster ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
-			hud_y += 25;
-		}
+        // hyper blaster
+        if (player->client->inventory[ITEM_WEAPON_HYPERBLASTER]) {
+            strcat(weaponhud, va("yv %d picn w_hyperblaster ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
+            hud_y += 25;
+        }
 
-		// rocket launcher
-		if (player->client->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
-			strcat(weaponhud, va("yv %d picn w_rlauncher ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_ROCKETS));
-			hud_y += 25;
-		}
+        // rocket launcher
+        if (player->client->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
+            strcat(weaponhud, va("yv %d picn w_rlauncher ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_ROCKETS));
+            hud_y += 25;
+        }
 
-		// railgun
-		if (player->client->inventory[ITEM_WEAPON_RAILGUN]) {
-			strcat(weaponhud, va("yv %d picn w_railgun ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SLUGS));
-			hud_y += 25;
-		}
+        // railgun
+        if (player->client->inventory[ITEM_WEAPON_RAILGUN]) {
+            strcat(weaponhud, va("yv %d picn w_railgun ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SLUGS));
+            hud_y += 25;
+        }
 
-		// BFG
-		if (player->client->inventory[ITEM_WEAPON_BFG]) {
-			strcat(weaponhud, va("yv %d picn w_bfg ", hud_y));
-			strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
-			hud_y += 25;
-		}
-	}
+        // BFG
+        if (player->client->inventory[ITEM_WEAPON_BFG]) {
+            strcat(weaponhud, va("yv %d picn w_bfg ", hud_y));
+            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
+            hud_y += 25;
+        }
+    }
 
-	dm_statusbar = va(
-		// bottom row
-		"yb -24 "
+    dm_statusbar = va(
+        // bottom row
+        "yb -24 "
 
-		// health
-		"xv 0 "
-		"hnum "
-		"xv 50 "
-		"pic 0 "
+        // health
+        "xv 0 "
+        "hnum "
+        "xv 50 "
+        "pic 0 "
 
-		// ammo
-		"if 2 "
-			"xv 100 "
-			"anum "
-			"xv 150 "
-			"pic 2 "
-		"endif "
+        // ammo
+        "if 2 "
+            "xv 100 "
+            "anum "
+            "xv 150 "
+            "pic 2 "
+        "endif "
 
-		// armor
-		"if 4 "
-			"xv 200 "
-			"rnum "
-			"xv 250 "
-			"pic 4 "
-		"endif "
+        // armor
+        "if 4 "
+            "xv 200 "
+            "rnum "
+            "xv 250 "
+            "pic 4 "
+        "endif "
 
-		// next row up
-		"yb -50 "
+        // next row up
+        "yb -50 "
 
-		// picked up item
-		"if 7 "
-			"xv 0 "
-			"pic 7 "
-			"xv 26 "
-			"yb -42 "
-			"stat_string 8 "
-			"yb -50 "
-		"endif "
+        // picked up item
+        "if 7 "
+            "xv 0 "
+            "pic 7 "
+            "xv 26 "
+            "yb -42 "
+            "stat_string 8 "
+            "yb -50 "
+        "endif "
 
-		// timer (quad, armor, rebreather, envirosuit)
-		"if 9 "
-			"xv 276 "
-			"num 2 10 "
-			"xv 310 "
-			"pic 9 "
-		"endif "
+        // timer (quad, armor, rebreather, envirosuit)
+        "if 9 "
+            "xv 276 "
+            "num 2 10 "
+            "xv 310 "
+            "pic 9 "
+        "endif "
 
-		//  help / weapon icon
-		"if 11 "
-			"xv 148 "
-			"pic 11 "
-		"endif "
+        //  help / weapon icon
+        "if 11 "
+            "xv 148 "
+            "pic 11 "
+        "endif "
 
-		// timer (pent, weapon)
-		"if 30 "
-			"yb -80 "
-			"xv 276 "
-			"num 2 30 "
-			"xv 310 "
-			"pic 29 "
-		"endif "
+        // timer (pent, weapon)
+        "if 30 "
+            "yb -80 "
+            "xv 276 "
+            "num 2 30 "
+            "xv 310 "
+            "pic 29 "
+        "endif "
 
-		// Match Status
-		"xv 205 "
-		"yb -48 "
-		"stat_string 26 "
+        // Match Status
+        "xv 205 "
+        "yb -48 "
+        "stat_string 26 "
 
-		// Time value
-		"yb -39 "
-		"stat_string 31 "
+        // Time value
+        "yb -39 "
+        "stat_string 31 "
 
-		// First team name
-		"xr -%d "
-		"yb -96 "
-		"string \"%s\" "
+        // First team name
+        "xr -%d "
+        "yb -96 "
+        "string \"%s\" "
 
-		// Second team name
-		"xr -%d "
-		"yb -48 "
-		"string \"%s\" "
+        // Second team name
+        "xr -%d "
+        "yb -48 "
+        "string \"%s\" "
 
-		// First team score / status
-		"xr -66 "
-		"yb -120 "
-		"num 4 23 "
+        // First team score / status
+        "xr -66 "
+        "yb -120 "
+        "num 4 23 "
 
-		// Second team score / status
-		"yb -72 "
-		"num 4 24 "
+        // Second team score / status
+        "yb -72 "
+        "num 4 24 "
 
-		// Timeout message
-		"if 25 "
-			"xr -58 "
-			"yt 40 "
-			"string \"Timeout\" "
+        // Timeout message
+        "if 25 "
+            "xr -58 "
+            "yt 40 "
+            "string \"Timeout\" "
 
-			// Timeout value
-			"xr -42 "
-			"yt 48 "
-			"stat_string 25 "
-		"endif "
+            // Timeout value
+            "xr -42 "
+            "yt 48 "
+            "stat_string 25 "
+        "endif "
 
-		//  frags
-		"xr -50 "
-		"yt 2 "
-		"num 3 14 "
+        //  frags
+        "xr -50 "
+        "yt 2 "
+        "num 3 14 "
 
-		// player id view
-		"if 27 "
-			"xv %d "
-			"yb %d "
-			"stat_string 27 "
-		"endif "
+        // player id view
+        "if 27 "
+            "xv %d "
+            "yb %d "
+            "stat_string 27 "
+        "endif "
 
-		// vote notice
-		"if 28 "
-			"xl 10 "
-			"yb -180 "
-			"stat_string 28 "
-		"endif "
+        // vote notice
+        "if 28 "
+            "xl 10 "
+            "yb -180 "
+            "stat_string 28 "
+        "endif "
 
-		"%s%s",
-		(int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
-		(int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
-		id_x, id_y,
-		weaponhud, ammohud
-	);
+        "%s%s",
+        (int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
+        (int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
+        id_x, id_y,
+        weaponhud, ammohud
+    );
 
-	return dm_statusbar;
+    return dm_statusbar;
 }
 
 /*
