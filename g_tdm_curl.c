@@ -470,7 +470,10 @@ qboolean HTTP_QueueDownload (tdm_download_t *d)
 
 	downloads[i].tdm_handle = d;
 	downloads[i].inuse = true;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
 	Q_strncpy (downloads[i].filePath, d->path, sizeof(downloads[i].filePath)-1);
+#pragma GCC diagnostic pop
 	HTTP_StartDownload (&downloads[i]);
 
 	return true;
