@@ -27,51 +27,51 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //the ordering of weapons must match ITEM_ defines too!
 const weaponinfo_t	weaponvotes[WEAPON_MAX] = 
 {
-	{{"shot", "sg"}, WEAPON_SHOTGUN, ITEM_WEAPON_SHOTGUN},
-	{{"sup", "ssg"}, WEAPON_SSHOTGUN, ITEM_WEAPON_SUPERSHOTGUN},
-	{{"mac", "mg"}, WEAPON_MACHINEGUN, ITEM_WEAPON_MACHINEGUN},
-	{{"cha", "cg"}, WEAPON_CHAINGUN, ITEM_WEAPON_CHAINGUN},
-	{{"han", "hg"}, WEAPON_GRENADES, ITEM_AMMO_GRENADES},
-	{{"gre", "gl"}, WEAPON_GRENADELAUNCHER, ITEM_WEAPON_GRENADELAUNCHER},
-	{{"roc", "rl"}, WEAPON_ROCKETLAUNCHER, ITEM_WEAPON_ROCKETLAUNCHER},
-	{{"hyper", "hb"}, WEAPON_HYPERBLASTER, ITEM_WEAPON_HYPERBLASTER},
-	{{"rail", "rg"}, WEAPON_RAILGUN, ITEM_WEAPON_RAILGUN},
-	{{"bfg", "10k"}, WEAPON_BFG10K, ITEM_WEAPON_BFG},
+    {{"shot", "sg"}, WEAPON_SHOTGUN, ITEM_WEAPON_SHOTGUN},
+    {{"sup", "ssg"}, WEAPON_SSHOTGUN, ITEM_WEAPON_SUPERSHOTGUN},
+    {{"mac", "mg"}, WEAPON_MACHINEGUN, ITEM_WEAPON_MACHINEGUN},
+    {{"cha", "cg"}, WEAPON_CHAINGUN, ITEM_WEAPON_CHAINGUN},
+    {{"han", "hg"}, WEAPON_GRENADES, ITEM_AMMO_GRENADES},
+    {{"gre", "gl"}, WEAPON_GRENADELAUNCHER, ITEM_WEAPON_GRENADELAUNCHER},
+    {{"roc", "rl"}, WEAPON_ROCKETLAUNCHER, ITEM_WEAPON_ROCKETLAUNCHER},
+    {{"hyper", "hb"}, WEAPON_HYPERBLASTER, ITEM_WEAPON_HYPERBLASTER},
+    {{"rail", "rg"}, WEAPON_RAILGUN, ITEM_WEAPON_RAILGUN},
+    {{"bfg", "10k"}, WEAPON_BFG10K, ITEM_WEAPON_BFG},
 };
 
 const powerupinfo_t	powerupvotes[POWERUP_MAX] = 
 {
-	{{"quad"}, POWERUP_QUAD, ITEM_ITEM_QUAD},
-	{{"invul"}, POWERUP_INVULN, ITEM_ITEM_INVULNERABILITY,},
-	{{"ps"}, POWERUP_POWERSHIELD, ITEM_ITEM_POWER_SHIELD},
-	{{"powerscreen"}, POWERUP_POWERSCREEN, ITEM_ITEM_POWER_SCREEN},
-	{{"silencer"}, POWERUP_SILENCER, ITEM_ITEM_SILENCER},
-	{{"rebreather"}, POWERUP_REBREATHER, ITEM_ITEM_BREATHER},
-	{{"envirosuit"}, POWERUP_ENVIROSUIT, ITEM_ITEM_ENVIRO},
+    {{"quad"}, POWERUP_QUAD, ITEM_ITEM_QUAD},
+    {{"invul"}, POWERUP_INVULN, ITEM_ITEM_INVULNERABILITY,},
+    {{"ps"}, POWERUP_POWERSHIELD, ITEM_ITEM_POWER_SHIELD},
+    {{"powerscreen"}, POWERUP_POWERSCREEN, ITEM_ITEM_POWER_SCREEN},
+    {{"silencer"}, POWERUP_SILENCER, ITEM_ITEM_SILENCER},
+    {{"rebreather"}, POWERUP_REBREATHER, ITEM_ITEM_BREATHER},
+    {{"envirosuit"}, POWERUP_ENVIROSUIT, ITEM_ITEM_ENVIRO},
 };
 
 const armorinfo_t armorvotes[ARMOR_MAX] =
 {
-	{{"jacket", "ga"}, ITEM_ARMOR_JACKET, ITEM_ITEM_ARMOR_JACKET},
-	{{"combat", "ya"}, ITEM_ARMOR_COMBAT, ITEM_ITEM_ARMOR_COMBAT},
-	{{"body", "ra"}, ITEM_ARMOR_BODY, ITEM_ITEM_ARMOR_BODY},
-	{{"shard", "sh"}, ITEM_ARMOR_SHARD, ITEM_ITEM_ARMOR_SHARD},
+    {{"jacket", "ga"}, ITEM_ARMOR_JACKET, ITEM_ITEM_ARMOR_JACKET},
+    {{"combat", "ya"}, ITEM_ARMOR_COMBAT, ITEM_ITEM_ARMOR_COMBAT},
+    {{"body", "ra"}, ITEM_ARMOR_BODY, ITEM_ITEM_ARMOR_BODY},
+    {{"shard", "sh"}, ITEM_ARMOR_SHARD, ITEM_ITEM_ARMOR_SHARD},
 };
 
 //current vote
-vote_t			vote;
+vote_t          vote;
 
 //cached configs
-tdm_config_t	tdm_configs;
+tdm_config_t    tdm_configs;
 
 //settings non-default?
-qboolean		tdm_settings_not_default;
+qboolean        tdm_settings_not_default;
 
 //config list
-char			**tdm_configlist;
-char			tdm_configlist_string[900];
+char            **tdm_configlist;
+char            tdm_configlist_string[900];
 
-tdm_download_t	tdm_vote_download;
+tdm_download_t  tdm_vote_download;
 
 /*
 ==============
@@ -82,202 +82,202 @@ Apply vote.
 void EndDMLevel (void);
 void TDM_ApplyVote (void)
 {
-	char value[16];
+    char value[16];
 
-	vote.applying = true;
+    vote.applying = true;
 
-	//only some flags cause settings change, restart, kick, abort, etc don't.
-	if (vote.flags &
-		(
-		VOTE_TIMELIMIT | VOTE_WEAPONS |VOTE_POWERUPS | VOTE_GAMEMODE | VOTE_TELEMODE | VOTE_TIEMODE |
-		VOTE_SWITCHMODE | VOTE_OVERTIME | VOTE_CONFIG	| VOTE_WEBCONFIG | VOTE_CHAT | VOTE_BUGS |
-		VOTE_TDM_SPAWNMODE | VOTE_1V1_SPAWNMODE)
-		)
-		tdm_settings_not_default = true;
+    //only some flags cause settings change, restart, kick, abort, etc don't.
+    if (vote.flags &
+        (
+        VOTE_TIMELIMIT | VOTE_WEAPONS |VOTE_POWERUPS | VOTE_GAMEMODE | VOTE_TELEMODE | VOTE_TIEMODE |
+        VOTE_SWITCHMODE | VOTE_OVERTIME | VOTE_CONFIG	| VOTE_WEBCONFIG | VOTE_CHAT | VOTE_BUGS |
+        VOTE_TDM_SPAWNMODE | VOTE_1V1_SPAWNMODE)
+        )
+        tdm_settings_not_default = true;
 
-	if (vote.flags & VOTE_CONFIG)
-	{
-		gi.bprintf (PRINT_CHAT, "New config: %s\n", vote.configname);
-		gi.AddCommandString (va ("exec configs/%s\nsv applysettings\n", vote.configname));
-	}
-	else if (vote.flags & VOTE_WEBCONFIG)
-		gi.bprintf (PRINT_CHAT, "New web config: %s\n", vote.configname);
-	
-	if (vote.flags & VOTE_TIMELIMIT)
-	{
-		sprintf (value, "%d", vote.newtimelimit * 60);
-		g_match_time = gi.cvar_set ("g_match_time", value);
+    if (vote.flags & VOTE_CONFIG)
+    {
+        gi.bprintf (PRINT_CHAT, "New config: %s\n", vote.configname);
+        gi.AddCommandString (va ("exec configs/%s\nsv applysettings\n", vote.configname));
+    }
+    else if (vote.flags & VOTE_WEBCONFIG)
+        gi.bprintf (PRINT_CHAT, "New web config: %s\n", vote.configname);
 
-		if (!(vote.flags & (VOTE_CONFIG|VOTE_WEBCONFIG)))
-			gi.bprintf (PRINT_CHAT, "New timelimit: %d minute%s\n", (int)vote.newtimelimit, vote.newtimelimit == 1 ? "" : "s");
+    if (vote.flags & VOTE_TIMELIMIT)
+    {
+        sprintf (value, "%d", vote.newtimelimit * 60);
+        g_match_time = gi.cvar_set ("g_match_time", value);
 
-		//update matchinfo, since this can be voted mid-game
-		if (tdm_match_status >= MM_PLAYING && tdm_match_status < MM_SCOREBOARD)
-		{
-			current_matchinfo.timelimit = g_match_time->value / 60;
-			level.match_end_framenum = level.match_start_framenum + SECS_TO_FRAMES(g_match_time->value);
+        if (!(vote.flags & (VOTE_CONFIG|VOTE_WEBCONFIG)))
+            gi.bprintf (PRINT_CHAT, "New timelimit: %d minute%s\n", (int)vote.newtimelimit, vote.newtimelimit == 1 ? "" : "s");
 
-			//end immediately if timelimit was reduced
-			if (level.match_end_framenum < level.framenum)
-				level.match_end_framenum = level.framenum;
+        //update matchinfo, since this can be voted mid-game
+        if (tdm_match_status >= MM_PLAYING && tdm_match_status < MM_SCOREBOARD)
+        {
+            current_matchinfo.timelimit = g_match_time->value / 60;
+            level.match_end_framenum = level.match_start_framenum + SECS_TO_FRAMES(g_match_time->value);
 
-			//tl was extended during OT, remove OT
-			if (level.match_end_framenum > level.framenum && (tdm_match_status == MM_OVERTIME || tdm_match_status == MM_SUDDEN_DEATH))
-			{
-				gi.bprintf (PRINT_HIGH, "Timelimit extended, %s canceled!\n",tdm_match_status == MM_OVERTIME ? "overtime" : "sudden death");
-				tdm_match_status = MM_PLAYING;
-			}				
-		}
-	}
+            //end immediately if timelimit was reduced
+            if (level.match_end_framenum < level.framenum)
+                level.match_end_framenum = level.framenum;
 
-	if (vote.flags & VOTE_KICK)
-	{
-		gi.AddCommandString (va ("kick %d\n", (int)(vote.victim - g_edicts - 1)));
-	}
+            //tl was extended during OT, remove OT
+            if (level.match_end_framenum > level.framenum && (tdm_match_status == MM_OVERTIME || tdm_match_status == MM_SUDDEN_DEATH))
+            {
+                gi.bprintf (PRINT_HIGH, "Timelimit extended, %s canceled!\n",tdm_match_status == MM_OVERTIME ? "overtime" : "sudden death");
+                tdm_match_status = MM_PLAYING;
+            }
+        }
+    }
 
-	if (vote.flags & VOTE_WEAPONS)
-	{
-		sprintf (value, "%d", vote.newweaponflags);
-		g_itemflags = gi.cvar_set ("g_itemflags", value);
-	}
+    if (vote.flags & VOTE_KICK)
+    {
+        gi.AddCommandString (va ("kick %d\n", (int)(vote.victim - g_edicts - 1)));
+    }
 
-	if (vote.flags & VOTE_POWERUPS)
-	{
-		sprintf (value, "%d", vote.newpowerupflags);
-		g_powerupflags = gi.cvar_set ("g_powerupflags", value);
-	}
+    if (vote.flags & VOTE_WEAPONS)
+    {
+        sprintf (value, "%d", vote.newweaponflags);
+        g_itemflags = gi.cvar_set ("g_itemflags", value);
+    }
 
-	if (vote.flags & (VOTE_WEAPONS|VOTE_POWERUPS))
-		TDM_ResetLevel ();
+    if (vote.flags & VOTE_POWERUPS)
+    {
+        sprintf (value, "%d", vote.newpowerupflags);
+        g_powerupflags = gi.cvar_set ("g_powerupflags", value);
+    }
 
-	if (vote.flags & VOTE_GAMEMODE)
-	{
-		if (vote.gamemode == GAMEMODE_ITDM)
-			dmflags = gi.cvar_set ("dmflags", g_itdmflags->string);
-		else if (vote.gamemode == GAMEMODE_TDM)
-			dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
-		else if (vote.gamemode == GAMEMODE_1V1)
-			dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
+    if (vote.flags & (VOTE_WEAPONS|VOTE_POWERUPS))
+        TDM_ResetLevel ();
 
-		//we force it here since we're in warmup and we know what we're doing.
-		//g_gamemode is latched otherwise to prevent server op from changing it
-		//via rcon / console mid game and ruining things.
-		gi.cvar_forceset ("g_gamemode", va ("%d", vote.gamemode));
+    if (vote.flags & VOTE_GAMEMODE)
+    {
+        if (vote.gamemode == GAMEMODE_ITDM)
+            dmflags = gi.cvar_set ("dmflags", g_itdmflags->string);
+        else if (vote.gamemode == GAMEMODE_TDM)
+            dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
+        else if (vote.gamemode == GAMEMODE_1V1)
+            dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
 
-		//0000129: Possible to start 1v1 with more than 2 players 
-		if (vote.gamemode == GAMEMODE_1V1)
-		{
-			edict_t	*ent;
-			int		i;
+        //we force it here since we're in warmup and we know what we're doing.
+        //g_gamemode is latched otherwise to prevent server op from changing it
+        //via rcon / console mid game and ruining things.
+        gi.cvar_forceset ("g_gamemode", va ("%d", vote.gamemode));
 
-			for (i = 1; i <= game.maxclients; i++)
-			{
-				ent = g_edicts + i;
+        //0000129: Possible to start 1v1 with more than 2 players
+        if (vote.gamemode == GAMEMODE_1V1)
+        {
+            edict_t *ent;
+            int i;
 
-				if (!ent->inuse)
-					continue;
+            for (i = 1; i <= game.maxclients; i++)
+            {
+                ent = g_edicts + i;
 
-				if (ent->client->pers.team && teaminfo[ent->client->pers.team].captain != ent)
-				{
-					TDM_LeftTeam (ent, false);
-					respawn (ent);
-				}
-			}
-		}
+                if (!ent->inuse)
+                    continue;
 
-		TDM_ResetGameState ();
-		TDM_UpdateConfigStrings (true);
-	}
+                if (ent->client->pers.team && teaminfo[ent->client->pers.team].captain != ent)
+                {
+                    TDM_LeftTeam (ent, false);
+                    respawn (ent);
+                }
+            }
+        }
 
-	if (vote.flags & VOTE_TIEMODE)
-	{
-		sprintf (value, "%d", vote.tiemode);
-		g_tie_mode = gi.cvar_set ("g_tie_mode", value);
-	}
+        TDM_ResetGameState ();
+        TDM_UpdateConfigStrings (true);
+    }
 
-	if (vote.flags & VOTE_SWITCHMODE)
-	{
-		sprintf (value, "%d", vote.switchmode);
-		g_fast_weap_switch = gi.cvar_set ("g_fast_weap_switch", value);
-	}
+    if (vote.flags & VOTE_TIEMODE)
+    {
+        sprintf (value, "%d", vote.tiemode);
+        g_tie_mode = gi.cvar_set ("g_tie_mode", value);
+    }
 
-	if (vote.flags & VOTE_TELEMODE)
-	{
-		sprintf (value, "%d", vote.telemode);
-		g_teleporter_nofreeze = gi.cvar_set ("g_teleporter_nofreeze", value);
-	}
+    if (vote.flags & VOTE_SWITCHMODE)
+    {
+        sprintf (value, "%d", vote.switchmode);
+        g_fast_weap_switch = gi.cvar_set ("g_fast_weap_switch", value);
+    }
 
-	if (vote.flags & VOTE_CHAT)
-	{
-		sprintf (value, "%d", vote.newchatmode);
-		g_chat_mode = gi.cvar_set ("g_chat_mode", value);
-	}
+    if (vote.flags & VOTE_TELEMODE)
+    {
+        sprintf (value, "%d", vote.telemode);
+        g_teleporter_nofreeze = gi.cvar_set ("g_teleporter_nofreeze", value);
+    }
 
-	if (vote.flags & VOTE_OVERTIME)
-	{
-		sprintf (value, "%d", vote.overtimemins * 60);
-		g_overtime = gi.cvar_set ("g_overtime", value);
+    if (vote.flags & VOTE_CHAT)
+    {
+        sprintf (value, "%d", vote.newchatmode);
+        g_chat_mode = gi.cvar_set ("g_chat_mode", value);
+    }
 
-		if (!(vote.flags & (VOTE_CONFIG|VOTE_WEBCONFIG)))
-			gi.bprintf (PRINT_CHAT, "New overtime: %d minute%s\n", (int)vote.overtimemins, vote.overtimemins == 1 ? "" : "s");
-	}
+    if (vote.flags & VOTE_OVERTIME)
+    {
+        sprintf (value, "%d", vote.overtimemins * 60);
+        g_overtime = gi.cvar_set ("g_overtime", value);
 
-	// let's have this in the end, so it doesn't mess up with other votes like gamemode
-	if (vote.flags & VOTE_MAP)
-	{
-		strcpy (level.nextmap, vote.newmap);
-		if (!(vote.flags & (VOTE_CONFIG|VOTE_WEBCONFIG)))
-			gi.bprintf (PRINT_CHAT, "New map: %s\n", vote.newmap);
-		EndDMLevel();
-	}
+        if (!(vote.flags & (VOTE_CONFIG|VOTE_WEBCONFIG)))
+            gi.bprintf (PRINT_CHAT, "New overtime: %d minute%s\n", (int)vote.overtimemins, vote.overtimemins == 1 ? "" : "s");
+    }
 
-	if (vote.flags & VOTE_RESTART)
-	{
-		edict_t *ent;
+    // let's have this in the end, so it doesn't mess up with other votes like gamemode
+    if (vote.flags & VOTE_MAP)
+    {
+        strcpy (level.nextmap, vote.newmap);
+        if (!(vote.flags & (VOTE_CONFIG|VOTE_WEBCONFIG)))
+            gi.bprintf (PRINT_CHAT, "New map: %s\n", vote.newmap);
+        EndDMLevel();
+    }
 
-		//abort the match instead of restarting if either team has no players
-		if (!teaminfo[TEAM_A].players || !teaminfo[TEAM_B].players)
-			goto abort;
+    if (vote.flags & VOTE_RESTART)
+    {
+        edict_t *ent;
 
-		gi.bprintf (PRINT_CHAT, "Restarting the match...\n");
-		
-		//ugly, but we need to free dynamic memory since the match start allocs a new array
-		gi.TagFree (current_matchinfo.teamplayers);
-		current_matchinfo.teamplayers = NULL;
+        //abort the match instead of restarting if either team has no players
+        if (!teaminfo[TEAM_A].players || !teaminfo[TEAM_B].players)
+            goto abort;
 
-		//clear stale teamplayerinfo pointers
-		for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-		{
-			if (ent->inuse)
-			{
-				ent->client->resp.teamplayerinfo = NULL;
-				ent->client->resp.score = 0;
-			}
-		}
-		
-		TDM_BeginCountdown ();
-	}
+        gi.bprintf (PRINT_CHAT, "Restarting the match...\n");
 
-	if (vote.flags & VOTE_SHUFFLE) {
-		gi.bprintf(PRINT_HIGH, "Teams have been randomly shuffled.\n");
-		TDM_RandomizeTeams();
-	}
+        //ugly, but we need to free dynamic memory since the match start allocs a new array
+        gi.TagFree (current_matchinfo.teamplayers);
+        current_matchinfo.teamplayers = NULL;
 
-	if (vote.flags & VOTE_ARMOR_TIMER) {
-		sprintf(value, "%d", vote.armor_timer);
-		g_armor_timer = gi.cvar_set("g_armor_timer", value);
-	}
+        //clear stale teamplayerinfo pointers
+        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
+        {
+            if (ent->inuse)
+            {
+                ent->client->resp.teamplayerinfo = NULL;
+                ent->client->resp.score = 0;
+            }
+        }
 
-	if (vote.flags & VOTE_WEAPON_TIMER) {
-		sprintf(value, "%d", vote.weapon_timer);
-		g_weapon_timer = gi.cvar_set("g_weapon_timer", value);
-	}
+        TDM_BeginCountdown ();
+    }
 
-	if (vote.flags & VOTE_TIMEOUT_LIMIT) {
-		sprintf(value, "%d", vote.timeoutlimit);
-		g_timeout_limit = gi.cvar_set("g_timeout_limit", va("%d", vote.timeoutlimit));
-		gi.bprintf(PRINT_HIGH, "Per-player timeout limit set to %d\n", vote.timeoutlimit);
-	}
+    if (vote.flags & VOTE_SHUFFLE) {
+        gi.bprintf(PRINT_HIGH, "Teams have been randomly shuffled.\n");
+        TDM_RandomizeTeams();
+    }
+
+    if (vote.flags & VOTE_ARMOR_TIMER) {
+        sprintf(value, "%d", vote.armor_timer);
+        g_armor_timer = gi.cvar_set("g_armor_timer", value);
+    }
+
+    if (vote.flags & VOTE_WEAPON_TIMER) {
+        sprintf(value, "%d", vote.weapon_timer);
+        g_weapon_timer = gi.cvar_set("g_weapon_timer", value);
+    }
+
+    if (vote.flags & VOTE_TIMEOUT_LIMIT) {
+        sprintf(value, "%d", vote.timeoutlimit);
+        g_timeout_limit = gi.cvar_set("g_timeout_limit", va("%d", vote.timeoutlimit));
+        gi.bprintf(PRINT_HIGH, "Per-player timeout limit set to %d\n", vote.timeoutlimit);
+    }
 
     if (vote.flags & VOTE_TIMEOUT_CAPTAIN) {
         sprintf(value, "%d", vote.timeoutcaptain);
@@ -285,32 +285,32 @@ void TDM_ApplyVote (void)
         gi.bprintf(PRINT_HIGH, "%s\n", (value) ? "Captains only can call timeout" : "Any player can call timeout");
     }
 
-	if (vote.flags & VOTE_ABORT)
-	{
-abort:
-		gi.bprintf (PRINT_CHAT, "Match aborted.\n");
-		TDM_EndMatch ();
-	}
+    if (vote.flags & VOTE_ABORT)
+    {
+    abort:
+        gi.bprintf (PRINT_CHAT, "Match aborted.\n");
+        TDM_EndMatch ();
+    }
 
-	if (vote.flags & VOTE_BUGS)
-	{
-		sprintf (value, "%d", vote.bugs);
-		g_bugs = gi.cvar_set ("g_bugs", value);
-	}
+    if (vote.flags & VOTE_BUGS)
+    {
+        sprintf (value, "%d", vote.bugs);
+        g_bugs = gi.cvar_set ("g_bugs", value);
+    }
 
-	if (vote.flags & VOTE_TDM_SPAWNMODE)
-	{
-		sprintf (value, "%d", vote.spawn_mode);
-		g_tdm_spawn_mode = gi.cvar_set ("g_tdm_spawn_mode", value);
-	}
+    if (vote.flags & VOTE_TDM_SPAWNMODE)
+    {
+        sprintf (value, "%d", vote.spawn_mode);
+        g_tdm_spawn_mode = gi.cvar_set ("g_tdm_spawn_mode", value);
+    }
 
-	if (vote.flags & VOTE_1V1_SPAWNMODE)
-	{
-		sprintf (value, "%d", vote.spawn_mode);
-		g_1v1_spawn_mode = gi.cvar_set ("g_1v1_spawn_mode", value);
-	}
+    if (vote.flags & VOTE_1V1_SPAWNMODE)
+    {
+        sprintf (value, "%d", vote.spawn_mode);
+        g_1v1_spawn_mode = gi.cvar_set ("g_1v1_spawn_mode", value);
+    }
 
-	vote.applying = false;
+    vote.applying = false;
 }
 
 /*
@@ -321,53 +321,53 @@ Display the vote on the screen during active vote.
 */
 void TDM_UpdateVoteConfigString (void)
 {
-	int		vote_time = 0;
-	int		vote_total = 0;
-	int		vote_hold = 0;
-	int		vote_yes = 0;
-	int		vote_no = 0;
-	edict_t	*ent;
-	char	vote_string[1024];
+    int vote_time = 0;
+    int vote_total = 0;
+    int vote_hold = 0;
+    int vote_yes = 0;
+    int vote_no = 0;
+    edict_t *ent;
+    char vote_string[1024];
 
-	*vote_string = 0;
+    *vote_string = 0;
 
-	if (vote.active)
-	{
-		for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-		{
-			if (!ent->inuse)
-				continue;
+    if (vote.active)
+    {
+        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
+        {
+            if (!ent->inuse)
+                continue;
 
-			if (!ent->client->pers.team)
-				continue;
+            if (!ent->client->pers.team)
+                continue;
 
-			if (ent->client->resp.vote == VOTE_YES)
-				vote_yes++;
-			else if (ent->client->resp.vote == VOTE_NO)
-				vote_no++;
-			else if (ent->client->resp.vote == VOTE_HOLD)
-	 			vote_hold++;
+            if (ent->client->resp.vote == VOTE_YES)
+                vote_yes++;
+            else if (ent->client->resp.vote == VOTE_NO)
+                vote_no++;
+            else if (ent->client->resp.vote == VOTE_HOLD)
+                vote_hold++;
 
-			vote_total++;
-		}
+            vote_total++;
+        }
 
-		if (vote_total % 2 == 0)
-			vote_total = vote_total/2 + 1;
-		else
-			vote_total = ceil((float)vote_total/2.0f);
+        if (vote_total % 2 == 0)
+            vote_total = vote_total/2 + 1;
+        else
+            vote_total = ceil((float)vote_total/2.0f);
 
-		vote_time = FRAMES_TO_SECS (vote.end_frame - level.framenum);
-		sprintf (vote_string, "Vote: %s. Yes: %d (%d) No: %d [%02d]",
-			vote.vote_string, vote_yes, vote_total, vote_no, vote_time);
+        vote_time = FRAMES_TO_SECS (vote.end_frame - level.framenum);
+        sprintf (vote_string, "Vote: %s. Yes: %d (%d) No: %d [%02d]",
+            vote.vote_string, vote_yes, vote_total, vote_no, vote_time);
 
-		if (strlen(vote_string) > 63)
-		{
-			sprintf (vote_string, "Vote: type 'vote' to see changes. Yes: %d (%d) No: %d [%02d]",
-				vote_yes, vote_total, vote_no, vote_time);
-		}
-	}
+        if (strlen(vote_string) > 63)
+        {
+            sprintf (vote_string, "Vote: type 'vote' to see changes. Yes: %d (%d) No: %d [%02d]",
+                vote_yes, vote_total, vote_no, vote_time);
+        }
+    }
 
-	gi.configstring (CS_TDM_VOTE_STRING, vote_string);
+    gi.configstring (CS_TDM_VOTE_STRING, vote_string);
 }
 
 /*
@@ -379,227 +379,227 @@ should be on screen vote
 */
 static void TDM_AnnounceVote (void)
 {
-	char		message[1024];
-	static char	what[1024];
+    char        message[1024];
+    static char what[1024];
 
-	message[0] = 0;
-	what[0] = 0;
+    message[0] = 0;
+    what[0] = 0;
 
-	strcpy (message, vote.initiator->client->pers.netname);
-	strcat (message, " started a vote: ");
+    strcpy (message, vote.initiator->client->pers.netname);
+    strcat (message, " started a vote: ");
 
-	if (vote.flags & VOTE_CONFIG)
-		sprintf (what, "config %s", vote.configname);
-	else if (vote.flags & VOTE_WEBCONFIG)
-		sprintf (what, "webconfig %s (", vote.configname);
+    if (vote.flags & VOTE_CONFIG)
+        sprintf (what, "config %s", vote.configname);
+    else if (vote.flags & VOTE_WEBCONFIG)
+        sprintf (what, "webconfig %s (", vote.configname);
 
-	if (vote.flags & VOTE_TIMELIMIT)
-	{
-		strcat (what, va("timelimit %d", vote.newtimelimit));
-	}
-	
-	if (vote.flags & VOTE_MAP)
-	{
-		if (what[0])
-			strcat (what, ", ");
-		strcat (what, va ("map %s",vote.newmap));
-	}
-	
-	if (vote.flags & VOTE_WEAPONS)
-	{
-		int			j;
+    if (vote.flags & VOTE_TIMELIMIT)
+    {
+        strcat (what, va("timelimit %d", vote.newtimelimit));
+    }
 
-		if (what[0])
-			strcat (what, ", ");
+    if (vote.flags & VOTE_MAP)
+    {
+        if (what[0])
+            strcat (what, ", ");
+        strcat (what, va ("map %s",vote.newmap));
+    }
 
-		strcat (what, va("weapons"));
-		for (j = 0; j < sizeof(weaponvotes) / sizeof(weaponvotes[1]); j++)
-		{
-			if ((vote.newweaponflags & weaponvotes[j].value) && !((int)g_itemflags->value & weaponvotes[j].value))
-			{
-				strcat (what, va(" -%s", weaponvotes[j].names[1]));
-			}
-			else if (!(vote.newweaponflags & weaponvotes[j].value) && ((int)g_itemflags->value & weaponvotes[j].value))
-			{
-				strcat (what, va(" +%s", weaponvotes[j].names[1]));
-			}
-		}
-	}
+    if (vote.flags & VOTE_WEAPONS)
+    {
+        int j;
 
-	//FIXME: should this really be able to be snuck in with all the other flags? :)
-	if (vote.flags & VOTE_KICK)
-	{
-		if (what[0])
-			strcat (what, ", ");
-		strcat (what, va("kick %s", vote.victim->client->pers.netname));
-	}
-	
-	if (vote.flags & VOTE_POWERUPS)
-	{
-		int			j;
+        if (what[0])
+            strcat (what, ", ");
 
-		if (what[0])
-			strcat (what, ", ");
+        strcat (what, va("weapons"));
+        for (j = 0; j < sizeof(weaponvotes) / sizeof(weaponvotes[1]); j++)
+        {
+            if ((vote.newweaponflags & weaponvotes[j].value) && !((int)g_itemflags->value & weaponvotes[j].value))
+            {
+                strcat (what, va(" -%s", weaponvotes[j].names[1]));
+            }
+            else if (!(vote.newweaponflags & weaponvotes[j].value) && ((int)g_itemflags->value & weaponvotes[j].value))
+            {
+                strcat (what, va(" +%s", weaponvotes[j].names[1]));
+            }
+        }
+    }
 
-		strcat (what, va("powerups"));
-		for (j = 0; j < sizeof(powerupvotes) / sizeof(powerupvotes[1]); j++)
-		{
-			if ((vote.newpowerupflags & powerupvotes[j].value) && !((int)g_powerupflags->value & powerupvotes[j].value))
-			{
-				strcat (what, va(" -%s", powerupvotes[j].names[0]));
-			}
-			else if (!(vote.newpowerupflags & powerupvotes[j].value) && ((int)g_powerupflags->value & powerupvotes[j].value))
-			{
-				strcat (what, va(" +%s", powerupvotes[j].names[0]));
-			}
-		}
-	}
-	
-	if (vote.flags & VOTE_GAMEMODE)
-	{
-		if (what[0])
-			strcat (what, ", ");
+    //FIXME: should this really be able to be snuck in with all the other flags? :)
+    if (vote.flags & VOTE_KICK)
+    {
+        if (what[0])
+            strcat (what, ", ");
+        strcat (what, va("kick %s", vote.victim->client->pers.netname));
+    }
 
-		if (vote.gamemode == GAMEMODE_TDM)
-			strcat (what, "mode TDM");
-		else if (vote.gamemode == GAMEMODE_ITDM)
-			strcat (what, "mode ITDM");
-		else if (vote.gamemode == GAMEMODE_1V1)
-			strcat (what, "mode 1v1");
-	}
+    if (vote.flags & VOTE_POWERUPS)
+    {
+        int j;
 
-	if (vote.flags & VOTE_TIEMODE)
-	{
-		if (what[0])
-			strcat (what, ", ");
+        if (what[0])
+            strcat (what, ", ");
 
-		if (vote.tiemode == 0)
-			strcat (what, "no overtime");
-		else if (vote.tiemode == 1)
-			strcat (what, "overtime enabled");
-		else if (vote.tiemode == 2)
-			strcat (what, "sudden death enabled");
-	}
+        strcat (what, va("powerups"));
+        for (j = 0; j < sizeof(powerupvotes) / sizeof(powerupvotes[1]); j++)
+        {
+            if ((vote.newpowerupflags & powerupvotes[j].value) && !((int)g_powerupflags->value & powerupvotes[j].value))
+            {
+                strcat (what, va(" -%s", powerupvotes[j].names[0]));
+            }
+            else if (!(vote.newpowerupflags & powerupvotes[j].value) && ((int)g_powerupflags->value & powerupvotes[j].value))
+            {
+                strcat (what, va(" +%s", powerupvotes[j].names[0]));
+            }
+        }
+    }
 
-	if (vote.flags & VOTE_SWITCHMODE)
-	{
-		if (what[0])
-			strcat (what, ", ");
+    if (vote.flags & VOTE_GAMEMODE)
+    {
+        if (what[0])
+            strcat (what, ", ");
 
-		if (vote.switchmode == 0)
-			strcat (what, "normal weapon switch");
-		else if (vote.switchmode == 1)
-			strcat (what, "faster weapon switch");
-		else if (vote.switchmode == 2)
-			strcat (what, "instant weapon switch");
-		else if (vote.switchmode == 3)
-			strcat (what, "insane weapon switch");
-		else if (vote.switchmode == 4)
-			strcat (what, "extreme weapon switch");
-	}
+        if (vote.gamemode == GAMEMODE_TDM)
+            strcat (what, "mode TDM");
+        else if (vote.gamemode == GAMEMODE_ITDM)
+            strcat (what, "mode ITDM");
+        else if (vote.gamemode == GAMEMODE_1V1)
+            strcat (what, "mode 1v1");
+    }
 
-	if (vote.flags & VOTE_TELEMODE)
-	{
-		if (what[0])
-			strcat (what, ", ");
+    if (vote.flags & VOTE_TIEMODE)
+    {
+        if (what[0])
+            strcat (what, ", ");
 
-		if (vote.telemode == 0)
-			strcat (what, "normal teleporter mode");
-		else if (vote.telemode == 1)
-			strcat (what, "no freeze teleporter mode");
-	}
+        if (vote.tiemode == 0)
+            strcat (what, "no overtime");
+        else if (vote.tiemode == 1)
+            strcat (what, "overtime enabled");
+        else if (vote.tiemode == 2)
+            strcat (what, "sudden death enabled");
+    }
 
-	if (vote.flags & VOTE_OVERTIME)
-	{
-		if (what[0])
-			strcat (what, ", ");
+    if (vote.flags & VOTE_SWITCHMODE)
+    {
+        if (what[0])
+            strcat (what, ", ");
 
-		strcat (what, va("overtime %d", vote.overtimemins));
-	}
+        if (vote.switchmode == 0)
+            strcat (what, "normal weapon switch");
+        else if (vote.switchmode == 1)
+            strcat (what, "faster weapon switch");
+        else if (vote.switchmode == 2)
+            strcat (what, "instant weapon switch");
+        else if (vote.switchmode == 3)
+            strcat (what, "insane weapon switch");
+        else if (vote.switchmode == 4)
+            strcat (what, "extreme weapon switch");
+    }
 
-	if (vote.flags & VOTE_CHAT)
-	{
-		if (what[0])
-			strcat (what, ", ");
+    if (vote.flags & VOTE_TELEMODE)
+    {
+        if (what[0])
+            strcat (what, ", ");
 
-		//note, 2 is not votable by clients
-		if (vote.newchatmode == 2)
-			strcat (what, "no spectator chat");
-		else if (vote.newchatmode == 1)
-			strcat (what, "no global spectator chat");
-		else
-			strcat (what, "allow all chat");
-	}
+        if (vote.telemode == 0)
+            strcat (what, "normal teleporter mode");
+        else if (vote.telemode == 1)
+            strcat (what, "no freeze teleporter mode");
+    }
 
-	if (vote.flags & VOTE_RESTART)
-		strcat (what, "restart the match");
+    if (vote.flags & VOTE_OVERTIME)
+    {
+        if (what[0])
+            strcat (what, ", ");
 
-	if (vote.flags & VOTE_ABORT)
-		strcat (what, "abort the match");
+        strcat (what, va("overtime %d", vote.overtimemins));
+    }
 
-	if (vote.flags & VOTE_BUGS)
-	{
-		if (what[0])
-			strcat (what, ", ");
+    if (vote.flags & VOTE_CHAT)
+    {
+        if (what[0])
+            strcat (what, ", ");
 
-		if (vote.bugs == 0)
-			strcat (what, "all q2 gameplay bugs fixed");
-		else if (vote.bugs == 1)
-			strcat (what, "serious q2 gameplay bugs fixed");
-		else if (vote.bugs == 2)
-			strcat (what, "no q2 gameplay bugs fixed");
-	}
+        //note, 2 is not votable by clients
+        if (vote.newchatmode == 2)
+            strcat (what, "no spectator chat");
+        else if (vote.newchatmode == 1)
+            strcat (what, "no global spectator chat");
+        else
+            strcat (what, "allow all chat");
+    }
 
-	if (vote.flags & (VOTE_1V1_SPAWNMODE | VOTE_TDM_SPAWNMODE))
-	{
-		int	spawn_mode;
+    if (vote.flags & VOTE_RESTART)
+        strcat (what, "restart the match");
 
-		if (what[0])
-			strcat (what, ", ");
+    if (vote.flags & VOTE_ABORT)
+        strcat (what, "abort the match");
 
-		spawn_mode = vote.spawn_mode & ~SPAWN_RANDOM_ON_SMALL_MAPS;
+    if (vote.flags & VOTE_BUGS)
+    {
+        if (what[0])
+            strcat (what, ", ");
 
-		if (spawn_mode == 0)
-			strcat (what, "respawn avoid closest");
-		else if (spawn_mode == 1)
-			strcat (what, "respawn avoid closest (fixed)");
-		else if (spawn_mode == 2)
-			strcat (what, "respawn random");
-	}
+        if (vote.bugs == 0)
+            strcat (what, "all q2 gameplay bugs fixed");
+        else if (vote.bugs == 1)
+            strcat (what, "serious q2 gameplay bugs fixed");
+        else if (vote.bugs == 2)
+            strcat (what, "no q2 gameplay bugs fixed");
+    }
 
-	if (vote.flags & (VOTE_WEBCONFIG))
-		strcat (what, ")");
+    if (vote.flags & (VOTE_1V1_SPAWNMODE | VOTE_TDM_SPAWNMODE))
+    {
+        int	spawn_mode;
 
-	if (vote.flags & VOTE_SHUFFLE) {
-		if (what[0]) {
-			strcat (what, ", ");
-		}
-		strcat(what, "shuffle team players");
-	}
+        if (what[0])
+            strcat (what, ", ");
 
-	if (vote.flags & VOTE_ARMOR_TIMER) {
-		if (what[0]) {
-			strcat (what, ", ");
-		}
+        spawn_mode = vote.spawn_mode & ~SPAWN_RANDOM_ON_SMALL_MAPS;
 
-		if (vote.armor_timer) {
-			strcat(what, "enable armor timer");
-		} else {
-			strcat(what, "disable armor timer");
-		}
-	}
+        if (spawn_mode == 0)
+            strcat (what, "respawn avoid closest");
+        else if (spawn_mode == 1)
+            strcat (what, "respawn avoid closest (fixed)");
+        else if (spawn_mode == 2)
+            strcat (what, "respawn random");
+    }
 
-	if (vote.flags & VOTE_WEAPON_TIMER) {
-		if (what[0]) {
-			strcat (what, ", ");
-		}
+    if (vote.flags & (VOTE_WEBCONFIG))
+        strcat (what, ")");
 
-		if (vote.weapon_timer) {
-			strcat(what, "enable weapon timer");
-		} else {
-			strcat(what, "disable weapon timer");
-		}
-	}
+    if (vote.flags & VOTE_SHUFFLE) {
+        if (what[0]) {
+            strcat (what, ", ");
+        }
+        strcat(what, "shuffle team players");
+    }
+
+    if (vote.flags & VOTE_ARMOR_TIMER) {
+        if (what[0]) {
+            strcat (what, ", ");
+        }
+
+        if (vote.armor_timer) {
+            strcat(what, "enable armor timer");
+        } else {
+            strcat(what, "disable armor timer");
+        }
+    }
+
+    if (vote.flags & VOTE_WEAPON_TIMER) {
+        if (what[0]) {
+            strcat (what, ", ");
+        }
+
+        if (vote.weapon_timer) {
+            strcat(what, "enable weapon timer");
+        } else {
+            strcat(what, "disable weapon timer");
+        }
+    }
 
     if (vote.flags & VOTE_TIMEOUT_CAPTAIN) {
         if (what[0]) {
@@ -613,25 +613,25 @@ static void TDM_AnnounceVote (void)
         }
     }
 
-	if (vote.flags & VOTE_TIMEOUT_LIMIT) {
-		if (what[0]) {
-			strcat(what, ", ");
-		}
+    if (vote.flags & VOTE_TIMEOUT_LIMIT) {
+        if (what[0]) {
+            strcat(what, ", ");
+        }
 
-		if (vote.timeoutlimit) {
-			strcat(what, va("timeout limit %d", vote.timeoutlimit));
-		} else {
-			strcat(what, "disable timeout limit");
-		}
-	}
+        if (vote.timeoutlimit) {
+            strcat(what, va("timeout limit %d", vote.timeoutlimit));
+        } else {
+            strcat(what, "disable timeout limit");
+        }
+    }
 
-	vote.vote_string = what;
+    vote.vote_string = what;
 
-	gi.bprintf (PRINT_HIGH, "%s%s\n", message, what);
+    gi.bprintf (PRINT_HIGH, "%s%s\n", message, what);
 
-	if (g_vote_attention->value) {
-		gi.sound(world, 0, gi.soundindex (g_vote_attention_sound->string), 1, ATTN_NONE, 0);
-	}
+    if (g_vote_attention->value) {
+        gi.sound(world, 0, gi.soundindex (g_vote_attention_sound->string), 1, ATTN_NONE, 0);
+    }
 }
 
 /*
@@ -2660,11 +2660,11 @@ qboolean TDM_ParseVoteConfigLine (char *line, int line_number, void *param)
     } else if (!strcmp(variable, "1v1_spawnmode")) {
         c->settings.spawn_mode = atoi (p);
         c->settings.flags |= VOTE_1V1_SPAWNMODE;
-    } else if (!strcmp(variable, "armor_timer")) {
+    } else if (!strcmp(variable, "armortimer")) {
         c->settings.armor_timer = atoi(p);
         c->settings.flags |= VOTE_ARMOR_TIMER;
-    } else if (!strcmp(variable, "weapon_timer")) {
-        c->settings.armor_timer = atoi(p);
+    } else if (!strcmp(variable, "weapontimer")) {
+        c->settings.weapon_timer = atoi(p);
         c->settings.flags |= VOTE_WEAPON_TIMER;
     } else if (!strcmp(variable, "timeout_captain")) {
         c->settings.timeoutcaptain = atoi(p);
