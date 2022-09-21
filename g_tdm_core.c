@@ -1855,6 +1855,14 @@ void TDM_CheckMatchStart (void)
 			level.tdm_pseudo_1v1mode = false;
 			tdm_match_status = MM_WARMUP;
 
+			// stop everyone from recording
+            for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+                if (ent->inuse && ent->client->pers.team &&
+                        (g_force_record->value == 1 || ent->client->pers.config.auto_record || UF(ent, AUTORECORD))) {
+                    G_StuffCmd (ent, "stop\n");
+                }
+            }
+
 			//reset teamnames if we entered pseudo-1v1 mode
 			TDM_UpdateTeamNames ();
 		}
