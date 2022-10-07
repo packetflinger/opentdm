@@ -1034,6 +1034,9 @@ void TDM_ItemsStats_f (edict_t *ent, matchinfo_t *m_info, teamplayer_t *p_info)
 	strcat (stats, extra);
 
 	gi.cprintf (ent, PRINT_HIGH, "%s", stats);
+
+	// send one to the server console as well (to include in server demos)
+	gi.cprintf(NULL, PRINT_HIGH, "%s", stats);
 }
 
 /*
@@ -1077,6 +1080,9 @@ void TDM_TeamItemsStats_f (edict_t *ent, matchinfo_t *m_info, int team)
 	strcat (stats, extra);
 
 	gi.cprintf (ent, PRINT_HIGH, "%s", stats);
+
+	// send one to the server console as well (to include in server demos)
+	gi.cprintf(NULL, PRINT_HIGH, "%s", stats);
 }
 
 /*
@@ -1159,6 +1165,9 @@ void TDM_GeneralStats_f (edict_t *ent, matchinfo_t *m_info, teamplayer_t *p_info
 	strcat (stats, va ("\n"));
 
 	gi.cprintf (ent, PRINT_HIGH, "%s", stats);
+
+	// send one to the server console as well (to include in server demos)
+	gi.cprintf(NULL, PRINT_HIGH, "%s", stats);
 }
 
 /*
