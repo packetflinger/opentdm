@@ -1181,34 +1181,34 @@ probably cause overflows!
 */
 void TDM_Stats_f (edict_t *ent, matchinfo_t *m_info)
 {
-	int				i;
-	teamplayer_t	*p_info = NULL;
+    int i;
+    teamplayer_t *p_info = NULL;
 
-	// after match stats.. don't guess the player, just pick the ent
-	if (tdm_match_status == MM_SCOREBOARD)
-	{
-		for (i = 0; i < m_info->num_teamplayers; i++)
-			if (m_info->teamplayers[i].client == ent)
-				p_info = &(m_info->teamplayers[i]);
+    // after match stats.. don't guess the player, just pick the ent
+    if (tdm_match_status == MM_SCOREBOARD) {
+        for (i = 0; i < m_info->num_teamplayers; i++) {
+            if (m_info->teamplayers[i].client == ent) {
+                p_info = &(m_info->teamplayers[i]);
+            }
+        }
+    } else { // find a player for stats
+        if (tdm_match_status == MM_WARMUP) {
+            m_info = &old_matchinfo;
+        }
 
-	}
-	// find a player for stats
-	else
-	{
-		if (tdm_match_status == MM_WARMUP)
-			m_info = &old_matchinfo;
+        p_info = TDM_GetInfoForPlayer (ent, m_info);
 
-		p_info = TDM_GetInfoForPlayer (ent, m_info);
+        if (!p_info) {
+            return;
+        }
 
-		if (!p_info)
-			return;
-	
-		if (TDM_StatCheatCheck (ent, m_info, p_info->team))
-			return;
-	}
+        if (TDM_StatCheatCheck (ent, m_info, p_info->team)) {
+            return;
+        }
+    }
 
-	TDM_ItemsStats_f (ent, m_info, p_info);
-	TDM_GeneralStats_f (ent, m_info, p_info, p_info->team);
+    TDM_ItemsStats_f (ent, m_info, p_info);
+    TDM_GeneralStats_f (ent, m_info, p_info, p_info->team);
 }
 
 /*
