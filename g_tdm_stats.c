@@ -1047,42 +1047,42 @@ Show items info.
 */
 void TDM_TeamItemsStats_f (edict_t *ent, matchinfo_t *m_info, int team)
 {
-	char			*extra;
-	static char		stats[1024];
+    char *extra;
+    static char stats[1024];
 
-	stats[0] = 0;
+    stats[0] = 0;
 
-	strcat (stats, va ("Team '%s':\n\n", m_info->teamnames[team]));
-	strcat (stats, va ("            %s | ", TDM_SetColorText (va ("Item"))));
-	strcat (stats, va ("%s\n", TDM_SetColorText (va ("Acc. Kills Deaths Dealt Recvd Pick Miss"))));
-	strcat (stats, va ("-----------------+----------------------------------------\n"));
+    strcat (stats, va ("Team '%s':\n\n", m_info->teamnames[team]));
+    strcat (stats, va ("            %s | ", TDM_SetColorText (va ("Item"))));
+    strcat (stats, va ("%s\n", TDM_SetColorText (va ("Acc. Kills Deaths Dealt Recvd Pick Miss"))));
+    strcat (stats, va ("-----------------+----------------------------------------\n"));
 
-	extra = TDM_BuildTeamWeaponsStatsString (ent, m_info, team);
+    extra = TDM_BuildTeamWeaponsStatsString (ent, m_info, team);
 
-	//need to flush?
-	if (strlen(stats) + 1 + strlen (extra) >= sizeof(stats)-1)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "%s", stats);
-		stats[0] = 0;
-	}
-	
-	strcat (stats, extra);
+    //need to flush?
+    if (strlen(stats) + 1 + strlen (extra) >= sizeof(stats)-1)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "%s", stats);
+        stats[0] = 0;
+    }
 
-	extra = TDM_BuildTeamItemsStatsString (ent, m_info, team);
+    strcat (stats, extra);
 
-	//need to flush?
-	if (strlen(stats) + 1 + strlen (extra) >= sizeof(stats)-1)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "%s", stats);
-		stats[0] = 0;
-	}
-	
-	strcat (stats, extra);
+    extra = TDM_BuildTeamItemsStatsString (ent, m_info, team);
 
-	gi.cprintf (ent, PRINT_HIGH, "%s", stats);
+    //need to flush?
+    if (strlen(stats) + 1 + strlen (extra) >= sizeof(stats)-1)
+    {
+        gi.cprintf (ent, PRINT_HIGH, "%s", stats);
+        stats[0] = 0;
+    }
 
-	// send one to the server console as well (to include in server demos)
-	gi.cprintf(NULL, PRINT_HIGH, "%s", stats);
+    strcat (stats, extra);
+
+    gi.cprintf (ent, PRINT_HIGH, "%s", stats);
+
+    // send one to the server console as well (to include in server demos)
+    gi.cprintf(NULL, PRINT_HIGH, "%s", stats);
 }
 
 /*
