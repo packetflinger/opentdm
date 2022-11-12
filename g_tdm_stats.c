@@ -814,95 +814,95 @@ Builds team items stats string.
 */
 char *TDM_BuildTeamItemsStatsString (edict_t *ent, matchinfo_t *m_info, unsigned team)
 {
-	static char		stats[1400];
-	unsigned		i, j;
-	int				frags_i, deaths_i, dealt_i, recvd_i, picked_i;
-	char			frags[6], deaths[6], dealt[6], recvd[6], missed[6];
-	teamplayer_t	*p_info;
-	qboolean		skip;
-	qboolean		basic;
+    static char     stats[1400];
+    unsigned        i, j;
+    int             frags_i, deaths_i, dealt_i, recvd_i, picked_i;
+    char            frags[6], deaths[6], dealt[6], recvd[6], missed[6];
+    teamplayer_t    *p_info;
+    qboolean        skip;
+    qboolean        basic;
 
-	stats[0] = 0;
+    stats[0] = 0;
 
-	basic = (tdm_match_status >= MM_PLAYING && tdm_match_status != MM_SCOREBOARD) && ent->client->pers.team && (m_info == &current_matchinfo);
+    basic = (tdm_match_status >= MM_PLAYING && tdm_match_status != MM_SCOREBOARD) && ent->client->pers.team && (m_info == &current_matchinfo);
 
-	//wision: items stats
-	for (i = 1; i < game.num_items; i++)
-	{
-		const gitem_t	*item;
+    //wision: items stats
+    for (i = 1; i < game.num_items; i++)
+    {
+        const gitem_t	*item;
 
-		frags_i = deaths_i = dealt_i = recvd_i = picked_i = 0;
-		skip = true;
+        frags_i = deaths_i = dealt_i = recvd_i = picked_i = 0;
+        skip = true;
 
-		for (j = 0; j < m_info->num_teamplayers; j++)
-		{
-			p_info = &(m_info->teamplayers[j]);
-			if (p_info->team == team)
-			{
-				if ((i >= ITEM_WEAPON_BLASTER && i <= ITEM_AMMO_SLUGS) || !p_info->items_collected[i])
-					continue;
+        for (j = 0; j < m_info->num_teamplayers; j++)
+        {
+            p_info = &(m_info->teamplayers[j]);
+            if (p_info->team == team)
+            {
+                if ((i >= ITEM_WEAPON_BLASTER && i <= ITEM_AMMO_SLUGS) || !p_info->items_collected[i])
+                    continue;
 
-				skip = false;
+                skip = false;
 
-				if (i == ITEM_ITEM_QUAD)
-				{
-					dealt_i += p_info->quad_dealt;
-					recvd_i += p_info->quad_recvd;
-					frags_i += p_info->quad_kills;
-					deaths_i += p_info->quad_deaths;
-				}
-				else if (i == ITEM_ITEM_INVULNERABILITY)
-				{
-					dealt_i += p_info->pent_dealt;
-					recvd_i += p_info->pent_recvd;
-					frags_i += p_info->pent_kills;
-					deaths_i += p_info->pent_deaths;
-				}
+                if (i == ITEM_ITEM_QUAD)
+                {
+                    dealt_i += p_info->quad_dealt;
+                    recvd_i += p_info->quad_recvd;
+                    frags_i += p_info->quad_kills;
+                    deaths_i += p_info->quad_deaths;
+                }
+                else if (i == ITEM_ITEM_INVULNERABILITY)
+                {
+                    dealt_i += p_info->pent_dealt;
+                    recvd_i += p_info->pent_recvd;
+                    frags_i += p_info->pent_kills;
+                    deaths_i += p_info->pent_deaths;
+                }
 
-				picked_i += p_info->items_collected[i];
-			}
-		}
+                picked_i += p_info->items_collected[i];
+            }
+        }
 
-		if (skip)
-			continue;
+        if (skip)
+            continue;
 
-		item = GETITEM (i);
+        item = GETITEM (i);
 
-		// display damage / frags / deaths stats for quad or invulnerability
-		if (i == ITEM_ITEM_QUAD || i == ITEM_ITEM_INVULNERABILITY)
-		{
-			sprintf (dealt, "%5d", dealt_i);
-			sprintf (recvd, "%5d", recvd_i);
-			sprintf (frags, "%5d", frags_i);
-			sprintf (deaths, "%5d", deaths_i);
-		}
-		// or don't display anything
-		else
-		{
-			sprintf (dealt, "    -");
-			sprintf (recvd, "    -");
-			sprintf (frags, "    -");
-			sprintf (deaths, "    -");
-		}
+        // display damage / frags / deaths stats for quad or invulnerability
+        if (i == ITEM_ITEM_QUAD || i == ITEM_ITEM_INVULNERABILITY)
+        {
+            sprintf (dealt, "%5d", dealt_i);
+            sprintf (recvd, "%5d", recvd_i);
+            sprintf (frags, "%5d", frags_i);
+            sprintf (deaths, "%5d", deaths_i);
+        }
+        // or don't display anything
+        else
+        {
+            sprintf (dealt, "    -");
+            sprintf (recvd, "    -");
+            sprintf (frags, "    -");
+            sprintf (deaths, "    -");
+        }
 
-		//don't print missed during the match
-		if (basic)
-			sprintf (missed, "   -");
-		else
-			sprintf (missed, "%4d", m_info->item_spawn_count[i] - picked_i);
+        //don't print missed during the match
+        if (basic)
+            sprintf (missed, "   -");
+        else
+            sprintf (missed, "%4d", m_info->item_spawn_count[i] - picked_i);
 
-		strcat (stats, va ("%16.16s |    - %s  %s %s %s %4d %s\n",
-					((i == ITEM_ITEM_HEALTH) ? va ("MegaHealth") : item->pickup_name),
-					frags,
-					deaths,
-					dealt,
-					recvd,
-					picked_i,
-					missed
-					));
-	}
+        strcat (stats, va ("%16.16s |    - %s  %s %s %s %4d %s\n",
+                    ((i == ITEM_ITEM_HEALTH) ? va ("MegaHealth") : item->pickup_name),
+                    frags,
+                    deaths,
+                    dealt,
+                    recvd,
+                    picked_i,
+                    missed
+                    ));
+    }
 
-	return stats;
+    return stats;
 }
 
 /*
