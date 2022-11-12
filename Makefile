@@ -43,7 +43,7 @@ endif
 
 OBJS := g_chase.o g_cmds.o g_combat.o g_func.o g_items.o g_main.o g_misc.o \
 g_phys.o g_save.o g_spawn.o g_svcmds.o g_target.o g_tdm_client.o g_tdm_cmds.o \
-g_tdm_core.o g_tdm_curl.o g_tdm_macros.o g_tdm_stats.o g_tdm_vote.o g_trigger.o \
+g_tdm_core.o g_tdm_curl.o g_tdm_elo.o g_tdm_macros.o g_tdm_stats.o g_tdm_vote.o g_trigger.o \
 g_utils.o g_weapon.o mt19937.o p_client.o p_hud.o p_menu.o p_view.o p_weapon.o \
 g_tdm_votemenu.o q_shared.o
 
