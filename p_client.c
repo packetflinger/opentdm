@@ -1468,176 +1468,170 @@ The game can override any of the settings in place
 */
 void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 {
-	
-	const char		*s;
-	const char		*old_name;
-	const char		*old_stats_id;
-	int				playernum;
-	qboolean		name_changed;
-	qboolean		do_config_download;
 
-	//new connection, server is calling us. just save userinfo for later.
-	if (!ent->inuse)
-	{
-		Q_strncpy (ent->client->pers.ip, Info_ValueForKey(userinfo, "ip"), sizeof(ent->client->pers.ip)-1);
-		Q_strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
+    const char  *s;
+    const char  *old_name;
+    const char  *old_stats_id;
+    int         playernum;
+    qboolean    name_changed;
+    qboolean    do_config_download;
 
-		if (game.server_features & GMF_MVDSPEC)
-		{
-			s = Info_ValueForKey (userinfo, "mvdspec");
-			if (s[0])
-				ent->client->pers.mvdclient = true;
-			else
-				ent->client->pers.mvdclient = false;
-		}
-		else
-			ent->client->pers.mvdclient = false;
+    //new connection, server is calling us. just save userinfo for later.
+    if (!ent->inuse) {
+        Q_strncpy (ent->client->pers.ip, Info_ValueForKey(userinfo, "ip"), sizeof(ent->client->pers.ip)-1);
+        Q_strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
 
-		return;
-	}
+        if (game.server_features & GMF_MVDSPEC) {
+            s = Info_ValueForKey (userinfo, "mvdspec");
+            if (s[0]) {
+                ent->client->pers.mvdclient = true;
+            } else {
+                ent->client->pers.mvdclient = false;
+            }
+        } else {
+            ent->client->pers.mvdclient = false;
+        }
 
-	// check for malformed or illegal info strings
-	if (!Info_Validate(userinfo))
-	{
-		strcpy (userinfo, "\\name\\badinfo\\skin\\male/grunt");
-	}
+        return;
+    }
 
-	playernum = ent-g_edicts-1;
+    // check for malformed or illegal info strings
+    if (!Info_Validate(userinfo)) {
+        strcpy (userinfo, "\\name\\badinfo\\skin\\male/grunt");
+    }
 
-	old_stats_id = Info_ValueForKey (ent->client->pers.userinfo, "stats_id");
-	s = Info_ValueForKey (userinfo, "stats_id");
-	if (strcmp (old_stats_id, s))
-		do_config_download = true;
-	else
-		do_config_download = false;
+    playernum = ent-g_edicts-1;
 
-	name_changed = false;
+    old_stats_id = Info_ValueForKey (ent->client->pers.userinfo, "stats_id");
+    s = Info_ValueForKey (userinfo, "stats_id");
+    if (strcmp (old_stats_id, s)) {
+        do_config_download = true;
+    } else {
+        do_config_download = false;
+    }
 
-	old_name = Info_ValueForKey (ent->client->pers.userinfo, "name");
+    name_changed = false;
 
-	// set name
-	s = Info_ValueForKey (userinfo, "name");
-	
-	if (strcmp (old_name, s))
-	{
-		if (old_name[0] && tdm_match_status > MM_COUNTDOWN && !g_allow_name_change_during_match->value)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "You cannot change your name in the middle of the match!\n");
-			Info_SetValueForKey (userinfo, "name", old_name);
-			G_StuffCmd (ent, "set name \"%s\"\n", old_name);
-		}
-		else
-		{
-			edict_t	*e;
+    old_name = Info_ValueForKey (ent->client->pers.userinfo, "name");
 
-			Q_strncpy (ent->client->pers.netname, s, sizeof(ent->client->pers.netname)-1);
+    // set name
+    s = Info_ValueForKey (userinfo, "name");
 
-			// wision: update current_matchinfo structure during the match, so the scoreboard is correct
-			if (current_matchinfo.teamplayers)
-			{
-				int				i;
-				teamplayer_t	*tmpl;
+    if (strcmp (old_name, s)) {
+        if (old_name[0] && tdm_match_status > MM_COUNTDOWN && !g_allow_name_change_during_match->value) {
+            gi.cprintf (ent, PRINT_HIGH, "You cannot change your name in the middle of the match!\n");
+            Info_SetValueForKey (userinfo, "name", old_name);
+            G_StuffCmd (ent, "set name \"%s\"\n", old_name);
+        } else {
+            edict_t	*e;
 
-				for (i = 0; i < current_matchinfo.num_teamplayers; i++)
-				{
-					tmpl = &current_matchinfo.teamplayers[i];
+            Q_strncpy (ent->client->pers.netname, s, sizeof(ent->client->pers.netname)-1);
 
-					if (tmpl->client == ent)
-						Q_strncpy (tmpl->name, s, sizeof(tmpl->name)-1);
-				}
-			}
+            // wision: update current_matchinfo structure during the match, so the scoreboard is correct
+            if (current_matchinfo.teamplayers) {
+                int i;
+                teamplayer_t *tmpl;
 
-			//reset any id cache information for this player so their name updates
-			for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++)
-			{
-				if (e->client->resp.last_id_client == ent)
-					e->client->resp.last_id_client = NULL;
-			}
+                for (i = 0; i < current_matchinfo.num_teamplayers; i++) {
+                    tmpl = &current_matchinfo.teamplayers[i];
 
-			gi.configstring (CS_PLAYERSKINS + playernum, va ("%s\\%s", ent->client->pers.netname, teaminfo[ent->client->pers.team].skin));
+                    if (tmpl->client == ent) {
+                        Q_strncpy (tmpl->name, s, sizeof(tmpl->name)-1);
+                    }
+                }
+            }
 
-			//this handles updating team names and configstrings
-			TDM_PlayerNameChanged (ent);
-		}
-	}
+            //reset any id cache information for this player so their name updates
+            for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++) {
+                if (e->client->resp.last_id_client == ent) {
+                    e->client->resp.last_id_client = NULL;
+                }
+            }
 
-	// fov
-	if ((int)dmflags->value & DF_FIXED_FOV)
-	{
-		ent->client->ps.fov = 90;
-	}
-	else
-	{
-		ent->client->ps.fov = atoi(Info_ValueForKey(userinfo, "fov"));
-		if (ent->client->ps.fov < 1)
-			ent->client->ps.fov = 90;
-		else if (ent->client->ps.fov > 160)
-			ent->client->ps.fov = 160;
-	}
+            gi.configstring (CS_PLAYERSKINS + playernum, va ("%s\\%s", ent->client->pers.netname, teaminfo[ent->client->pers.team].skin));
 
-	// handedness
-	s = Info_ValueForKey (userinfo, "hand");
-	if (s[0])
-		ent->client->pers.hand = atoi(s);
+            //this handles updating team names and configstrings
+            TDM_PlayerNameChanged (ent);
+        }
+    }
 
-	// user flags
-	s = Info_ValueForKey(userinfo, "uf");
-	if (s[0]) {
-		ent->client->pers.userflags = atoi(s);
-		if (UF(ent, WEAPON_HUD)) {
-			ent->client->pers.weaponhud = true;
-		} else {
-		    if ((int) g_weapon_hud->value != HUD_FORCED) {
-		        ent->client->pers.weaponhud = false;
-		    }
-		}
-	}
+    // fov
+    if ((int)dmflags->value & DF_FIXED_FOV) {
+        ent->client->ps.fov = 90;
+    } else {
+        ent->client->ps.fov = atoi(Info_ValueForKey(userinfo, "fov"));
+        if (ent->client->ps.fov < 1) {
+            ent->client->ps.fov = 90;
+        } else if (ent->client->ps.fov > 160) {
+            ent->client->ps.fov = 160;
+        }
+    }
 
-	// left/right offset for weapon hud (negative is left)
-	s = Info_ValueForKey(userinfo, "wh.x");
-	if (s[0]) {
-		if (s[0] == '-') {
-			ent->client->pers.weaponhud_offset_x = atoi(s) | 1<<31;
-		} else {
-			ent->client->pers.weaponhud_offset_x = atoi(s);
-		}
-	}
+    // handedness
+    s = Info_ValueForKey (userinfo, "hand");
+    if (s[0]) {
+        ent->client->pers.hand = atoi(s);
+    }
 
-	// up/down offset for weapon hud (negative is up)
-	s = Info_ValueForKey(userinfo, "wh.y");
-	if (s[0]) {
-		if (s[0] == '-') {
-			ent->client->pers.weaponhud_offset_y = atoi(s) | 1<<31;
-		} else {
-			ent->client->pers.weaponhud_offset_y = atoi(s);
-		}
-	}
+    // user flags
+    s = Info_ValueForKey(userinfo, "uf");
+    if (s[0]) {
+        ent->client->pers.userflags = atoi(s);
+        if (UF(ent, WEAPON_HUD)) {
+            ent->client->pers.weaponhud = true;
+        } else {
+            if ((int) g_weapon_hud->value != HUD_FORCED) {
+                ent->client->pers.weaponhud = false;
+            }
+        }
+    }
 
-	// weapon mask for auto timer
-	s = Info_ValueForKey(userinfo, "wmask");
-	if (s[0]) {
-		if (s[0] >= '0' && s[0] <= '9') {
-			ent->client->pers.weapon_mask = atoi(s);
-		} else {
-			ent->client->pers.weapon_mask = TDM_WeaponStringToBitmask(s);
-		}
-	}
+    // left/right offset for weapon hud (negative is left)
+    s = Info_ValueForKey(userinfo, "wh.x");
+    if (s[0]) {
+        if (s[0] == '-') {
+            ent->client->pers.weaponhud_offset_x = atoi(s) | 1<<31;
+        } else {
+            ent->client->pers.weaponhud_offset_x = atoi(s);
+        }
+    }
 
-	// armor mask for auto timer
-	s = Info_ValueForKey(userinfo, "amask");
-	if (s[0]) {
-		if (s[0] >= '0' && s[0] <= '9') {
-			ent->client->pers.armor_mask = atoi(s);
-		} else {
-			ent->client->pers.armor_mask = TDM_ArmorStringToBitmask(s);
-		}
-	}
+    // up/down offset for weapon hud (negative is up)
+    s = Info_ValueForKey(userinfo, "wh.y");
+    if (s[0]) {
+        if (s[0] == '-') {
+            ent->client->pers.weaponhud_offset_y = atoi(s) | 1<<31;
+        } else {
+            ent->client->pers.weaponhud_offset_y = atoi(s);
+        }
+    }
 
-	// save off the userinfo in case we want to check something later
-	Q_strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
+    // weapon mask for auto timer
+    s = Info_ValueForKey(userinfo, "wmask");
+    if (s[0]) {
+        if (s[0] >= '0' && s[0] <= '9') {
+            ent->client->pers.weapon_mask = atoi(s);
+        } else {
+            ent->client->pers.weapon_mask = TDM_WeaponStringToBitmask(s);
+        }
+    }
 
-	if (do_config_download)
-		TDM_DownloadPlayerConfig (ent);
+    // armor mask for auto timer
+    s = Info_ValueForKey(userinfo, "amask");
+    if (s[0]) {
+        if (s[0] >= '0' && s[0] <= '9') {
+            ent->client->pers.armor_mask = atoi(s);
+        } else {
+            ent->client->pers.armor_mask = TDM_ArmorStringToBitmask(s);
+        }
+    }
+
+    // save off the userinfo in case we want to check something later
+    Q_strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
+
+    if (do_config_download) {
+        TDM_DownloadPlayerConfig (ent);
+    }
 }
 
 
