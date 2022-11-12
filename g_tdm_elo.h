@@ -11,7 +11,7 @@
  */
 
 // used for players without a score
-#define DEFAULT_SCORE   500
+#define DEFAULT_ELO_SCORE   500
 
 // constants for the formula
 #define D   400
