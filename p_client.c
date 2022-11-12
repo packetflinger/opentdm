@@ -1468,10 +1468,10 @@ The game can override any of the settings in place
 */
 void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 {
-
     const char  *s;
     const char  *old_name;
     const char  *old_stats_id;
+    const char  *elo;
     int         playernum;
     qboolean    name_changed;
     qboolean    do_config_download;
@@ -1508,6 +1508,13 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
         do_config_download = true;
     } else {
         do_config_download = false;
+    }
+
+    elo = Info_ValueForKey(userinfo, "elo");
+    if (elo[0]) {
+        ent->client->pers.elo_score = atoi(elo);
+    } else {
+        G_StuffCmd(ent, "set elo \"%d\" u\n", DEFAULT_ELO_SCORE);
     }
 
     name_changed = false;
