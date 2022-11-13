@@ -237,6 +237,19 @@ void InitGame (void)
     // testing
     g_debug_spawns = gi.cvar("g_debug_spawns", "0", 0);
 
+    // do elo ranking on players to team balancing
+    g_elo_enable = gi.cvar("g_elo_enable", "1", 0);
+
+    // Used in calculating expected outcomes between players
+    g_elo_const_d = gi.cvar("g_elo_const_d", "400", 0);
+
+    // Used in calculating new elo score based on match result
+    // and expected values
+    g_elo_const_k = gi.cvar("g_elo_const_k", "16", 0);
+
+    // If no previous elo score, use this value
+    g_elo_initial_value = gi.cvar("g_elo_initial_value", "500", 0);
+
     // how quick weapons switch (0 is original quake 2 speed)
     g_fast_weap_switch = gi.cvar("g_fast_weap_switch", "0", 0);
 

@@ -103,6 +103,10 @@ cvar_t	*g_weapon_timer;
 cvar_t	*g_timeout_limit;
 cvar_t  *g_timeout_captain;
 cvar_t	*g_highlight_captain;
+cvar_t  *g_elo_enable;
+cvar_t  *g_elo_const_d;
+cvar_t  *g_elo_const_k;
+cvar_t  *g_elo_initial_value;
 
 cvar_t	*g_tdmflags;
 cvar_t	*g_itdmflags;

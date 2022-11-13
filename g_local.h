@@ -754,6 +754,10 @@ extern cvar_t   *g_weapon_timer;
 extern cvar_t   *g_timeout_limit;
 extern cvar_t   *g_timeout_captain;
 extern cvar_t   *g_highlight_captain;
+extern cvar_t   *g_elo_enable;
+extern cvar_t   *g_elo_initial_value;
+extern cvar_t   *g_elo_const_d;
+extern cvar_t   *g_elo_const_k;
 
 extern cvar_t   *g_tdmflags;
 extern cvar_t   *g_itdmflags;
