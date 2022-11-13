@@ -5,7 +5,7 @@
  * This is used to calculate a player's new elo score after
  * having just played a match.
  */
-double TDM_Elo_CalcScore(int current, double expected, qboolean winner)
+double TDM_Elo_CalcScore(double current, double expected, qboolean winner)
 {
     return (double)(K * (((winner) ? 1 : 0) - expected)) + current;
 }
@@ -18,7 +18,7 @@ double TDM_Elo_CalcScore(int current, double expected, qboolean winner)
  *
  * This is a percentage
  */
-double TDM_Elo_ExpectedScore(int currentScore, int challengerScore)
+double TDM_Elo_ExpectedScore(double currentScore, double challengerScore)
 {
     return 1/(1+(double)(pow(10, (((float) (challengerScore-currentScore)) / D))));
 }

@@ -17,5 +17,5 @@
 #define D   400
 #define K   32
 
-double TDM_Elo_CalcScore(int current, double expected, qboolean winner);
-double TDM_Elo_ExpectedScore(int currentScore, int challengerScore);
+double TDM_Elo_CalcScore(double current, double expected, qboolean winner);
+double TDM_Elo_ExpectedScore(double currentScore, double challengerScore);

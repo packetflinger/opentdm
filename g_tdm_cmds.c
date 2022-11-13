@@ -2656,10 +2656,10 @@ void TDM_Test_f(edict_t *ent)
     }
 
     char *o = gi.argv(1);
-    int opponentscore = atoi(o);
+    double opponentscore = atof(o);
 
-    gi.cprintf(ent, PRINT_HIGH, "Current elo score: %d\n", ent->client->pers.elo_score);
-    gi.cprintf(ent, PRINT_HIGH, "Opponent score: %d\n", opponentscore);
+    gi.cprintf(ent, PRINT_HIGH, "Current elo score: %.3f\n", ent->client->pers.elo_score);
+    gi.cprintf(ent, PRINT_HIGH, "Opponent score: %.3f\n", opponentscore);
 
     double expected = TDM_Elo_ExpectedScore(ent->client->pers.elo_score, opponentscore);
     gi.cprintf(ent, PRINT_HIGH, "Expected value: %.3f\n\n", expected);
