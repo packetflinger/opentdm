@@ -1510,12 +1510,16 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
         do_config_download = false;
     }
 
-    elo = Info_ValueForKey(userinfo, "elo");
-    if (elo[0]) {
-        ent->client->pers.elo_score = atof(elo);
-    } else {
-        G_StuffCmd(ent, "setu elo \"%d\"\n", ELO_DEFAULT_SCORE);
-        G_StuffCmd(ent, "seta elo \"%d\"\n", ELO_DEFAULT_SCORE);
+    // player ranking for internal team balancing
+    if ((int)g_elo_enable->value) {
+        elo = Info_ValueForKey(userinfo, "elo");
+        if (elo[0]) {
+            ent->client->pers.elo_score = atof(elo);
+            gi.cprintf(ent, PRINT_HIGH, "Loading elo score: %.3f\n", ent->client->pers.elo_score);
+        } else {
+            G_StuffCmd(ent, "setu elo \"%.3f\"\n", g_elo_initial_value->value);
+            G_StuffCmd(ent, "seta elo \"%.3f\"\n", g_elo_initial_value->value);
+        }
     }
 
     name_changed = false;
