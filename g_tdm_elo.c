@@ -21,8 +21,10 @@ int TDM_Elo_CalcScore(int current, int expected, qboolean winner)
  * An expected score is the probability a player will win vs another
  * player based on their current elo scores. This is used in calculating
  * their new scores after the match.
+ *
+ * This is a percentage
  */
-float TDM_Elo_ExpectedScore(int currentScore, int challengerScore)
+double TDM_Elo_ExpectedScore(int currentScore, int challengerScore)
 {
-    return 1/(10^((challengerScore - currentScore)/D));
+    return 1/(1+(double)(pow(10, (((float) (challengerScore-currentScore)) / D))));
 }
