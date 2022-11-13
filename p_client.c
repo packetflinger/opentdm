@@ -1515,7 +1515,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
         elo = Info_ValueForKey(userinfo, "elo");
         if (elo[0]) {
             ent->client->pers.elo_score = atof(elo);
-            gi.cprintf(ent, PRINT_HIGH, "Loading elo score: %.3f\n", ent->client->pers.elo_score);
         } else {
             G_StuffCmd(ent, "setu elo \"%.3f\"\n", g_elo_initial_value->value);
             G_StuffCmd(ent, "seta elo \"%.3f\"\n", g_elo_initial_value->value);
