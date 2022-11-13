@@ -7,6 +7,10 @@
  */
 double TDM_Elo_CalcScore(double current, double expected, qboolean winner)
 {
+    if (!(int)g_elo_enable->value) {
+        return 0.0;
+    }
+
     return (double)(g_elo_const_k->value * (((winner) ? 1 : 0) - expected)) + current;
 }
 
@@ -20,5 +24,9 @@ double TDM_Elo_CalcScore(double current, double expected, qboolean winner)
  */
 double TDM_Elo_ExpectedScore(double currentScore, double challengerScore)
 {
+    if (!(int)g_elo_enable->value) {
+        return 0.0;
+    }
+
     return 1/(1+(double)(pow(10, (((float) (challengerScore-currentScore)) / g_elo_const_d->value))));
 }
