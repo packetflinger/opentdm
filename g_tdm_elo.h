@@ -11,11 +11,11 @@
  */
 
 // used for players without a score
-#define DEFAULT_ELO_SCORE   500
+#define ELO_DEFAULT_SCORE   500
 
 // constants for the formula
-#define D   400
-#define K   32
+#define ELO_CONST_D   400
+#define ELO_CONST_K   16
 
 double TDM_Elo_CalcScore(double current, double expected, qboolean winner);
 double TDM_Elo_ExpectedScore(double currentScore, double challengerScore);
