@@ -2648,41 +2648,21 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
 /**
  * Just for testing stuff
  */
-void TDM_Test_f(edict_t *ent) {
-	/*
-	gi.cprintf(ent, PRINT_HIGH,
-			"player_state_t       %lu\n"
-			"client_persistent_t  %lu\n"
-			"client_respawn_t     %lu\n"
-			"pmove_state_t        %lu\n"
-			"qboolean             %lu\n"
-			"gitem_t              %lu\n"
-			"int                  %lu\n"
-			"vec3_t               %lu\n"
-			"float                %lu\n"
-			"weaponstate_t        %lu\n"
-			"unsigned             %lu\n"
-			"grenade_state_t      %lu\n"
-			"edict_t              %lu\n"
-			"gclient_t            %lu\n",
-			sizeof(player_state_t),
-			sizeof(client_persistent_t),
-			sizeof(client_respawn_t),
-			sizeof(pmove_state_t),
-			sizeof(qboolean),
-			sizeof(gitem_t),
-			sizeof(int),
-			sizeof(vec3_t),
-			sizeof(float),
-			sizeof(weaponstate_t),
-			sizeof(unsigned),
-			sizeof(grenade_state_t),
-			sizeof(edict_t),
-			sizeof(gclient_t)
-	);
-	*/
+void TDM_Test_f(edict_t *ent)
+{
+    if (gi.argc() != 2) {
+        gi.cprintf(ent, PRINT_HIGH, "Usage: test <opponent value>\n");
+        return;
+    }
 
-	gi.cprintf(ent, PRINT_HIGH, "weapon offset: %lu", offsetof(gclient_t, weapon));
+    char *o = gi.argv(1);
+    int opponentscore = atoi(o);
+
+    gi.cprintf(ent, PRINT_HIGH, "Current elo score: %d\n", ent->client->pers.elo_score);
+    gi.cprintf(ent, PRINT_HIGH, "Opponent score: %d\n", opponentscore);
+
+    int expected = TDM_Elo_ExpectedScore(ent->client->pers.elo_score, opponentscore);
+    gi.cprintf(ent, PRINT_HIGH, "Expected value: %d", expected);
 }
 
 
