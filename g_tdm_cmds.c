@@ -2662,7 +2662,12 @@ void TDM_Test_f(edict_t *ent)
     gi.cprintf(ent, PRINT_HIGH, "Opponent score: %d\n", opponentscore);
 
     double expected = TDM_Elo_ExpectedScore(ent->client->pers.elo_score, opponentscore);
-    gi.cprintf(ent, PRINT_HIGH, "Expected value: %.3f\n", expected);
+    gi.cprintf(ent, PRINT_HIGH, "Expected value: %.3f\n\n", expected);
+
+    double newwin = TDM_Elo_CalcScore(ent->client->pers.elo_score, expected, true);
+    double newloss = TDM_Elo_CalcScore(ent->client->pers.elo_score, expected, false);
+    gi.cprintf(ent, PRINT_HIGH, "New score win:  %.3f\n", newwin);
+    gi.cprintf(ent, PRINT_HIGH, "New score Loss: %.3f\n", newloss);
 }
 
 
