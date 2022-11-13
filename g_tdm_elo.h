@@ -18,4 +18,4 @@
 #define K   32
 
 int TDM_Elo_CalcScore(int current, int expected, qboolean winner);
-int TDM_Elo_ExpectedScore(int currentScore, int challengerScore);
+float TDM_Elo_ExpectedScore(int currentScore, int challengerScore);

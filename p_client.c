@@ -1514,7 +1514,8 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
     if (elo[0]) {
         ent->client->pers.elo_score = atoi(elo);
     } else {
-        G_StuffCmd(ent, "set elo \"%d\" u\n", DEFAULT_ELO_SCORE);
+        G_StuffCmd(ent, "setu elo \"%d\"\n", DEFAULT_ELO_SCORE);
+        G_StuffCmd(ent, "seta elo \"%d\"\n", DEFAULT_ELO_SCORE);
     }
 
     name_changed = false;
