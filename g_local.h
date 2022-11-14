@@ -1487,6 +1487,7 @@ typedef struct
 	int            armor_mask;            // armor to auto timer
 	int            timeout_count;         // how many timeouts did we call?
 	double         elo_score;             // for ranking and team balancing
+	double         elo_expected;          // percent expected to win
 
 	// armor/weapon timers
 	int            item_timer[TIMER_MAX];
