@@ -1438,66 +1438,65 @@ typedef enum
 } item_timer_t;
 
 typedef struct {
-	item_timer_t   current;    // which is current displayed? (quad, inv, armor, etc)
-	int            expires;    // frame to switch from current
-	int            stat_index; // ps stat for the timer value
-	int            stat_icon;  // ps stat for the icon
+    item_timer_t    current;    // which is current displayed? (quad, inv, etc)
+    int             expires;    // frame to switch from current
+    int             stat_index; // ps stat for the timer value
+    int             stat_icon;  // ps stat for the icon
 } timer_state_t;
 
 // client data that stays across multiple level loads
 typedef struct
 {
-	char           userinfo[MAX_INFO_STRING];
-	char           netname[16];
-	char           ip[24];
-	int            hand;
-	qboolean       connected;       // a loadgame will leave valid entities that
-                                    // just don't have a connection yet
-	qboolean       admin;
-	unsigned       team;
-	joinstate_t    joinstate;
-	const gitem_t  *last_weapon;
-	qboolean       shown_motd;
-	qboolean       disable_id_view;
-	qboolean       specinvite[MAX_TEAMS];
-	unsigned       mute_frame;      // mute player while game framenum < this
-	qboolean       mvdclient;
-	pmenuhnd_t     menu;            // persist across death
+    char            userinfo[MAX_INFO_STRING];
+    char            netname[16];
+    char            ip[24];
+    int             hand;
+    qboolean        connected;          // a loadgame will leave valid entities that
+                                        // just don't have a connection yet
+    qboolean        admin;
+    unsigned        team;
+    joinstate_t     joinstate;
+    const gitem_t   *last_weapon;
+    qboolean        shown_motd;
+    qboolean        disable_id_view;
+    qboolean        specinvite[MAX_TEAMS];
+    unsigned        mute_frame;         // mute player while game framenum < this
+    qboolean        mvdclient;
+    pmenuhnd_t      menu;               // persist across death
 
-	// stored values displayed in the menu
-	vote_menu_t    votemenu_values;
-	join_menu_t    joinmenu_values;
+    // stored values displayed in the menu
+    vote_menu_t     votemenu_values;
+    join_menu_t     joinmenu_values;
 
-	// we need separate menus for all players
-	pmenu_t        votemenu[19];
-	pmenu_t        joinmenu[19];
+    // we need separate menus for all players
+    pmenu_t         votemenu[19];
+    pmenu_t         joinmenu[19];
 
-	// per-client download handle (configs)
-	tdm_download_t download;
-	playerconfig_t config;
-	unsigned       uniqueid;
-	int            userflags;
-	qboolean       weaponhud;             // show weap/ammo counts on screen
-	int            weaponhud_offset_x;    // right/left offset from right side
-	int            weaponhud_offset_y;    // up/down offset from middle
-	int            ignore;                // bitmask
-	int            weapon_timer;          // auto timer for weapons
-	int            weapon_mask;           // weapons to auto timer
-	int            armor_timer;           // auto timer for armor
-	int            armor_mask;            // armor to auto timer
-	int            timeout_count;         // how many timeouts did we call?
-	double         elo_score;             // for ranking and team balancing
-	double         elo_expected;          // percent expected to win
+    // per-client download handle (configs)
+    tdm_download_t  download;
+    playerconfig_t  config;
+    unsigned        uniqueid;
+    int             userflags;
+    qboolean        weaponhud;          // show weap/ammo counts on screen
+    int             weaponhud_offset_x; // right/left offset from right side
+    int             weaponhud_offset_y; // up/down offset from middle
+    int             ignore;             // bitmask
+    int             weapon_timer;       // auto timer for weapons
+    int             weapon_mask;        // weapons to auto timer
+    int             armor_timer;        // auto timer for armor
+    int             armor_mask;         // armor to auto timer
+    int             timeout_count;      // how many timeouts did we call?
+    double          elo_score;          // for ranking and team balancing
+    double          elo_expected;       // percent expected to win
 
-	// armor/weapon timers
-	int            item_timer[TIMER_MAX];
-	int            item_timer_icon[TIMER_MAX];
-	int            next_timer_update;
+    // armor/weapon timers
+    int             item_timer[TIMER_MAX];
+    int             item_timer_icon[TIMER_MAX];
+    int             next_timer_update;
 
-	// the timers in the hud
-	timer_state_t  timer1;
-	timer_state_t  timer2;
-
+    // the timers in the hud
+    timer_state_t   timer1;
+    timer_state_t   timer2;
 } client_persistent_t;
 
 typedef struct
