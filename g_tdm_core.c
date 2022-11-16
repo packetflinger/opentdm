@@ -1310,8 +1310,8 @@ TDM_EndMatch
 A match has ended through some means.
 Overtime / SD is handled in CheckTimes.
 */
-    void TDM_EndMatch (void)
-    {
+void TDM_EndMatch (void)
+{
     qboolean forfeit;
     int winner, loser;
     edict_t *ent;
@@ -1390,6 +1390,15 @@ Overtime / SD is handled in CheckTimes.
     level.timeout_end_framenum = 0;
     level.match_resume_framenum = 0;
     level.match_end_framenum = 0;
+
+    // adjust player rankings
+    if ((int)g_elo_enable->value) {
+        for (int i=0; i<current_matchinfo.num_teamplayers; i++) {
+            TDM_Elo_ExpectedTeamScore(current_matchinfo.teamplayers[i].client);
+        }
+
+        // figure out the ranks here and assign new scores
+    }
 
     TDM_BeginIntermission ();
 }
