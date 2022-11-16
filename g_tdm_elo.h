@@ -12,5 +12,6 @@
 
 double  TDM_Elo_CalcScore(double current, double expected, qboolean winner);
 double  TDM_Elo_ExpectedScore(double currentScore, double challengerScore);
+void    TDM_Elo_ExpectedTeamScore(edict_t *ent);
 void    TDM_EloScore_f(edict_t *ent);
 void    TDM_Elo_UpdateScore(edict_t *ent, edict_t *challenger, qboolean winner);
