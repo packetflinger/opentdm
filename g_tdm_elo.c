@@ -54,6 +54,21 @@ void TDM_Elo_ExpectedTeamScore(edict_t *ent)
     opponent_team = (ent->client->pers.team == TEAM_A) ? TEAM_B : TEAM_A;
     num_players = teaminfo[opponent_team].players;
 
+    // special case for duel
+    if (num_players == 1) {
+        for (i=0; i<current_matchinfo.num_teamplayers; i++) {
+            e = current_matchinfo.teamplayers[i].client;
+
+            if (TEAM(e) == opponent_team) {
+                break;
+            }
+        }
+
+        score = TDM_Elo_ExpectedScore(ent->client->pers.elo_score, e->client->pers.elo_score);
+        ent->client->pers.elo_expected = score;
+        return;
+    }
+
     for (i=0; i < game.maxclients; i++) {
         e = g_edicts + i + 1;
 
