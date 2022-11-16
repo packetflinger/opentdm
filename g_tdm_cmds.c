@@ -3076,6 +3076,8 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
             TDM_WeaponTimer_f(ent);
         else if (!Q_stricmp(cmd, "maplist") || !Q_stricmp(cmd, "maps"))
             TDM_Maplist_f(ent);
+        else if (!Q_stricmp(cmd, "eloscore"))
+            TDM_EloScore_f(ent);
         else if (!Q_stricmp (cmd, "stopsound"))
             return true;	//prevent chat from our stuffcmds on people who have no sound
         else

@@ -76,6 +76,44 @@ void TDM_Elo_ExpectedTeamScore(edict_t *ent)
     ent->client->pers.elo_expected = score;
 }
 
+/**
+ * Show a user their elo score. Refs can see everyone's score
+ */
+void TDM_EloScore_f(edict_t *ent)
+{
+    int i;
+    edict_t *e;
+
+    if (!(int)g_elo_enable->value) {
+        gi.cprintf(ent, PRINT_HIGH, "Elo ranking is disabled on this server\n");
+        return;
+    }
+
+    if (ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH, "Team Player     Elo Score\n");
+        gi.cprintf(ent, PRINT_HIGH, "-------------------------\n");
+
+        for (i=0; i < game.maxclients; i++) {
+            e = g_edicts + i + 1;
+
+            if (!e->inuse) {
+                continue;
+            }
+
+            if (!e->client) {
+                continue;
+            }
+
+            if (TEAM(e) > TEAM_SPEC) {
+                gi.cprintf(ent, PRINT_HIGH, "%-15s %-.3f\n", NAME(ent), ent->client->pers.elo_score);
+            }
+        }
+        return;
+    }
+
+    gi.cprintf(ent, PRINT_HIGH, "Your elo score: %.3f\n", ent->client->pers.elo_score);
+}
+
 
 /**
  * Update ent's elo score based on the outcome of their match with challenger
