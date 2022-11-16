@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #define NAME(e) ((e)->client->pers.netname)
+#define TEAM(e) ((e)->client->pers.team)
 
 // protocol bytes that can be directly added to messages
 #define SVC_MUZZLEFLASH    1
