@@ -5,18 +5,90 @@
  * This is used to calculate a player's new elo score after
  * having just played a match.
  */
-double TDM_Elo_CalcScore(double current, double expected, qboolean winner)
+/*double TDM_Elo_CalcScore(double current, double expected, qboolean winner)
 {
     if (!(int)g_elo_enable->value) {
         return 0.0;
     }
 
     return (double)(g_elo_const_k->value * (((winner) ? 1 : 0) - expected)) + current;
+}*/
+
+void TDM_Elo_Calculate(teamplayer_t *p)
+{
+    teamplayer_t *t = 0;
+    elo_t elo;
+    int numplayers;
+    int enemycount = 0;
+    int i;
+    int winner;
+
+    memset(&elo, 0, sizeof(elo_t));
+
+    // calc expected score for p based on opposing team
+    TDM_Elo_ExpectedTeamScore(p->client);
+
+    elo.opposing_team = (p->team == TEAM_A) ? TEAM_B : TEAM_A;
+
+    elo.damage = p->damage_dealt - p->damage_received;
+
+    // start as lowest (biggest number)
+    elo.rank = numplayers = current_matchinfo.num_teamplayers;
+
+    elo.current = p->client->client->pers.elo_score;
+    elo.expected = p->client->client->pers.elo_expected;
+
+    // special case for duel
+    if (teaminfo[elo.opposing_team].players == 1) {
+        for (i=0; i<current_matchinfo.num_teamplayers; i++) {
+            if (current_matchinfo.teamplayers[i].team == elo.opposing_team) {
+                t = &current_matchinfo.teamplayers[i];
+            }
+        }
+
+        if (t) {
+            winner = (p->enemy_kills > t->enemy_kills) ? 1 : 0;
+            gi.cprintf(NULL, PRINT_HIGH, "both p and t exist. winner: %d\n", winner);
+        } else {
+            winner = 0;
+        }
+
+        elo.updated = (double)(g_elo_const_k->value * (winner - elo.expected)) + elo.current;
+        gi.cprintf(NULL, PRINT_HIGH, "%s's new score (duel): %.3f\n", NAME(p->client), elo.updated);
+        p->client->client->pers.elo_score = elo.updated;
+        return;
+    }
+
+    //
+    for (i=0; i<current_matchinfo.num_teamplayers; i++) {
+        t = &current_matchinfo.teamplayers[i];
+        if (p->team == t->team) {
+            continue;
+        }
+
+        if (elo.damage > t->damage_dealt - t->damage_received) {
+            elo.qty_beat++;
+        }
+    }
+
+    enemycount = current_matchinfo.num_teamplayers;
+
+    elo.rank = enemycount - elo.qty_beat;
+
+    // calculate new elo score
+    elo.actual = (enemycount - elo.rank) / (enemycount * (enemycount - 1)/2);
+
+    elo.updated = elo.current + ((int)g_elo_const_k->value  * (enemycount - 1) * (elo.actual - elo.expected));
+    //gi.cprintf(NULL, PRINT_HIGH, "%s's new score: %.3f\n", NAME(p->client), elo.updated);
+    gi.cprintf(p->client, PRINT_HIGH,
+            "ELO DEBUG\n--------\n%15s %4.3f\n%15s %4.3f\n%15s %4.3f\n",
+            "Current", elo.current,
+            "Expected", elo.expected,
+            "New", elo.updated
+    );
+    p->client->client->pers.elo_score = elo.updated;
+    G_StuffCmd(p->client, "seta elo \"%.3f\"\n", elo.updated);
 }
-
-
-
-
 
 /**
  * An expected score is the probability a player will win vs another
@@ -43,7 +115,7 @@ void TDM_Elo_ExpectedTeamScore(edict_t *ent)
     int i;
     int num_players;
     unsigned opponent_team;
-    double score;
+    double score = 0.0;
     edict_t *e;
 
     if (!(int)g_elo_enable->value) {
@@ -60,13 +132,12 @@ void TDM_Elo_ExpectedTeamScore(edict_t *ent)
             e = current_matchinfo.teamplayers[i].client;
 
             if (TEAM(e) == opponent_team) {
-                break;
+                score = TDM_Elo_ExpectedScore(ent->client->pers.elo_score, e->client->pers.elo_score);
+                ent->client->pers.elo_expected = score;
+                gi.cprintf(NULL, PRINT_HIGH, "%s current: %.3f\t%.3f\n", NAME(ent), ent->client->pers.elo_score, ent->client->pers.elo_expected);
+                return;
             }
         }
-
-        score = TDM_Elo_ExpectedScore(ent->client->pers.elo_score, e->client->pers.elo_score);
-        ent->client->pers.elo_expected = score;
-        return;
     }
 
     for (i=0; i < game.maxclients; i++) {

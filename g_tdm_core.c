@@ -1393,11 +1393,10 @@ void TDM_EndMatch (void)
 
     // adjust player rankings
     if ((int)g_elo_enable->value) {
+        gi.cprintf(NULL, PRINT_HIGH, "Elo ranking:\n");
         for (int i=0; i<current_matchinfo.num_teamplayers; i++) {
-            TDM_Elo_ExpectedTeamScore(current_matchinfo.teamplayers[i].client);
+            TDM_Elo_Calculate(&current_matchinfo.teamplayers[i]);
         }
-
-        // figure out the ranks here and assign new scores
     }
 
     TDM_BeginIntermission ();
