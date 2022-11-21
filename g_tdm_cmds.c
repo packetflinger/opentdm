@@ -2650,24 +2650,6 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
  */
 void TDM_Test_f(edict_t *ent)
 {
-    if (gi.argc() != 2) {
-        gi.cprintf(ent, PRINT_HIGH, "Usage: test <opponent value>\n");
-        return;
-    }
-
-    char *o = gi.argv(1);
-    double opponentscore = atof(o);
-
-    gi.cprintf(ent, PRINT_HIGH, "Current elo score: %.3f\n", ent->client->pers.elo_score);
-    gi.cprintf(ent, PRINT_HIGH, "Opponent score: %.3f\n", opponentscore);
-
-    double expected = TDM_Elo_ExpectedScore(ent->client->pers.elo_score, opponentscore);
-    gi.cprintf(ent, PRINT_HIGH, "Expected value: %.3f\n\n", expected);
-
-    double newwin = TDM_Elo_CalcScore(ent->client->pers.elo_score, expected, true);
-    double newloss = TDM_Elo_CalcScore(ent->client->pers.elo_score, expected, false);
-    gi.cprintf(ent, PRINT_HIGH, "New score win:  %.3f\n", newwin);
-    gi.cprintf(ent, PRINT_HIGH, "New score Loss: %.3f\n", newloss);
 }
 
 
