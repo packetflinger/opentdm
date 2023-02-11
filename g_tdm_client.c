@@ -570,108 +570,15 @@ void TDM_Disconnected (edict_t *ent)
 const char *TDM_CreateSpectatorStatusBar(edict_t *player)
 {
     char *spec_statusbar;
-    char weaponhud[1400];   // the weapon icons
-    char ammohud[1400];     // the ammo counts
     int id_x, id_y;
-    int hud_x, hud_y;
-    edict_t *target;        // the chase target if we're chasing
-                            // or the spectator if not chasing
-
-    if (player->client->chase_target) {
-        target = player->client->chase_target;
-    } else {
-        target = player;
-    }
 
     // opentdm default
     id_x = -100;
     id_y = -80;
-    hud_y = 0;
-    hud_x = -25;
 
     if (player) {
-        id_x += target->client->pers.config.id_x;
-        id_y += target->client->pers.config.id_y;
-    }
-
-    // disabled, ammo hud is overflowing
-    if (SHOWWEAPONHUD(target) && (1 == 0)) {
-        id_x += target->client->pers.config.id_x;
-        id_y += target->client->pers.config.id_y;
-
-        hud_x += target->client->pers.weaponhud_offset_x;
-        hud_y += target->client->pers.weaponhud_offset_y;
-
-        weaponhud[0] = 0;
-        ammohud[0] = 0;
-
-        // set x position at first for all weapon icons, to save the chars since CS max is 1000
-        strcpy(weaponhud, va("xr %d ", hud_x));
-
-        // set x position for ammo quantities ^
-        strcpy(ammohud, va("xr %d ", hud_x - 50));
-
-        // super/shotgun
-        if (target->client->inventory[ITEM_WEAPON_SUPERSHOTGUN]) {
-            strcat(weaponhud, va("yv %d picn w_sshotgun ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
-            hud_y += 25;
-        } else if (target->client->inventory[ITEM_WEAPON_SHOTGUN]) {
-            strcat(weaponhud, va("yv %d picn w_shotgun ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SHELLS));
-            hud_y += 25;
-        }
-
-        // chaingun/machinegun
-        if (target->client->inventory[ITEM_WEAPON_CHAINGUN]) {
-            strcat(weaponhud, va("yv %d picn w_chaingun ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
-            hud_y += 25;
-        } else if (target->client->inventory[ITEM_WEAPON_MACHINEGUN]) {
-            strcat(weaponhud, va("yv %d picn w_machinegun ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_BULLETS));
-            hud_y += 25;
-        }
-
-        // hand grenades/launcher
-        if (target->client->inventory[ITEM_WEAPON_GRENADELAUNCHER]) {
-            strcat(weaponhud, va("yv %d picn w_glauncher ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
-            hud_y += 25;
-        } else if (target->client->inventory[ITEM_AMMO_GRENADES]) {
-            //strcat(weaponhud, va("yv %d picn w_hgrenade ", hud_y));
-            strcat(weaponhud, va("yv %d picn a_grenades ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_GRENADES));
-            hud_y += 25;
-        }
-
-        // hyper blaster
-        if (target->client->inventory[ITEM_WEAPON_HYPERBLASTER]) {
-            strcat(weaponhud, va("yv %d picn w_hyperblaster ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
-            hud_y += 25;
-        }
-
-        // rocket launcher
-        if (target->client->inventory[ITEM_WEAPON_ROCKETLAUNCHER]) {
-            strcat(weaponhud, va("yv %d picn w_rlauncher ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_ROCKETS));
-            hud_y += 25;
-        }
-
-        // railgun
-        if (target->client->inventory[ITEM_WEAPON_RAILGUN]) {
-            strcat(weaponhud, va("yv %d picn w_railgun ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_SLUGS));
-            hud_y += 25;
-        }
-
-        // BFG
-        if (target->client->inventory[ITEM_WEAPON_BFG]) {
-            strcat(weaponhud, va("yv %d picn w_bfg ", hud_y));
-            strcat(ammohud, va("yv %d num 3 %d ", hud_y, STAT_WEAPHUD_CELLS));
-            hud_y += 25;
-        }
+        id_x += player->client->pers.config.id_x;
+        id_y += player->client->pers.config.id_y;
     }
 
     spec_statusbar = va (
@@ -831,12 +738,10 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
             "xl 10 "
             "yb -180 "
             "stat_string 28 "
-        "endif "
-        "%s%s",
+        "endif",
         (int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
         (int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
-        id_x, id_y,
-        weaponhud, ammohud
+        id_x, id_y
     );
 
     return spec_statusbar;
