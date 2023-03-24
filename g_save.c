@@ -310,6 +310,9 @@ void InitGame (void)
     // seconds added if tied
     g_overtime = gi.cvar("g_overtime", "60", 0);
 
+    // display super low pings around this value instead of their real ping
+    g_ping_handicap = gi.cvar("g_ping_handicap", "0", 0);
+
     // allow downloading of player configs on connect
     g_playerconfig_enabled = gi.cvar("g_playerconfig_enabled", "1", CVAR_LATCH);
 

@@ -47,6 +47,7 @@ void TDM_RandomizeTeams(void);
 void TDM_RecordMVD(void);
 void TDM_StopMVD(void);
 void TDM_DeleteMVD(char *name);
+int TDM_PingHandicap(int ping);
 
 extern char **tdm_maplist;
 

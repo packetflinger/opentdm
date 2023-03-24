@@ -754,6 +754,7 @@ extern cvar_t   *g_weapon_timer;
 extern cvar_t   *g_timeout_limit;
 extern cvar_t   *g_timeout_captain;
 extern cvar_t   *g_highlight_captain;
+extern cvar_t   *g_ping_handicap;
 
 extern cvar_t   *g_tdmflags;
 extern cvar_t   *g_itdmflags;

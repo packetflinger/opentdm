@@ -609,9 +609,9 @@ char *TDM_ScoreBoardString (edict_t *ent)
             total[team]++;
 
             if (current_matchinfo.teamplayers[i].client)
-                ping = current_matchinfo.teamplayers[i].client->client->ping;
+                ping = TDM_PingHandicap(current_matchinfo.teamplayers[i].client->client->ping);
             else
-                ping = current_matchinfo.teamplayers[i].ping;
+                ping = TDM_PingHandicap(current_matchinfo.teamplayers[i].ping);
 
             if (ping > 999)
                 averageping[team] += 999;
@@ -701,7 +701,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
                 if (!cl_ent)
                     ping = tmpl->ping;
                 else
-                    ping = cl_ent->client->ping;
+                    ping = TDM_PingHandicap(cl_ent->client->ping);
 
                 // calculate player's score
                 j = tmpl->enemy_kills - tmpl->team_kills - tmpl->suicides;
@@ -738,7 +738,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
                 if (!cl_ent)
                     ping = tmpl->ping;
                 else
-                    ping = cl_ent->client->ping;
+                    ping = TDM_PingHandicap(cl_ent->client->ping);
 
                 // calculate player's score
                 j = tmpl->enemy_kills - tmpl->team_kills - tmpl->suicides;
@@ -803,7 +803,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
             if (game.clients[i].ping > 999)
                 averageping[team] += 999;
             else
-                averageping[team] += (float)game.clients[i].ping;
+                averageping[team] += (float)TDM_PingHandicap(game.clients[i].ping);
         }
 
         // calculate average ping
@@ -888,7 +888,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
                     i * 8 + 56,
                     cl->pers.netname,
                     cl->resp.ready ? "[READY]    " : "",
-                    (cl->ping > 999) ? 999 : cl->ping
+                    (cl->ping > 999) ? 999 : TDM_PingHandicap(cl->ping)
                 );
 
                 // this is the captain
@@ -916,7 +916,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
                     i * 8 + 56 + offset,
                     cl->pers.netname,
                     cl->resp.ready ? "[READY]    " : "",
-                    (cl->ping > 999) ? 999 : cl->ping
+                    (cl->ping > 999) ? 999 : TDM_PingHandicap(cl->ping)
                 );
 
                 // this is the captain
@@ -972,7 +972,7 @@ char *TDM_ScoreBoardString (edict_t *ent)
                 //0, // x
                 j+8, // y
                 cl->pers.netname,
-                cl->ping > 999 ? 999 : cl->ping,
+                cl->ping > 999 ? 999 : TDM_PingHandicap(cl->ping),
                 cl->chase_target ? va("->%-12.12s", cl->chase_target->client->pers.netname) : "");
 
             if (maxsize - len > strlen(entry))
@@ -3578,4 +3578,34 @@ void TDM_RandomizeTeams(void)
 
     // check stuff now that the teams are different
     TDM_TeamsChanged();
+}
+
+/**
+ * This is not a real handicap, it's for display only.
+ * Servers sometimes are refused in league matches because
+ * they are too good for certain players.
+ */
+int TDM_PingHandicap(int ping)
+{
+    int handi = (int)g_ping_handicap->value;
+
+    if (handi < 1) {
+        return ping;
+    }
+
+    // add some fake jitter
+    if (level.framenum % 4 == 0) {
+        if(level.framenum % 8 == 0) {
+            handi += 3;
+
+        } else {
+            handi -= 2;
+        }
+    }
+
+    if (ping < handi) {
+        return handi;
+    }
+
+    return ping;
 }

@@ -102,7 +102,8 @@ cvar_t	*g_armor_timer;
 cvar_t	*g_weapon_timer;
 cvar_t	*g_timeout_limit;
 cvar_t  *g_timeout_captain;
-cvar_t	*g_highlight_captain;
+cvar_t  *g_highlight_captain;
+cvar_t  *g_ping_handicap;
 
 cvar_t	*g_tdmflags;
 cvar_t	*g_itdmflags;
