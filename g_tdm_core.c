@@ -3583,7 +3583,9 @@ void TDM_RandomizeTeams(void)
 /**
  * This is not a real handicap, it's for display only.
  * Servers sometimes are refused in league matches because
- * they are too good for certain players.
+ * they are too good for certain players. This will
+ * replace the player's ping with the handicap value +-
+ * some fake jitter
  */
 int TDM_PingHandicap(int ping)
 {
@@ -3597,7 +3599,6 @@ int TDM_PingHandicap(int ping)
     if (level.framenum % 4 == 0) {
         if(level.framenum % 8 == 0) {
             handi += 3;
-
         } else {
             handi -= 2;
         }
