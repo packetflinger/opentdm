@@ -958,7 +958,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 			else
 				effect = 0;
 
-			damage = 15;
+			damage = 20;
 
 			Blaster_Fire (ent, offset, damage, true, effect);
 			TDM_WeaponFired (ent);
