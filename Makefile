@@ -24,22 +24,46 @@ LDFLAGS ?= -shared
 LIBS ?=
 
 ifdef CONFIG_WINDOWS
+	CC = i686-w64-mingw32-gcc
+	WINDRES = i686-w64-mingw32-windres
+	CFLAGS += -Duint32_t=int -Duint8_t="unsigned char"
     LDFLAGS += -mconsole
     LDFLAGS += -Wl,--nxcompat,--dynamicbase
+    CURL_CFLAGS = -static -static-libgcc -DCURL_STATIC
+    CFLAGS += -DHAVE_CURL $(CURL_CFLAGS) -DCURL_STATICLIB \
+              -Ideps/win32/include
+    LIBS += deps/win32/lib/libcurl.a \
+            deps/win32/lib/libcrypto.a \
+            deps/win32/lib/libcrypt32.a \
+            deps/win32/lib/libz.a \
+            deps/win32/lib/libssl.a \
+            deps/win32/lib/libssh2.a \
+            deps/win32/lib/libidn.a \
+            deps/win32/lib/libiconv.a \
+            deps/win32/lib/libintl.a \
+            deps/win32/lib/libwldap32.a \
+            deps/win32/lib/libgdi32.a \
+            deps/win32/lib/libcrypto.a \
+            deps/win32/lib/libcrypt32.a \
+            deps/win32/lib/libssp.a \
+            deps/win32/lib/libidn2.a \
+            -static -static-libgcc
 else
     CFLAGS += -fPIC -fvisibility=hidden
+    CURL_CFLAGS ?= -Ideps/$(CPU)/curl/include
+    CFLAGS += -DHAVE_CURL $(CURL_CFLAGS) -DCURL_STATICLIB \
+              -Ideps/$(CPU)/openssl/include \
+              -Ideps/$(CPU)/zlib/include
+    LIBS +=   deps/$(CPU)/curl/lib/libcurl.a \
+              deps/$(CPU)/openssl/lib/libssl.a \
+              deps/$(CPU)/openssl/lib/libcrypto.a \
+              deps/$(CPU)/zlib/lib/libz.a
 endif
 
 CFLAGS += -DC_ONLY
 CFLAGS += -DOPENTDM_VERSION='"$(VER)"' -DOPENTDM_REVISION=$(REV)
 RCFLAGS += -DOPENTDM_VERSION='\"$(VER)\"' -DOPENTDM_REVISION=$(REV)
 
-ifdef CONFIG_HTTP
-    CURL_CFLAGS ?= $(shell pkg-config libcurl --cflags)
-    CURL_LIBS ?= $(shell pkg-config libcurl --libs)
-    CFLAGS += -DHAVE_CURL $(CURL_CFLAGS) -DCURL_STATICLIB
-    LIBS += deps/$(CPU)/libcurl.a-7.82.0
-endif
 
 OBJS := g_chase.o g_cmds.o g_combat.o g_func.o g_items.o g_main.o g_misc.o \
 g_phys.o g_save.o g_spawn.o g_svcmds.o g_target.o g_tdm_client.o g_tdm_cmds.o \
@@ -51,10 +75,9 @@ ifdef CONFIG_WINDOWS
     CPU := x86
     OBJS += sys_win32.o
     OBJS += opentdm.o
-    ifdef CONFIG_HTTP
-        LIBS += -lws2_32
-    endif
+    LIBS += -lws2_32
     TARGET ?= game$(CPU)-opentdm-$(VER).dll
+    
 else
     OBJS += sys_linux.o
     LIBS += -lm

@@ -415,7 +415,7 @@ static void HTTP_FinishDownload (void)
 
 		//show some stats
 		curl_easy_getinfo (curl, CURLINFO_TOTAL_TIME, &timeTaken);
-		curl_easy_getinfo (curl, CURLINFO_SIZE_DOWNLOAD, &fileSize);
+		curl_easy_getinfo (curl, CURLINFO_SIZE_DOWNLOAD_T, &fileSize);
 
 		//FIXME:
 		//technically i shouldn't need to do this as curl will auto reuse the
