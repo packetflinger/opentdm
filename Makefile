@@ -47,6 +47,7 @@ ifdef CONFIG_WINDOWS
             deps/win32/lib/libcrypt32.a \
             deps/win32/lib/libssp.a \
             deps/win32/lib/libidn2.a \
+            deps/win32/lib/libpthread.a \
             -static -static-libgcc
 else
     CFLAGS += -fPIC -fvisibility=hidden
