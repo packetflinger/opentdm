@@ -462,6 +462,3 @@ Int Value | String Value | Description
 256 | `rg` or `rail` | Railgun
 512 | `bfg` or `10k` | BFG10K
 
-`cl.x <integer> u` Userinfo variable to move the game clock on the X axis relative to the "center". Negative values move the clock left, positive values to the right. You can also use the command `setu cl.x <integer>` in configs.
-
-`cl.y <integer> u` Userinfo variable to move the game clock on the Y axis relative to the "center". Negative values move the clock up, positive values to the down. You can also use the command `setu cl.y <integer>` in configs.

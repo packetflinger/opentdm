@@ -1477,8 +1477,6 @@ typedef struct
 	qboolean       weaponhud;             // show weap/ammo counts on screen
 	int            weaponhud_offset_x;    // right/left offset from right side
 	int            weaponhud_offset_y;    // up/down offset from middle
-	int            clock_position_x;      // right/left offset for clock
-	int            clock_position_y;      // up/down offset for clock
 	int            ignore;                // bitmask
 	int            weapon_timer;          // auto timer for weapons
 	int            weapon_mask;           // weapons to auto timer

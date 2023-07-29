@@ -758,39 +758,14 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
     char *dm_statusbar;
     char weaponhud[1400];   // the weapon icons
     char ammohud[1400];     // the ammo counts
-    char clock[35];
     int id_x, id_y;
     int hud_x, hud_y;
-    int clock_x, clock_y;
-
-    if (player) {
-        clock_x = player->client->pers.clock_position_x;
-        clock_y = player->client->pers.clock_position_y;
-    } else {
-        clock_x = 0;
-        clock_y = 0;
-    }
 
     // opentdm default
     id_x = -100;
     id_y = -80;
     hud_y = 0;
     hud_x = -25;
-
-    // move the clock if the player wants it somewhere else
-    // relative to the "center" of the screen. 0,0 is not really
-    // at the center though.
-    clock[0] = 0;
-    if (player && (clock_x || clock_y)) {
-        strcpy(clock,
-            va("xv %d yv %d stat_string 31 ",
-                player->client->pers.clock_position_x,
-                player->client->pers.clock_position_y
-            )
-        );
-    } else {
-        strcpy(clock, va("xv 205 yb -39 stat_string 31 "));
-    }
 
     if (SHOWWEAPONHUD(player)) {
 
@@ -939,6 +914,10 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
         "yb -48 "
         "stat_string 26 "
 
+        // Time value
+        "yb -39 "
+        "stat_string 31 "
+
         // First team name
         "xr -%d "
         "yb -96 "
@@ -989,11 +968,11 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
             "stat_string 28 "
         "endif "
 
-        "%s%s%s",
+        "%s%s",
         (int)strlen(teaminfo[TEAM_A].name) * 8, teaminfo[TEAM_A].name,
         (int)strlen(teaminfo[TEAM_B].name) * 8, teaminfo[TEAM_B].name,
         id_x, id_y,
-        weaponhud, ammohud, clock
+        weaponhud, ammohud
     );
 
     return dm_statusbar;

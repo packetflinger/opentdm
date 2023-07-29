@@ -1633,18 +1633,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		}
 	}
 
-	// clock position x
-	s = Info_ValueForKey(userinfo, "cl.x");
-	if (s[0]) {
-	    ent->client->pers.clock_position_x = atoi(s);
-	}
-
-	// clock position y
-    s = Info_ValueForKey(userinfo, "cl.y");
-    if (s[0]) {
-        ent->client->pers.clock_position_y = atoi(s);
-    }
-
 	// save off the userinfo in case we want to check something later
 	Q_strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
 
