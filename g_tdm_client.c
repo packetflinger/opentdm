@@ -577,9 +577,13 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
     id_y = -80;
 
     if (player) {
+        spec_statusbar = &player->client->pers.statusbar[0];
         id_x += player->client->pers.config.id_x;
         id_y += player->client->pers.config.id_y;
+    } else {
+        spec_statusbar = &level.statusbar[0];
     }
+    memset(spec_statusbar, 0, 2000);
 
     spec_statusbar = va (
         // First team name
@@ -766,6 +770,13 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
     id_y = -80;
     hud_y = 0;
     hud_x = -25;
+
+    if (player) {
+        dm_statusbar = &player->client->pers.statusbar[0];
+    } else {
+        dm_statusbar = &level.statusbar[0];
+    }
+    memset(dm_statusbar, 0, 2000);
 
     if (SHOWWEAPONHUD(player)) {
 
