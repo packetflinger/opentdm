@@ -523,7 +523,6 @@ typedef struct
 	int           numspawns;
 	edict_t       *spawns[TDM_MAX_MAP_SPAWNPOINTS];
 	time_t        spawntime;
-	char          statusbar[2000];
 } level_locals_t;
 
 
@@ -1484,7 +1483,6 @@ typedef struct
 	int            armor_timer;           // auto timer for armor
 	int            armor_mask;            // armor to auto timer
 	int            timeout_count;         // how many timeouts did we call?
-	char           statusbar[2000];       // custom layout
 
 	// armor/weapon timers
 	int            item_timer[TIMER_MAX];
