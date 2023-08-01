@@ -577,13 +577,9 @@ const char *TDM_CreateSpectatorStatusBar(edict_t *player)
     id_y = -80;
 
     if (player) {
-        spec_statusbar = &player->client->pers.statusbar[0];
         id_x += player->client->pers.config.id_x;
         id_y += player->client->pers.config.id_y;
-    } else {
-        spec_statusbar = &level.statusbar[0];
     }
-    memset(spec_statusbar, 0, 2000);
 
     spec_statusbar = va (
         // First team name
@@ -771,12 +767,8 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
     hud_y = 0;
     hud_x = -25;
 
-    if (player) {
-        dm_statusbar = &player->client->pers.statusbar[0];
-    } else {
-        dm_statusbar = &level.statusbar[0];
-    }
-    memset(dm_statusbar, 0, 2000);
+    memset(&weaponhud, 0, sizeof(weaponhud));
+    memset(&ammohud, 0, sizeof(ammohud));
 
     if (SHOWWEAPONHUD(player)) {
 
@@ -785,9 +777,6 @@ const char *TDM_CreatePlayerDmStatusBar (edict_t *player)
 
         hud_x += player->client->pers.weaponhud_offset_x;
         hud_y += player->client->pers.weaponhud_offset_y;
-
-        weaponhud[0] = 0;
-        ammohud[0] = 0;
 
         // set x position at first for all weapon icons, to save the chars since CS max is 1000
         strcpy(weaponhud, va("xr %d ", hud_x));
