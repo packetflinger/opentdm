@@ -822,6 +822,7 @@ extern cvar_t   *g_playerconfig_enabled;
 extern cvar_t   *g_debug_spawns;
 
 extern cvar_t   *g_maplistfile;
+extern cvar_t   *g_randommapfile;
 extern cvar_t   *g_motd_message;
 
 extern cvar_t  *g_max_players_per_team;

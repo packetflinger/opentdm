@@ -319,6 +319,9 @@ void InitGame (void)
     // powerups removed (bitmask)
     g_powerupflags = gi.cvar("g_powerupflags", "0", 0);
 
+    // File where random maps are defined
+    g_randommapfile = gi.cvar("g_randommapfile", RANDMAPFILE, CVAR_LATCH);
+
     // whether server should record multi-view demo of matches
     g_record_mvd = gi.cvar("g_record_mvd", "0", 0);
 
