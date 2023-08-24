@@ -1132,6 +1132,8 @@ void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *kille
 qboolean TDM_Is1V1 (void);
 edict_t *TDM_ClosestTeammate(edict_t *ent);
 void TDM_LoadRandomMapLists(void);
+char *TDM_GetRandomMap(int playercount);
+qboolean TDM_VoteRandomMap(edict_t *ent);
 
 void CountPlayers (void);
 void UpdatePlayerTeamMenu (edict_t *ent);

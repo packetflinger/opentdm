@@ -3669,3 +3669,28 @@ void TDM_LoadRandomMapLists(void)
         RandomizeArray((void *)game.random_maps[i].maps, game.random_maps[i].total);
     }
 }
+
+/**
+ * Get the map name of the next random map in the list.
+ * If we hit the end of the list, reshuffle and go back to 0
+ */
+char *TDM_GetRandomMap(int playercount)
+{
+    randmap_t *rm;
+    int idx;
+
+    rm = &game.random_maps[playercount];
+    if (rm == NULL) {
+        return NULL;
+    }
+
+    // we're at the end...shuffle and start over
+    if (rm->index == rm->total) {
+        RandomizeArray((void *)rm->maps, rm->total);
+        rm->index = 0;
+    }
+
+    idx = rm->index;
+    rm->index++;
+    return rm->maps[idx];
+}

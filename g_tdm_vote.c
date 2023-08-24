@@ -2182,6 +2182,7 @@ void TDM_Vote_f (edict_t *ent)
                 "  weapontimer <0/1>\n"
                 "  timeoutlimit <integer> (per player; 0 == unlimited)\n"
                 "  timeoutcaptain <0/1>\n"
+                "  randommap [#] (# is players per team, optional)\n"
                 );
             return;
         }
@@ -2283,6 +2284,8 @@ void TDM_Vote_f (edict_t *ent)
         started_new_vote = TDM_VoteTimeoutLimit(ent);
     else if (!Q_stricmp(cmd, "timeoutcaptain"))
         started_new_vote = TDM_VoteTimeoutCaptain(ent);
+    else if (!Q_stricmp(cmd, "randommap"))
+        started_new_vote = TDM_VoteRandomMap(ent);
     else if (!Q_stricmp (cmd, "yes"))
         TDM_Vote_X (ent, VOTE_YES, "YES");
     else if (!Q_stricmp (cmd, "no"))
@@ -2776,4 +2779,60 @@ int TDM_ArmorStringToBitmask(const char *str) {
     }
 
     return mask;
+}
+
+qboolean TDM_VoteRandomMap(edict_t *ent)
+{
+    const char  *value;
+    int arg;
+
+    if (!((int)g_vote_mask->value & VOTE_MAP) && !ent->client->pers.admin) {
+        gi.cprintf (ent, PRINT_HIGH, "Voting for map is not allowed on this server.\n");
+        return false;
+    }
+
+    arg = atoi(gi.argv(2));
+
+    // assuming no arg was given rather than specifying a "0"
+    if (arg == RM_NONE) {
+        arg = teaminfo[ent->client->pers.team].players;
+    }
+
+    if (arg >= RM_MAX || arg <= RM_NONE) {
+        gi.cprintf(ent, PRINT_HIGH, "Invalid random map list\n");
+        return false;
+    }
+
+    value = TDM_GetRandomMap(arg);
+    while (!strcmp(level.mapname, value)) {
+        value = TDM_GetRandomMap(arg);
+    }
+
+    if (!value[0]) {
+        gi.cprintf(ent, PRINT_HIGH, "Problems...giving up.\n");
+        return false;
+    }
+
+    if (!TDM_Checkmap(ent, value)) {
+        return false;
+    }
+
+    if (vote.active) {
+        if (!strcmp (vote.newmap , value)) {
+            gi.cprintf (ent, PRINT_HIGH, "You've already started a vote for %s.\n", value);
+            return false;
+        }
+
+        if (TDM_RateLimited (ent, SECS_TO_FRAMES(2))) {
+            return false;
+        }
+
+        gi.bprintf (PRINT_HIGH, "Vote canceled!\n");
+        TDM_RemoveVote();
+    }
+
+    strcpy (vote.newmap, value);
+    vote.flags |= VOTE_MAP;
+
+    return true;
 }
