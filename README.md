@@ -422,6 +422,7 @@ Value | Description
 2 | `Default` Hud on by default for all players, they can still turn it off if they like 
 3 | `Forced` Hud is forced on for all players, they can't turn it off
 
+`g_randommapfile <string>` Set the file to use inside the game folder that holds the random map config. Random map voting allows players to get a random known-good map of appropriate size. Each line of this file starts with a map name (minus the .bsp) and then a space delimited list of integers. These numbers represent the number of players per team that are appropriate for the map. These should be between 1-4. These can be voted on by team players by using the `vote randommap` command. It will use the player count of the team of the vote caller for the size. You can specify a player count when voting as well. Example: `vote randommap 4`
 
 ## Client CVARs
 
