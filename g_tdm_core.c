@@ -3610,3 +3610,62 @@ int TDM_PingHandicap(int ping)
 
     return ping;
 }
+
+/**
+ * Read the random map list config file, load the maps, and randomize them.
+ *
+ * Called at game startup and if a reshuffle is required.
+ */
+void TDM_LoadRandomMapLists(void)
+{
+    FILE *fp;
+    cvar_t *gamedir;
+    char buffer[MAX_QPATH + 1];
+    char *entry;
+    char *tok;
+    char *map;
+    int idx;
+    randmap_t *rm;
+    char *path;
+
+    gamedir = gi.cvar("gamedir", "baseq2", 0);
+    path = va("%s/%s", gamedir->string, g_randommapfile->string);
+
+    memset(buffer, 0, sizeof(buffer));
+    fp = fopen(path, "r");
+    if (fp == NULL) {
+        gi.cprintf(NULL, PRINT_HIGH, "Can't load random maps - can't find %s\n", path);
+        return;
+    }
+
+    for (int i=0;;i++) {
+        entry = fgets(buffer, sizeof(buffer), fp);
+        if (entry == NULL) {
+            break;
+        }
+
+        // ignore comments and whitespace
+        if (entry[0] == '#' || entry[0] == ' ' || entry[0] == '\t') {
+            continue;
+        }
+
+        map = strtok(entry, " ");
+        tok = strtok(NULL, " ");
+
+        while (tok != NULL) {
+            idx = atoi(tok);
+            rm = &game.random_maps[idx];
+            rm->maps[rm->total] = gi.TagMalloc(strlen(map)+1, TAG_GAME);
+            strcpy(rm->maps[rm->total], map);
+            rm->total++;
+
+            tok = strtok(NULL, " ");
+        }
+    }
+    fclose(fp);
+
+    // randomize the lists
+    for (int i=0; i<RM_MAX; i++) {
+        RandomizeArray((void *)game.random_maps[i].maps, game.random_maps[i].total);
+    }
+}

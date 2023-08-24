@@ -419,7 +419,7 @@ void InitGame (void)
         game.random_maps[i].maps = gi.TagMalloc(100, TAG_GAME);
         game.random_maps[i].type = i;
     }
-
+    TDM_LoadRandomMapLists();
     TDM_Init ();
 }
 
