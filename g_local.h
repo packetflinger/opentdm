@@ -436,6 +436,35 @@ typedef struct gitem_s
     const char  *shortname;
 } gitem_t;
 
+#define RANDMAPFILE "randommaps.cfg"
+
+/**
+ * Indexes for random map lists
+ */
+typedef enum {
+    RM_NONE,
+    RM_DUEL,
+    RM_TWOS,
+    RM_THREES,
+    RM_FOURS,
+    RM_MAX
+} randmap_type_t;
+
+/**
+ * A grouping of random maps for a particular team size (duel, 3s, etc). These are
+ * loaded from a text config file in the mod directory.
+ *
+ * These structures should persist across maploads and only be
+ * re-shuffled once they're all used.
+ */
+typedef struct {
+    randmap_type_t  type;   // backwards lookup, maybe not needed
+    unsigned long   time;   // when was this list last shuffled?
+    int             index;  // where in the list we are
+    int             total;  // how many
+    char            **maps; // the array of map names
+} randmap_t;
+
 /**
  * this structure keeps track of the status of server-side multi-view demos.
  * MVD can record through multiple gamemaps, so we need to keep track
@@ -479,6 +508,9 @@ typedef struct {
 
     // auto server demo stuff
     server_demo_t mvd;
+
+    // sets of random "known good" maps for various team sizes
+    randmap_t random_maps[RM_MAX];
 } game_locals_t;
 
 
