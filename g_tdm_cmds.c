@@ -2649,40 +2649,6 @@ void TDM_PlayerConfigDisplay_f(edict_t *ent)
  * Just for testing stuff
  */
 void TDM_Test_f(edict_t *ent) {
-	/*
-	gi.cprintf(ent, PRINT_HIGH,
-			"player_state_t       %lu\n"
-			"client_persistent_t  %lu\n"
-			"client_respawn_t     %lu\n"
-			"pmove_state_t        %lu\n"
-			"qboolean             %lu\n"
-			"gitem_t              %lu\n"
-			"int                  %lu\n"
-			"vec3_t               %lu\n"
-			"float                %lu\n"
-			"weaponstate_t        %lu\n"
-			"unsigned             %lu\n"
-			"grenade_state_t      %lu\n"
-			"edict_t              %lu\n"
-			"gclient_t            %lu\n",
-			sizeof(player_state_t),
-			sizeof(client_persistent_t),
-			sizeof(client_respawn_t),
-			sizeof(pmove_state_t),
-			sizeof(qboolean),
-			sizeof(gitem_t),
-			sizeof(int),
-			sizeof(vec3_t),
-			sizeof(float),
-			sizeof(weaponstate_t),
-			sizeof(unsigned),
-			sizeof(grenade_state_t),
-			sizeof(edict_t),
-			sizeof(gclient_t)
-	);
-	*/
-
-	gi.cprintf(ent, PRINT_HIGH, "weapon offset: %lu", offsetof(gclient_t, weapon));
 }
 
 
@@ -2815,6 +2781,66 @@ void TDM_Maplist_f(edict_t *ent)
 	TDM_WriteMaplist(ent);
 }
 
+/**
+ * Players issue this command to see the randomized list of maps and
+ * which one is next.
+ */
+void TDM_RandomMap_f(edict_t *ent)
+{
+    randmap_t *list;
+    int index;
+    int i;
+    char buf[150];
+    char buf2[MAX_QPATH];
+    char *arg;
+
+    arg = gi.argv(1);
+    if (!arg[0]) {  // no arg given, use current team
+        if (ent->client->pers.team > TEAM_SPEC) {
+            index = teaminfo[ent->client->pers.team].players;
+        } else {
+            gi.cprintf(ent, PRINT_HIGH, "Specs must specify a list. Usage: %s [1-%d]\n", gi.argv(0), RM_MAX-1);
+            return;
+        }
+    } else {
+        if (!isdigit(arg[0])) {
+            gi.cprintf(ent, PRINT_HIGH, "Usage: %s [1-%d]\n", gi.argv(0), RM_MAX-1);
+            return;
+        }
+        index = atoi(arg);
+    }
+
+    if (index >= RM_MAX) {
+        gi.cprintf(ent, PRINT_HIGH, "Usage: %s [1-%d]\n", gi.argv(0), RM_MAX-1);
+        return;
+    }
+
+    list = &game.random_maps[index];
+    if (!list) {
+        gi.cprintf(ent, PRINT_HIGH, "No maps listed for teams of %d\n", index);
+        return;
+    }
+
+    memset(buf2, 0, sizeof(buf2));
+    TDM_AsciiToConsole(buf2, list->maps[list->index]);
+
+    gi.cprintf(ent, PRINT_HIGH, "Next random map: %s\n\n", buf2);
+    gi.cprintf(ent, PRINT_HIGH, "Maplist for %d's:\n", index);
+
+    memset(buf, 0, sizeof(buf));
+    for (i=1; i<=list->total; i++) {
+        if (list->index == i-1) {
+            strcat(buf, va("%-12s", buf2));
+        } else {
+            strcat(buf, va("%-12s", list->maps[i-1]));
+        }
+        if (i % 6 == 0) {
+            gi.cprintf(ent, PRINT_HIGH, "%s\n", buf);
+            memset(buf, 0, sizeof(buf));
+        }
+    }
+    gi.cprintf(ent, PRINT_HIGH, "%s\n", buf);
+}
 /*
 ==============
 TDM_Command
@@ -3093,6 +3119,8 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
             TDM_Maplist_f(ent);
         else if (!Q_stricmp (cmd, "stopsound"))
             return true;	//prevent chat from our stuffcmds on people who have no sound
+        else if (!Q_stricmp(cmd, "randommap"))
+            TDM_RandomMap_f(ent);
         else
             return false;
     }

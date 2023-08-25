@@ -1134,6 +1134,7 @@ edict_t *TDM_ClosestTeammate(edict_t *ent);
 void TDM_LoadRandomMapLists(void);
 char *TDM_GetRandomMap(int playercount);
 qboolean TDM_VoteRandomMap(edict_t *ent);
+void TDM_AsciiToConsole(char *out, char *in);
 
 void CountPlayers (void);
 void UpdatePlayerTeamMenu (edict_t *ent);

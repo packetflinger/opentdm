@@ -3685,7 +3685,7 @@ char *TDM_GetRandomMap(int playercount)
     }
 
     // we're at the end...shuffle and start over
-    if (rm->index == rm->total) {
+    if (rm->index == rm->total-1) {
         RandomizeArray((void *)rm->maps, rm->total);
         rm->index = 0;
     }
@@ -3693,4 +3693,23 @@ char *TDM_GetRandomMap(int playercount)
     idx = rm->index;
     rm->index++;
     return rm->maps[idx];
+}
+
+/**
+ * convert normal ascii string to console characters
+ */
+void TDM_AsciiToConsole(char *out, char *in)
+{
+    uint32_t i;
+
+    if (!in[0]) {
+        out[0] = '\0';
+        return;
+    }
+
+    for (i=0; in[i] != '\0'; i++) {
+        out[i] = (char)(in[i] | 0x80);
+    }
+
+    out[i] = '\0';
 }
