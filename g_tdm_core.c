@@ -3620,8 +3620,8 @@ void TDM_LoadRandomMapLists(void)
 {
     FILE *fp;
     cvar_t *gamedir;
-    char buffer[MAX_QPATH + 1];
-    char *entry;
+    char entry[MAX_QPATH + 1];
+    char *ret;
     char *tok;
     char *map;
     int idx;
@@ -3631,7 +3631,7 @@ void TDM_LoadRandomMapLists(void)
     gamedir = gi.cvar("gamedir", "baseq2", 0);
     path = va("%s/%s", gamedir->string, g_randommapfile->string);
 
-    memset(buffer, 0, sizeof(buffer));
+    memset(entry, 0, sizeof(entry));
     fp = fopen(path, "r");
     if (fp == NULL) {
         gi.cprintf(NULL, PRINT_HIGH, "Can't load random maps - can't find %s\n", path);
@@ -3639,8 +3639,8 @@ void TDM_LoadRandomMapLists(void)
     }
 
     for (int i=0;;i++) {
-        entry = fgets(buffer, sizeof(buffer), fp);
-        if (entry == NULL) {
+        ret = fgets(entry, sizeof(entry), fp);
+        if (ret == NULL) {
             break;
         }
 
@@ -3655,6 +3655,14 @@ void TDM_LoadRandomMapLists(void)
         while (tok != NULL) {
             idx = atoi(tok);
             rm = &game.random_maps[idx];
+            if (rm->total == MAX_RANDOM_MAPS) {
+                gi.cprintf(
+                    NULL, PRINT_HIGH, "[Rand map] skipping %s (%d), limited to %d maps per group\n",
+                    map, idx, MAX_RANDOM_MAPS
+                );
+                tok = strtok(NULL, " ");
+                continue;
+            }
             rm->maps[rm->total] = gi.TagMalloc(strlen(map)+1, TAG_GAME);
             strcpy(rm->maps[rm->total], map);
             rm->total++;

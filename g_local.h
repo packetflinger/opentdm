@@ -437,6 +437,7 @@ typedef struct gitem_s
 } gitem_t;
 
 #define RANDMAPFILE "randommaps.cfg"
+#define MAX_RANDOM_MAPS     75
 
 /**
  * Indexes for random map lists

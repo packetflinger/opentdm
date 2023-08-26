@@ -416,7 +416,7 @@ void InitGame (void)
     // allocate memory for the random map lists
     memset(&game.random_maps, 0, sizeof(randmap_t) * RM_MAX);
     for (int i=0; i<RM_MAX; i++) {
-        game.random_maps[i].maps = gi.TagMalloc(100, TAG_GAME);
+        game.random_maps[i].maps = gi.TagMalloc(sizeof(char *) * MAX_RANDOM_MAPS, TAG_GAME);
         game.random_maps[i].type = i;
     }
     TDM_LoadRandomMapLists();
