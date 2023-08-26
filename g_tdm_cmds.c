@@ -2841,6 +2841,23 @@ void TDM_RandomMap_f(edict_t *ent)
     }
     gi.cprintf(ent, PRINT_HIGH, "%s\n", buf);
 }
+
+/**
+ * Admin command, re-randomize the random map lists
+ */
+void TDM_ShuffleMaps_f(edict_t *ent)
+{
+    int i;
+    randmap_t *rm;
+
+    for (i=1; i<RM_MAX; i++) {
+        rm = &game.random_maps[i];
+        RandomizeArray((void *)rm->maps, rm->total);
+        rm->index = 0;
+    }
+
+    gi.cprintf(ent, PRINT_HIGH, "Random map lists shuffled\n");
+}
 /*
 ==============
 TDM_Command
@@ -2925,6 +2942,11 @@ qboolean TDM_Command (const char *cmd, edict_t *ent)
         else if (!Q_stricmp(cmd, "serverdemostop"))
         {
             //TDM_ServerDemoStop_f(ent);
+            return true;
+        }
+        else if (!Q_stricmp(cmd, "shufflemaps"))
+        {
+            TDM_ShuffleMaps_f(ent);
             return true;
         }
     }
