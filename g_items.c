@@ -558,7 +558,7 @@ qboolean Pickup_Health (edict_t *ent, edict_t *other)
 	else
 	{
 		if (!(ent->spawnflags & DROPPED_ITEM))
-			SetRespawn (ent, 30);
+			SetRespawn (ent, g_respawn_ammo->value);
 	}
 
 	return true;
