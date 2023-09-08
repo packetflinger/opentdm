@@ -674,6 +674,7 @@ void SpawnEntities (const char *mapname, const char *entities, const char *spawn
 
 	ParseEntityString (false);
 
+	SetPowerupRespawnDelay();
 	TDM_MapChanged ();
 }
 

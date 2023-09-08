@@ -1960,3 +1960,30 @@ void SetItemNames (void)
 	power_screen_index = ITEM_INDEX(FindItem("Power Screen"));
 	power_shield_index = ITEM_INDEX(FindItem("Power Shield"));*/
 }
+
+/**
+ * Yes, these values are already set when itemlist is defined,
+ * but they can be overrode by cvars.
+ */
+void SetPowerupRespawnDelay(void)
+{
+    gitem_t *it;
+
+    it = (void *) FindItem("item_quad");
+    it->quantity = (int) g_respawn_quad->value;
+
+    it = (void *) FindItem("item_invulnerability");
+    it->quantity = (int) g_respawn_invuln->value;
+
+    it = (void *) FindItem("item_pack");
+    it->quantity = (int) g_respawn_backpack->value;
+
+    it = (void *) FindItem("item_adrenaline");
+    it->quantity = (int) g_respawn_adren->value;
+
+    it = (void *) FindItem("item_power_shield");
+    it->quantity = (int) g_respawn_ps->value;
+
+    it = (void *) FindItem("item_power_screen");
+    it->quantity = (int) g_respawn_ps->value;
+}

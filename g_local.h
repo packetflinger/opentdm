@@ -904,6 +904,7 @@ int PowerArmorType (edict_t *ent);
 const gitem_t   *GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, const gitem_t *item, int count);
 void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
+void SetPowerupRespawnDelay(void);
 
 //
 // g_utils.c
