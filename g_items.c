@@ -1094,7 +1094,7 @@ void SpawnItem (edict_t *ent, const gitem_t *item)
 
 //======================================================================
 
-const gitem_t	itemlist[] = 
+gitem_t	itemlist[] =
 {
 	{
 		NULL
@@ -1969,21 +1969,21 @@ void SetPowerupRespawnDelay(void)
 {
     gitem_t *it;
 
-    it = (void *) FindItem("item_quad");
+    it = (gitem_t *) GETITEM(ITEM_ITEM_QUAD);
     it->quantity = (int) g_respawn_quad->value;
 
-    it = (void *) FindItem("item_invulnerability");
+    it = (gitem_t *) GETITEM(ITEM_ITEM_INVULNERABILITY);
     it->quantity = (int) g_respawn_invuln->value;
 
-    it = (void *) FindItem("item_pack");
+    it = (gitem_t *) GETITEM(ITEM_ITEM_PACK);
     it->quantity = (int) g_respawn_backpack->value;
 
-    it = (void *) FindItem("item_adrenaline");
+    it = (gitem_t *) GETITEM(ITEM_ITEM_ADRENALINE);
     it->quantity = (int) g_respawn_adren->value;
 
-    it = (void *) FindItem("item_power_shield");
+    it = (gitem_t *) GETITEM(ITEM_ITEM_POWER_SCREEN);
     it->quantity = (int) g_respawn_ps->value;
 
-    it = (void *) FindItem("item_power_screen");
+    it = (gitem_t *) GETITEM(ITEM_ITEM_POWER_SHIELD);
     it->quantity = (int) g_respawn_ps->value;
 }

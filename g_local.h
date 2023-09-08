@@ -864,7 +864,7 @@ typedef struct
 
 
 extern field_t          fields[];
-extern const gitem_t    itemlist[];
+extern gitem_t    itemlist[];
 
 // a sound without an ent or pos will be a local only sound
 #define SND_VOLUME      (1<<0)  // a byte
