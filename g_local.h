@@ -423,7 +423,9 @@ typedef struct gitem_s
     const char  *pickup_name;	// for printing on pickup
     int         count_width;		// number of digits to display by icon
 
-    int         quantity;		// for ammo how much, for weapons how much is used per shot
+    int         quantity;       // for ammo: how much
+                                // for weapons: how much is used per shot
+                                // for powerups: respawn time in seconds
     int         ammoindex;
     int         flags;			// IT_* flags
 
