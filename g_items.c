@@ -659,7 +659,7 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 	}
 
 	if (!(ent->spawnflags & DROPPED_ITEM)) {
-		SetRespawn (ent, 20);
+		SetRespawn (ent, g_respawn_armor->value);
 	}
 
 	// set the timer if enabled
