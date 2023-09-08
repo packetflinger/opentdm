@@ -328,6 +328,16 @@ void InitGame (void)
     // seconds until fragged player repawns automatically
     g_respawn_time = gi.cvar("g_respawn_time", "5", 0);
 
+    // respawn seconds, very rare to need to override these defaults
+    g_respawn_weapon = gi.cvar("g_respawn_weapon", "30", 0);
+    g_respawn_ammo = gi.cvar("g_respawn_ammor", "30", 0);
+    g_respawn_armor = gi.cvar("g_respawn_armor", "20", 0);
+    g_respawn_quad = gi.cvar("g_respawn_quad", "60", 0);
+    g_respawn_invuln = gi.cvar("g_respawn_invuln", "300", 0);
+    g_respawn_backpack = gi.cvar("g_respawn_backpack", "180", 0);
+    g_respawn_adren = gi.cvar("g_respawn_adren", "60", 0);
+    g_respawn_ps = gi.cvar("g_respawn_ps", "60", 0);
+
     //
     g_tdm_allow_pick = gi.cvar("g_tdm_allow_pick", "0", 0);
 

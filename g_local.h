@@ -810,6 +810,15 @@ extern cvar_t   *g_tdm_spawn_mode;
 
 extern cvar_t   *sv_mvd_enable;
 
+extern cvar_t   *g_respawn_weapon;
+extern cvar_t   *g_respawn_ammo;
+extern cvar_t   *g_respawn_armor;
+extern cvar_t   *g_respawn_quad;
+extern cvar_t   *g_respawn_invuln;
+extern cvar_t   *g_respawn_backpack;
+extern cvar_t   *g_respawn_adren;
+extern cvar_t   *g_respawn_ps;
+
 #define world   (&g_edicts[0])
 
 // item spawnflags

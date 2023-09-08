@@ -156,6 +156,15 @@ cvar_t	*g_auto_rejoin_map;
 cvar_t	*g_1v1_spawn_mode;
 cvar_t	*g_tdm_spawn_mode;
 
+cvar_t *g_respawn_weapon;
+cvar_t *g_respawn_ammo;
+cvar_t *g_respawn_armor;
+cvar_t *g_respawn_quad;
+cvar_t *g_respawn_invuln;
+cvar_t *g_respawn_backpack;
+cvar_t *g_respawn_adren;
+cvar_t *g_respawn_ps;
+
 cvar_t	*sv_mvd_enable;
 
 void SpawnEntities (const char *mapname, const char *entities, const char *spawnpoint);
