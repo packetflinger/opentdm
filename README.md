@@ -422,6 +422,21 @@ Value | Description
 2 | `Default` Hud on by default for all players, they can still turn it off if they like 
 3 | `Forced` Hud is forced on for all players, they can't turn it off
 
+`g_respawn_weapon <seconds>` Set a custom respawn time for guns. Default 30
+
+`g_respawn_ammo <seconds>` Set a custom respawn time for ammo (and health (and stims). Default 30
+
+`g_respawn_armor <seconds>` Set a custom respawn time for armor (and shards). Default 20
+
+`g_respawn_quad <seconds>` Set a custom respawn time for quad damage. Default 60
+
+`g_respawn_invuln <seconds>` Set a custom respawn time for invulnerablity. Default 300
+
+`g_respawn_backpack <seconds>` Set a custom respawn time for the ammo pack. Default 180
+
+`g_respawn_ps <seconds>` Set a custom respawn time for both the power shield and power screen. Default 60
+
+`g_respawn_adren <seconds>` Set a custom respawn time for adrenaline. Default 60
 
 ## Client CVARs
 
