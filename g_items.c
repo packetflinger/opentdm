@@ -465,7 +465,7 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 	}
 
 	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM))) {
-		SetRespawn(ent, 30);
+		SetRespawn(ent, g_respawn_ammo->value);
 	}
 
 	// special case, grenades are ammo and their own weapon,
