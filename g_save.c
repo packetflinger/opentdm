@@ -340,6 +340,7 @@ void InitGame (void)
     g_respawn_backpack = gi.cvar("g_respawn_backpack", "180", 0);
     g_respawn_adren = gi.cvar("g_respawn_adren", "60", 0);
     g_respawn_ps = gi.cvar("g_respawn_ps", "60", 0);
+    g_respawn_mega = gi.cvar("g_respawn_mega", "20", 0);
 
     //
     g_tdm_allow_pick = gi.cvar("g_tdm_allow_pick", "0", 0);

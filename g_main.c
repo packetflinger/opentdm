@@ -165,6 +165,7 @@ cvar_t *g_respawn_invuln;
 cvar_t *g_respawn_backpack;
 cvar_t *g_respawn_adren;
 cvar_t *g_respawn_ps;
+cvar_t *g_respawn_mega;
 
 cvar_t	*sv_mvd_enable;
 

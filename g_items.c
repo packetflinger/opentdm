@@ -527,7 +527,7 @@ void MegaHealth_think (edict_t *self)
 	}
 
 	if (!(self->spawnflags & DROPPED_ITEM))
-		SetRespawn (self, 20);
+		SetRespawn (self, g_respawn_mega->value);
 	else
 		G_FreeEdict (self);
 }

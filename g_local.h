@@ -854,6 +854,7 @@ extern cvar_t   *g_respawn_invuln;
 extern cvar_t   *g_respawn_backpack;
 extern cvar_t   *g_respawn_adren;
 extern cvar_t   *g_respawn_ps;
+extern cvar_t   *g_respawn_mega;
 
 #define world   (&g_edicts[0])
 
