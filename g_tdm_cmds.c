@@ -2816,7 +2816,7 @@ void TDM_RandomMap_f(edict_t *ent)
     }
 
     list = &game.random_maps[index];
-    if (!list) {
+    if (list->total == 0) {
         gi.cprintf(ent, PRINT_HIGH, "No maps listed for teams of %d\n", index);
         return;
     }
