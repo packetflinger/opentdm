@@ -849,6 +849,7 @@ extern cvar_t   *sv_mvd_enable;
 extern cvar_t   *g_respawn_weapon;
 extern cvar_t   *g_respawn_ammo;
 extern cvar_t   *g_respawn_armor;
+extern cvar_t   *g_respawn_health;
 extern cvar_t   *g_respawn_quad;
 extern cvar_t   *g_respawn_invuln;
 extern cvar_t   *g_respawn_backpack;

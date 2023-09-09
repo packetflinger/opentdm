@@ -335,6 +335,7 @@ void InitGame (void)
     g_respawn_weapon = gi.cvar("g_respawn_weapon", "30", 0);
     g_respawn_ammo = gi.cvar("g_respawn_ammo", "30", 0);
     g_respawn_armor = gi.cvar("g_respawn_armor", "20", 0);
+    g_respawn_health = gi.cvar("g_respawn_health", "30", 0);
     g_respawn_quad = gi.cvar("g_respawn_quad", "60", 0);
     g_respawn_invuln = gi.cvar("g_respawn_invuln", "300", 0);
     g_respawn_backpack = gi.cvar("g_respawn_backpack", "180", 0);

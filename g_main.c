@@ -160,6 +160,7 @@ cvar_t	*g_tdm_spawn_mode;
 cvar_t *g_respawn_weapon;
 cvar_t *g_respawn_ammo;
 cvar_t *g_respawn_armor;
+cvar_t *g_respawn_health;
 cvar_t *g_respawn_quad;
 cvar_t *g_respawn_invuln;
 cvar_t *g_respawn_backpack;
