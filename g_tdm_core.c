@@ -3634,7 +3634,7 @@ void TDM_LoadRandomMapLists(void)
     memset(entry, 0, sizeof(entry));
     fp = fopen(path, "r");
     if (fp == NULL) {
-        gi.cprintf(NULL, PRINT_HIGH, "Can't load random maps - can't find %s\n", path);
+        gi.cprintf(NULL, PRINT_HIGH, "Can't load random maps file %s\n", path);
         return;
     }
 
@@ -3710,7 +3710,7 @@ void TDM_AsciiToConsole(char *out, char *in)
 {
     uint32_t i;
 
-    if (!in[0]) {
+    if (!in) {
         out[0] = '\0';
         return;
     }
