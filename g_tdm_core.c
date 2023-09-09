@@ -3610,3 +3610,114 @@ int TDM_PingHandicap(int ping)
 
     return ping;
 }
+
+/**
+ * Read the random map list config file, load the maps, and randomize them.
+ *
+ * Called at game startup and if a reshuffle is required.
+ */
+void TDM_LoadRandomMapLists(void)
+{
+    FILE *fp;
+    cvar_t *gamedir;
+    char entry[MAX_QPATH + 1];
+    char *ret;
+    char *tok;
+    char *map;
+    int idx;
+    randmap_t *rm;
+    char *path;
+
+    gamedir = gi.cvar("gamedir", "baseq2", 0);
+    path = va("%s/%s", gamedir->string, g_randommapfile->string);
+
+    memset(entry, 0, sizeof(entry));
+    fp = fopen(path, "r");
+    if (fp == NULL) {
+        gi.cprintf(NULL, PRINT_HIGH, "Can't load random maps file %s\n", path);
+        return;
+    }
+
+    for (int i=0;;i++) {
+        ret = fgets(entry, sizeof(entry), fp);
+        if (ret == NULL) {
+            break;
+        }
+
+        // ignore comments and whitespace
+        if (entry[0] == '#' || entry[0] == ' ' || entry[0] == '\t') {
+            continue;
+        }
+
+        map = strtok(entry, " ");
+        tok = strtok(NULL, " ");
+
+        while (tok != NULL) {
+            idx = atoi(tok);
+            rm = &game.random_maps[idx];
+            if (rm->total == MAX_RANDOM_MAPS) {
+                gi.cprintf(
+                    NULL, PRINT_HIGH, "[Rand map] skipping %s (%d), limited to %d maps per group\n",
+                    map, idx, MAX_RANDOM_MAPS
+                );
+                tok = strtok(NULL, " ");
+                continue;
+            }
+            rm->maps[rm->total] = gi.TagMalloc(strlen(map)+1, TAG_GAME);
+            strcpy(rm->maps[rm->total], map);
+            rm->total++;
+
+            tok = strtok(NULL, " ");
+        }
+    }
+    fclose(fp);
+
+    // randomize the lists
+    for (int i=0; i<RM_MAX; i++) {
+        RandomizeArray((void *)game.random_maps[i].maps, game.random_maps[i].total);
+    }
+}
+
+/**
+ * Get the map name of the next random map in the list.
+ * If we hit the end of the list, reshuffle and go back to 0
+ */
+char *TDM_GetRandomMap(int playercount)
+{
+    randmap_t *rm;
+    int idx;
+
+    rm = &game.random_maps[playercount];
+    if (rm == NULL) {
+        return NULL;
+    }
+
+    // we're at the end...shuffle and start over
+    if (rm->index == rm->total-1) {
+        RandomizeArray((void *)rm->maps, rm->total);
+        rm->index = 0;
+    }
+
+    idx = rm->index;
+    rm->index++;
+    return rm->maps[idx];
+}
+
+/**
+ * convert normal ascii string to console characters
+ */
+void TDM_AsciiToConsole(char *out, char *in)
+{
+    uint32_t i;
+
+    if (!in) {
+        out[0] = '\0';
+        return;
+    }
+
+    for (i=0; in[i] != '\0'; i++) {
+        out[i] = (char)(in[i] | 0x80);
+    }
+
+    out[i] = '\0';
+}
