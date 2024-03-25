@@ -1479,7 +1479,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	//new connection, server is calling us. just save userinfo for later.
 	if (!ent->inuse)
 	{
-		Q_strncpy (ent->client->pers.ip, Info_ValueForKey(userinfo, "ip"), sizeof(ent->client->pers.ip)-1);
+	    ent->client->pers.address = net_parseIP(Info_ValueForKey(userinfo, "ip"));
 		Q_strncpy (ent->client->pers.userinfo, userinfo, sizeof(ent->client->pers.userinfo)-1);
 
 		if (game.server_features & GMF_MVDSPEC)
