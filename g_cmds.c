@@ -1107,93 +1107,100 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 	}
 }
 
-void Cmd_PlayerList_f (edict_t *ent)
+void Cmd_PlayerList_f(edict_t *ent)
 {
-	char	st[128];
-	char	text[1024];
-	char	ip[32];
-	int		players = 0;
-	cvar_t	*sv_reserved_slots;
-	edict_t	*e2;
+    char st[128];
+    char text[1024];
+    char ip[32];
+    int players = 0;
+    cvar_t *sv_reserved_slots;
+    edict_t *e2;
 
-	// find out how many reserved slots there are
-	sv_reserved_slots = gi.cvar ("sv_reserved_slots", NULL, 0);
+    // find out how many reserved slots there are
+    sv_reserved_slots = gi.cvar("sv_reserved_slots", NULL, 0);
 
-	// show players' ips for admin
-	if (ent->client->pers.admin)
-		strcpy (text, "id    time  ping   score                ip  name          team\n"
-					"----------------------------------------------------------------\n");
-	else
-		strcpy (text, "id    time  ping   score  name          team\n"
-					"----------------------------------------------\n");
+    // show players' ips for admin
+    if (ent->client->pers.admin) {
+        strcpy(text,
+                "id    time  ping   score                ip  name          team\n"
+                        "----------------------------------------------------------------\n");
+    } else {
+        strcpy(text, "id    time  ping   score  name          team\n"
+                "----------------------------------------------\n");
+    }
 
-	ip[0] = '[';
+    ip[0] = '[';
 
-	for (e2 = g_edicts + 1; e2 <= g_edicts + game.maxclients; e2++)
-	{
-		if (!e2->inuse)
-			continue;
+    for (e2 = g_edicts + 1; e2 <= g_edicts + game.maxclients; e2++) {
+        if (!e2->inuse) {
+            continue;
+        }
 
-		if (e2->client->pers.mvdclient)
-			continue;
+        if (e2->client->pers.mvdclient) {
+            continue;
+        }
 
-		if (ent->client->pers.admin)
-		{
-			char	*p;
+        if (ent->client->pers.admin) {
+            char *p;
 
-			strcpy (ip + 1, e2->client->pers.ip);
+            strcpy(ip + 1, e2->client->pers.ip);
 
-			p = strchr (ip, ':');
-			if (p)
-			{
-				p[0] = ']';
-				p[1] = '\0';
-			}
-		}
+            p = strchr(ip, ':');
+            if (p) {
+                p[0] = ']';
+                p[1] = '\0';
+            }
+        }
 
-		Com_sprintf (st, sizeof(st), "%2d  %3d:%02d  %4d     %3d %s %-13s %s%s\n",
-			(int)(e2 - g_edicts - 1),
-			(level.framenum - e2->client->resp.enterframe) / 600,
-			((level.framenum - e2->client->resp.enterframe) % 600)/10,
-			e2->client->ping,
-			e2->client->resp.score,
-			ent->client->pers.admin ? va ("%17s ", ip) : "",
-			e2->client->pers.netname,
-			teaminfo[e2->client->pers.team].name,
-			e2->client->pers.team == TEAM_SPEC && e2->client->chase_target ? 
-				va ("->%s", e2->client->chase_target->client->pers.netname) : "");
+        Com_sprintf(st, sizeof(st),
+                "%2d  %3d:%02d  %4d     %3d %s %-13s %s%s\n",
+                (int) (e2 - g_edicts - 1),
+                (level.framenum - e2->client->resp.enterframe) / 600,
+                ((level.framenum - e2->client->resp.enterframe) % 600) / 10,
+                e2->client->ping, e2->client->resp.score,
+                ent->client->pers.admin ? va("%17s ", ip) : "",
+                e2->client->pers.netname, teaminfo[e2->client->pers.team].name,
+                e2->client->pers.team == TEAM_SPEC && e2->client->chase_target ?
+                        va("->%s",
+                                e2->client->chase_target->client->pers.netname) :
+                        "");
 
-		if (strlen(text) + 1 + strlen(st) > sizeof(text) - 50)
-		{
-			gi.cprintf (ent, PRINT_HIGH, "%s", text);
-			text[0] = 0;
-		}
+        if (strlen(text) + 1 + strlen(st) > sizeof(text) - 50) {
+            gi.cprintf(ent, PRINT_HIGH, "%s", text);
+            text[0] = 0;
+        }
 
-		strcat (text, st);
-		players++;
-	}
+        strcat(text, st);
+        players++;
+    }
 
-	//force flush just to be safe
-	gi.cprintf (ent, PRINT_HIGH, "%s", text);
-	text[0] = 0;
+    //force flush just to be safe
+    gi.cprintf(ent, PRINT_HIGH, "%s", text);
+    text[0] = 0;
 
-	strcat (text, va ("\nServer status: "));
-	if (sv_reserved_slots)
-	{
-		if (players >= game.maxclients - (int)sv_reserved_slots->value)
-			strcat (text, TDM_SetColorText (va ("%d/%d\n", players, game.maxclients - (int)sv_reserved_slots->value)));
-		else
-			strcat (text, va("%d/%d\n", players, game.maxclients - (int)sv_reserved_slots->value));
-	}
-	else
-	{
-		if (players >= game.maxclients)
-			strcat (text, TDM_SetColorText (va ("%d/%d\n", players, game.maxclients)));
-		else
-			strcat (text, va("%d/%d\n", players, game.maxclients));
-	}
+    strcat(text, va("\nServer status: "));
+    if (sv_reserved_slots) {
+        if (players >= game.maxclients - (int) sv_reserved_slots->value) {
+            strcat(text,
+                    TDM_SetColorText(
+                            va("%d/%d\n", players,
+                                    game.maxclients
+                                            - (int) sv_reserved_slots->value)));
+        } else {
+            strcat(text,
+                    va("%d/%d\n", players,
+                            game.maxclients - (int) sv_reserved_slots->value));
+        }
+    } else {
+        if (players >= game.maxclients) {
+            strcat(text,
+                    TDM_SetColorText(va("%d/%d\n", players, game.maxclients)));
+        } else {
+            strcat(text, va("%d/%d\n", players, game.maxclients));
+        }
+    }
 
-	gi.cprintf (ent, PRINT_HIGH, "%s", text);
+    gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
 
 /*
