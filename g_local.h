@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // g_local.h -- local definitions for game module
 
 #include "q_shared.h"
+#include "g_net.h"
 
 // define GAME_INCLUDE so that game.h does not define the
 // short, server-visible gclient_t and edict_t structures,
@@ -1498,7 +1499,7 @@ typedef struct
 {
 	char           userinfo[MAX_INFO_STRING];
 	char           netname[16];
-	char           ip[24];
+	char           ip[INET6_ADDRSTRLEN + 8]; // plus port and surrounding brackets
 	int            hand;
 	qboolean       connected;       // a loadgame will leave valid entities that
                                     // just don't have a connection yet
