@@ -1111,7 +1111,7 @@ void Cmd_PlayerList_f(edict_t *ent)
 {
     char st[128];
     char text[1024];
-    char ip[32];
+    char ip[INET6_ADDRSTRLEN];
     int players = 0;
     cvar_t *sv_reserved_slots;
     edict_t *e2;
@@ -1129,8 +1129,6 @@ void Cmd_PlayerList_f(edict_t *ent)
                 "----------------------------------------------\n");
     }
 
-    ip[0] = '[';
-
     for (e2 = g_edicts + 1; e2 <= g_edicts + game.maxclients; e2++) {
         if (!e2->inuse) {
             continue;
@@ -1141,15 +1139,8 @@ void Cmd_PlayerList_f(edict_t *ent)
         }
 
         if (ent->client->pers.admin) {
-            char *p;
-
-            strcpy(ip + 1, e2->client->pers.ip);
-
-            p = strchr(ip, ':');
-            if (p) {
-                p[0] = ']';
-                p[1] = '\0';
-            }
+            memset(ip, 0, INET6_ADDRSTRLEN);
+            strcpy(ip, IP(&e2->client->pers.address));
         }
 
         Com_sprintf(st, sizeof(st),
