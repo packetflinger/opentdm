@@ -1351,7 +1351,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 {
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
-	char		saved_ip[24];
+	netadr_t    saved_addr;
 	qboolean	saved_mvdclient;
 
 	G_InitEdict (ent);
@@ -1369,12 +1369,12 @@ void ClientBeginDeathmatch (edict_t *ent)
 	if (ent->client->pers.joinstate != JS_JOINED)
 	{
 		strcpy (userinfo, ent->client->pers.userinfo);
-		strcpy (saved_ip, ent->client->pers.ip);
+		memcpy(&saved_addr, &ent->client->pers.address, sizeof(netadr_t));
 		saved_mvdclient = ent->client->pers.mvdclient;
 
 		memset (&client->pers, 0, sizeof(client->pers));
 
-		strcpy (ent->client->pers.ip, saved_ip);
+		memcpy(&ent->client->pers.address, &saved_addr, sizeof(netadr_t));
 		ent->client->pers.mvdclient = saved_mvdclient;
 
 		client->resp.enterframe = level.framenum;
