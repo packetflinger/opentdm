@@ -40,7 +40,7 @@ int net_ceil(float x);
 netadr_t net_cidrToMask(int cidr, netadrtype_t t);
 qboolean net_contains(netadr_t *network, netadr_t *host);
 int net_floor(float x);
-void net_parseIP(netadr_t *addr, const char *ip);
+netadr_t net_parseIP(const char *ip);
 netadr_t net_parseIPAddressBase(const char *ip);
 netadr_t net_parseIPAddressMask(const char *ip);
 
