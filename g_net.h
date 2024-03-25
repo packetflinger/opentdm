@@ -5,11 +5,10 @@
 #define IP4_LEN  4
 #define IP6_LEN 16
 
-#define IP(x)     (net_addressToString(&proxyinfo[x].address, qfalse, qfalse, qfalse))
-#define IPMASK(x) (net_addressToString(&proxyinfo[x].address, qfalse, qfalse, qtrue))
-#define IPSTR(a)  (net_addressToString(a->address, qfalse, qfalse))
-#define IPSTRMASK(a) (net_addressToString(a, qfalse, qfalse, qtrue))
-#define HASIP(x)  (proxyinfo[x].address.ip.u8[0] != 0)
+#define IP(x)     (net_addressToString(x, false, false, false))
+#define IPMASK(x) (net_addressToString(x, false, false, true))
+#define IPPORT(x) (net_addressToString(x, false, true, false))
+#define HASIP(x)  (x.ip.u8[0] != 0)
 
 typedef enum {
     NA_UNSPECIFIED,
