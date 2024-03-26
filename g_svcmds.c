@@ -85,14 +85,16 @@ RemoveIP
 =================
 Removes IP from the filter list defined by index i in the array.
 */
-void RemoveIP (int i)
+void RemoveIP(int i)
 {
-	int			j;
+    int *target = ((int *)&ipfilters[i]);
+    int *last = ((int *)&ipfilters[numipfilters-1]);
 
-	for (j = i+1; j < numipfilters; j++)
-		ipfilters[j-1] = ipfilters[j];
-
-	numipfilters--;
+    // overwrite the target filter by moving the last filter its place,
+    // then zero out the last one
+    memcpy(target, last, sizeof(ipfilter_t));
+    memset(last, 0, sizeof(ipfilter_t));
+    numipfilters--;
 }
 
 /*
@@ -195,10 +197,9 @@ void SVCmd_RemoveIP_f(edict_t *ent, char *ip)
 
     for (i = 0; i < numipfilters; i++) {
         if (f.addr.mask_bits == ipfilters[i].addr.mask_bits
-                && memcmp(&f.addr.ip, &ipfilters[i].addr.ip,
-                        sizeof(netadrip_t))) {
+                && !memcmp(&f.addr, &ipfilters[i].addr, sizeof(netadr_t))) {
             RemoveIP(i);
-            gi.cprintf(ent, PRINT_HIGH, "Removed %s.\n", ip);
+            gi.cprintf(ent, PRINT_HIGH, "Removed %s\n", IPMASK(&f.addr));
             return;
         }
     }
