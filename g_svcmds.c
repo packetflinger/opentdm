@@ -141,34 +141,34 @@ qboolean SV_FilterPacket (netadr_t *addr)
 SV_AddIP_f
 =================
 */
-void SVCmd_AddIP_f (edict_t *ent, char *ip, int expiry)
+void SVCmd_AddIP_f(edict_t *ent, char *ip, int expiry)
 {
-	ipfilter_t	new_filter;
+    ipfilter_t new_filter;
 
-	// wision: different message for server and ingame admin
-	if (!ip[0])
-	{
-		gi.cprintf(ent, PRINT_HIGH, "Usage: %s <ip-mask>%s\n", ent == NULL ? "addip" : "ban", ent == NULL ? "" : " [duration]");
-		return;
-	}
+    if (!ip[0]) {
+        gi.cprintf(ent, PRINT_HIGH, "Usage: %s <ip-mask>%s\n",
+                ent == NULL ? "addip" : "ban",
+                ent == NULL ? "" : " [duration]");
+        return;
+    }
 
-	TDM_CheckBans ();
+    TDM_CheckBans();
 
-	// check if list is full
-	if (numipfilters == MAX_IPFILTERS)
-	{
-		gi.cprintf (ent, PRINT_HIGH, "IP filter list is full\n");
-		return;
-	}
+    // check if list is full
+    if (numipfilters == MAX_IPFILTERS) {
+        gi.cprintf(ent, PRINT_HIGH, "IP filter list is full\n");
+        return;
+    }
 
-	// minutes to seconds
-	expiry *= 60;
+    // minutes to seconds
+    expiry *= 60;
 
-	if (!StringToFilter (ip, &new_filter, expiry))
-		return;
+    if (!StringToFilter(ip, &new_filter, expiry)) {
+        return;
+    }
 
-	ipfilters[numipfilters] = new_filter;
-	numipfilters++;
+    ipfilters[numipfilters] = new_filter;
+    numipfilters++;
 }
 
 /*
@@ -219,7 +219,7 @@ void SVCmd_ListIP_f (edict_t *ent)
 
 	now = (unsigned)time(NULL);
 
-	gi.cprintf (ent, PRINT_HIGH, "Filter list:\n IP                 Duration\n");
+	gi.cprintf (ent, PRINT_HIGH, "Filter list:\n Duration    IP\n");
 	for (i = 0; i < numipfilters; i++)
 	{
 		unsigned	remaining, minutes;
@@ -231,9 +231,9 @@ void SVCmd_ListIP_f (edict_t *ent)
 		if (ipfilters[i].expire == -1) {
 			strcpy (value, "permanent");
 		} else {
-			sprintf (value, "%d minute%s", minutes, minutes == 1 ? "" : "s");
+			sprintf (value, "%d min%s", minutes, minutes == 1 ? "" : "s");
 		}
-		gi.cprintf (ent, PRINT_HIGH, "  %s                                                %s\n", IPMASK(&ipfilters[i].addr), value);
+		gi.cprintf (ent, PRINT_HIGH, " %-12s%s\n", value, IPMASK(&ipfilters[i].addr));
 	}
 }
 
@@ -310,7 +310,7 @@ void	ServerCommand (void)
 	if (Q_stricmp (cmd, "itemlist") == 0)
 		Svcmd_Itemlist_f ();
 	else if (Q_stricmp (cmd, "addip") == 0)
-		SVCmd_AddIP_f (NULL, gi.argv(2), 0);
+		SVCmd_AddIP_f (NULL, gi.argv(2), atoi(gi.argv(3)));
 	else if (Q_stricmp (cmd, "removeip") == 0)
 		SVCmd_RemoveIP_f (NULL, gi.argv(2));
 	else if (Q_stricmp (cmd, "listip") == 0)
