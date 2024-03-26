@@ -176,32 +176,33 @@ void SVCmd_AddIP_f(edict_t *ent, char *ip, int expiry)
 SV_RemoveIP_f
 =================
 */
-void SVCmd_RemoveIP_f (edict_t *ent, char *ip)
+void SVCmd_RemoveIP_f(edict_t *ent, char *ip)
 {
-	ipfilter_t	f;
-	int			i;
+    ipfilter_t f;
+    int i;
 
-	if (!ip[0])
-	{
-		// wision: different message for server and ingame admin
-		gi.cprintf(ent, PRINT_HIGH, "Usage: %s <ip-mask>\n", ent == NULL ? "sv removeip" : "unban");
-		return;
-	}
+    if (!ip[0]) {
+        gi.cprintf(ent, PRINT_HIGH, "Usage: %s <ip-mask>\n",
+                ent == NULL ? "sv removeip" : "unban");
+        return;
+    }
 
-	if (!StringToFilter (ip, &f, 0)) {
-		return;
-	}
+    if (!StringToFilter(ip, &f, 0)) {
+        return;
+    }
 
-	TDM_CheckBans ();
+    TDM_CheckBans();
 
-	for (i = 0; i < numipfilters ;i++) {
-		if (f.addr.mask_bits == ipfilters[i].addr.mask_bits && memcmp(&f.addr.ip, &ipfilters[i].addr.ip, sizeof(netadrip_t))) {
-			RemoveIP (i);
-			gi.cprintf (ent, PRINT_HIGH, "Removed %s.\n", ip);
-			return;
-		}
-	}
-	gi.cprintf (ent, PRINT_HIGH, "Didn't find %s.\n", ip);
+    for (i = 0; i < numipfilters; i++) {
+        if (f.addr.mask_bits == ipfilters[i].addr.mask_bits
+                && memcmp(&f.addr.ip, &ipfilters[i].addr.ip,
+                        sizeof(netadrip_t))) {
+            RemoveIP(i);
+            gi.cprintf(ent, PRINT_HIGH, "Removed %s.\n", ip);
+            return;
+        }
+    }
+    gi.cprintf(ent, PRINT_HIGH, "Didn't find %s.\n", ip);
 }
 
 /*
