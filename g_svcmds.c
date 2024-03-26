@@ -56,57 +56,27 @@ If 0, then only addresses matching the list will be allowed.  This lets you easi
 ipfilter_t  ipfilters[MAX_IPFILTERS];
 unsigned    numipfilters;
 
-/*
-=================
-StringToFilter
-=================
-*/
-qboolean StringToFilter (const char *s, ipfilter_t *f, int seconds)
+/**
+ * Convert a string representation of an IP address into an ipfilter_t
+ *
+ * Allowed input format examples:
+ *   192.0.2.5
+ *   192.0.2.0/27
+ *   2002:db8::b00b:face
+ *   2002:db8::b00b:face/64
+ */
+qboolean StringToFilter(const char *s, ipfilter_t *f, int seconds)
 {
-	char	num[128];
-	int		i, j;
-	byte	b[4];
-	byte	m[4];
-	
-	for (i = 0; i < 4 ;i++)
-	{
-		b[i] = 0;
-		m[i] = 0;
-	}
-	
-	for (i = 0 ;i < 4 ;i++)
-	{
-		if (*s < '0' || *s > '9')
-		{
-			gi.cprintf (NULL, PRINT_HIGH, "Bad filter address: %s\n", s);
-			return false;
-		}
-		
-		j = 0;
-		while (*s >= '0' && *s <= '9')
-		{
-			num[j++] = *s++;
-		}
+    memset(&f->addr, 0, sizeof(netadr_t));
+    f->addr = net_parseIPAddressMask(s);
 
-		num[j] = 0;
-		b[i] = atoi(num);
-		if (b[i] != 0)
-			m[i] = 255;
+    if (seconds) {
+        f->expire = time(NULL) + seconds;
+    } else {
+        f->expire = -1;
+    }
 
-		if (!*s)
-			break;
-		s++;
-	}
-	
-	f->mask = *(unsigned *)m;
-	f->compare = *(unsigned *)b;
-
-	if (seconds)
-		f->expire = time(NULL) + seconds;
-	else
-		f->expire = -1;
-
-	return true;
+    return true;
 }
 
 /*
@@ -153,39 +123,15 @@ void TDM_CheckBans (void)
 SV_FilterPacket
 =================
 */
-qboolean SV_FilterPacket (const char *from)
+qboolean SV_FilterPacket (netadr_t *addr)
 {
 	int			i;
-	unsigned	in;
-	byte		m[4];
-	const char *p;
-
-	i = 0;
-	p = from;
-
 	TDM_CheckBans ();
-
-	while (*p && i < 4)
-	{
-		m[i] = 0;
-		while (*p >= '0' && *p <= '9')
-		{
-			m[i] = m[i]*10 + (*p - '0');
-			p++;
-		}
-		if (!*p || *p == ':')
-			break;
-		i++, p++;
-	}
-	
-	in = *(unsigned *)m;
-
-	for (i = 0; i < numipfilters; i++)
-	{
-		if ( (in & ipfilters[i].mask) == ipfilters[i].compare)
+	for (i = 0; i < numipfilters; i++) {
+	    if (net_contains(&ipfilters[i].addr, addr)) {
 			return (int)filterban->value;
+	    }
 	}
-
 	return (int)!filterban->value;
 }
 
@@ -242,15 +188,14 @@ void SVCmd_RemoveIP_f (edict_t *ent, char *ip)
 		return;
 	}
 
-	if (!StringToFilter (ip, &f, 0))
+	if (!StringToFilter (ip, &f, 0)) {
 		return;
+	}
 
 	TDM_CheckBans ();
 
-	for (i = 0; i < numipfilters ;i++)
-	{
-		if (ipfilters[i].mask == f.mask && ipfilters[i].compare == f.compare)
-		{
+	for (i = 0; i < numipfilters ;i++) {
+		if (f.addr.mask_bits == ipfilters[i].addr.mask_bits && memcmp(&f.addr.ip, &ipfilters[i].addr.ip, sizeof(netadrip_t))) {
 			RemoveIP (i);
 			gi.cprintf (ent, PRINT_HIGH, "Removed %s.\n", ip);
 			return;
@@ -267,7 +212,6 @@ SV_ListIP_f
 void SVCmd_ListIP_f (edict_t *ent)
 {
 	int			i;
-	byte		b[4];
 	char		value[32];
 	unsigned	now;
 
@@ -284,13 +228,12 @@ void SVCmd_ListIP_f (edict_t *ent)
 
 		minutes = remaining / 60;
 
-		if (ipfilters[i].expire == -1)
+		if (ipfilters[i].expire == -1) {
 			strcpy (value, "permanent");
-		else
+		} else {
 			sprintf (value, "%d minute%s", minutes, minutes == 1 ? "" : "s");
-			
-		*(unsigned int *)b = ipfilters[i].compare;
-		gi.cprintf (ent, PRINT_HIGH, "  %3i.%3i.%3i.%3i    %s\n", b[0], b[1], b[2], b[3], value);
+		}
+		gi.cprintf (ent, PRINT_HIGH, "  %s                                                %s\n", IPMASK(&ipfilters[i].addr), value);
 	}
 }
 
@@ -303,22 +246,21 @@ void SVCmd_WriteIP_f (void)
 {
 	FILE	*f;
 	char	name[MAX_OSPATH];
-	byte	b[4];
-	int		i;
+	int i;
 	cvar_t	*game;
 
 	game = gi.cvar ("game", "", 0);
 
-	if (!*game->string)
+	if (!*game->string) {
 		sprintf (name, "%s/listip.cfg", GAMEVERSION);
-	else
+	} else {
 		Com_sprintf (name, sizeof(name), "%s/listip.cfg", game->string);
+	}
 
 	gi.cprintf (NULL, PRINT_HIGH, "Writing %s.\n", name);
 
 	f = fopen (name, "wb");
-	if (!f)
-	{
+	if (!f) {
 		gi.cprintf (NULL, PRINT_HIGH, "Couldn't open %s\n", name);
 		return;
 	}
@@ -327,14 +269,12 @@ void SVCmd_WriteIP_f (void)
 
 	TDM_CheckBans ();
 
-	for (i = 0; i < numipfilters; i++)
-	{
+	for (i = 0; i < numipfilters; i++) {
 		// only write permanent bans to disk
-		if (ipfilters[i].expire)
+		if (ipfilters[i].expire) {
 			continue;
-
-		*(unsigned *)b = ipfilters[i].compare;
-		fprintf (f, "sv addip %i.%i.%i.%i\n", b[0], b[1], b[2], b[3]);
+		}
+		fprintf (f, "sv addip %s\n", IPMASK(&ipfilters[i].addr));
 	}
 	
 	fclose (f);

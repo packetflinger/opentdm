@@ -1,6 +1,5 @@
 typedef struct {
-    unsigned    mask;
-    unsigned    compare;
+    netadr_t    addr;
     int         expire;
 } ipfilter_t;
 

@@ -1656,24 +1656,21 @@ loadgames will.
 qboolean ClientConnect (edict_t *ent, char *userinfo)
 {
 	const char	*value;
-	const char	*ipa;
+	char *tempip;
+	netadr_t ip;
 
 	// find \ip variable
-	ipa = strstr(userinfo,"\\ip\\");
-
-	if (ipa == NULL)
-	{
+	tempip = Info_ValueForKey (userinfo, "ip");
+	if (!tempip) {
 		userinfo[0] = '\0';
 		Info_SetValueForKey (userinfo,"rejmsg","Your userinfo string is malformed, please restart Quake 2.");
 		return false;
 	}
 
-	// skip "\ip\"
-	ipa += 4;
+	ip = net_parseIP(tempip);
 
 	// check to see if they are on the banned IP list
-	if (SV_FilterPacket(ipa))
-	{
+	if (SV_FilterPacket(&ip)) {
 		userinfo[0] = '\0';
 		Info_SetValueForKey(userinfo, "rejmsg", "You are banned from this server.");
 		return false;
@@ -1681,9 +1678,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 
 	// check for a password
 	value = Info_ValueForKey (userinfo, "password");
-	if (*password->string && strcmp(password->string, "none") && 
-		strcmp(password->string, value))
-	{
+	if (*password->string && strcmp(password->string, "none") && strcmp(password->string, value)) {
 		userinfo[0] = '\0';
 		Info_SetValueForKey (userinfo, "rejmsg", "Password required or incorrect.");
 		return false;
@@ -1693,31 +1688,23 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	ent->client = game.clients + (ent - g_edicts - 1);
 
 	//possible new client taking the place of a non-clean disconnect, clean up if so
-	if (ent->client->pers.connected)
-	{
+	if (ent->client->pers.connected) {
 		ent->s.solid = 0;
 		ent->s.effects = 0;
 		ent->s.modelindex = 0;
 		ent->s.sound = 0;
-
 		ent->solid = SOLID_NOT;
-		
 		ent->client->pers.connected = false;
 
 		//zero pers in preparation for new client
 		memset (&ent->client->pers, 0, sizeof(ent->client->pers));
 	}
 
-	// clear the respawning variables
-	//InitClientResp (ent->client);
-	//InitClientPersistant (ent->client);
+	value = Info_ValueForKey(userinfo, "name");
 
-	//ClientUserinfoChanged (ent, userinfo);
-
-	value = Info_ValueForKey (userinfo, "name");
-
-	if (game.maxclients > 1)
-		gi.dprintf ("%s[%s] connected\n", value, ipa);
+	if (game.maxclients > 1) {
+		gi.dprintf ("%s[%s] connected\n", value, IP(&ip));
+	}
 
 	//ent->client->pers.connected = true;
 	return true;
