@@ -21,31 +21,6 @@
 #include "m_player.h"
 #include "g_tdm_votemenu.h"
 
-/*char *ClientTeam (edict_t *ent)
- {
- char		*p;
- static char	value[512];
-
- value[0] = 0;
-
- if (!ent->client)
- return value;
-
- strcpy(value, Info_ValueForKey (ent->client->pers.userinfo, "skin"));
- p = strchr(value, '/');
- if (!p)
- return value;
-
- if ((int)(dmflags->value) & DF_MODELTEAMS)
- {
- *p = 0;
- return value;
- }
-
- // if ((int)(dmflags->value) & DF_SKINTEAMS)
- return ++p;
- }*/
-
 qboolean OnSameTeam(edict_t *ent1, edict_t *ent2) {
     if (ent1->client && ent2->client) {
         return (ent1->client->pers.team == ent2->client->pers.team);
@@ -518,48 +493,6 @@ void Cmd_DropNearestAmmo_f(edict_t *ent) {
 
 /*
  =================
- Cmd_Inven_f
- =================
- */
-/*void Cmd_Inven_f (edict_t *ent)
- {
- int			i;
- gclient_t	*cl;
-
- cl = ent->client;
-
- cl->showscores = false;
- cl->showhelp = false;
-
- if (cl->showinventory)
- {
- cl->showinventory = false;
- return;
- }
-
- if (cl->menu.active)
- {
- PMenu_Close (ent);
- return;
- }
- else if (cl->pers.team == TEAM_SPEC)
- {
- TDM_ShowTeamMenu (ent);
- return;
- }
-
- cl->showinventory = true;
-
- gi.WriteByte (svc_inventory);
- for (i=0 ; i<MAX_ITEMS ; i++)
- {
- gi.WriteShort (cl->inventory[i]);
- }
- gi.unicast (ent, true);
- }*/
-
-/*
- =================
  Cmd_InvUse_f
  =================
  */
@@ -825,49 +758,6 @@ int PlayerSort(void const *a, void const *b) {
     }
     return 0;
 }
-
-/*
- =================
- Cmd_Players_f
- =================
- */
-/*void Cmd_Players_f (edict_t *ent)
- {
- int		i;
- int		count;
- char	small[64];
- char	large[1280];
- int		index[256];
-
- count = 0;
- for (i = 0 ; i < game.maxclients; i++)
- if (game.clients[i].pers.connected)
- {
- index[count] = i;
- count++;
- }
-
- // sort by frags
- qsort (index, count, sizeof(index[0]), PlayerSort);
-
- // print information
- large[0] = 0;
-
- for (i = 0 ; i < count ; i++)
- {
- Com_sprintf (small, sizeof(small), "%3i %s\n",
- game.clients[index[i]].ps.stats[STAT_FRAGS],
- game.clients[index[i]].pers.netname);
- if (strlen (small) + strlen(large) > sizeof(large) - 100 )
- {	// can't print all of them in one packet
- strcat (large, "...\n");
- break;
- }
- strcat (large, small);
- }
-
- gi.cprintf (ent, PRINT_HIGH, "%s\n%i players\n", large, count);
- }*/
 
 /*
  =================
