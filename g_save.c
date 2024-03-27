@@ -25,117 +25,71 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 mmove_t mmove_reloc;
 
 field_t fields[] = {
-	{"classname", FOFS(classname), F_LSTRING},
-	{"model", FOFS(model), F_LSTRING},
-	{"spawnflags", FOFS(spawnflags), F_INT},
-	{"speed", FOFS(speed), F_FLOAT},
-	{"accel", FOFS(accel), F_FLOAT},
-	{"decel", FOFS(decel), F_FLOAT},
-	{"target", FOFS(target), F_LSTRING},
-	{"targetname", FOFS(targetname), F_LSTRING},
-	{"pathtarget", FOFS(pathtarget), F_LSTRING},
-	{"deathtarget", FOFS(deathtarget), F_LSTRING},
-	{"killtarget", FOFS(killtarget), F_LSTRING},
-	{"combattarget", FOFS(combattarget), F_LSTRING},
-	{"message", FOFS(message), F_LSTRING},
-	{"team", FOFS(team), F_LSTRING},
-	{"wait", FOFS(wait), F_FLOAT},
-	{"delay", FOFS(delay), F_FLOAT},
-	{"random", FOFS(random), F_FLOAT},
-	{"move_origin", FOFS(move_origin), F_VECTOR},
-	{"move_angles", FOFS(move_angles), F_VECTOR},
-	{"style", FOFS(style), F_INT},
-	{"count", FOFS(count), F_INT},
-	{"health", FOFS(health), F_INT},
-	{"sounds", FOFS(sounds), F_INT},
-	{"light", 0, F_IGNORE},
-	{"dmg", FOFS(dmg), F_INT},
-	{"mass", FOFS(mass), F_INT},
-	{"volume", FOFS(volume), F_FLOAT},
-	{"attenuation", FOFS(attenuation), F_FLOAT},
-	{"map", FOFS(map), F_LSTRING},
-	{"origin", FOFS(s.origin), F_VECTOR},
-	{"angles", FOFS(s.angles), F_VECTOR},
-	{"angle", FOFS(s.angles), F_ANGLEHACK},
-
-/*	{"goalentity", FOFS(goalentity), F_EDICT, FFL_NOSPAWN},
-	{"movetarget", FOFS(movetarget), F_EDICT, FFL_NOSPAWN},
-	{"enemy", FOFS(enemy), F_EDICT, FFL_NOSPAWN},
-	{"oldenemy", FOFS(oldenemy), F_EDICT, FFL_NOSPAWN},
-	{"activator", FOFS(activator), F_EDICT, FFL_NOSPAWN},
-	{"groundentity", FOFS(groundentity), F_EDICT, FFL_NOSPAWN},
-	{"teamchain", FOFS(teamchain), F_EDICT, FFL_NOSPAWN},
-	{"teammaster", FOFS(teammaster), F_EDICT, FFL_NOSPAWN},
-	{"owner", FOFS(owner), F_EDICT, FFL_NOSPAWN},
-	{"mynoise", FOFS(mynoise), F_EDICT, FFL_NOSPAWN},
-	{"mynoise2", FOFS(mynoise2), F_EDICT, FFL_NOSPAWN},
-	{"target_ent", FOFS(target_ent), F_EDICT, FFL_NOSPAWN},
-	{"chain", FOFS(chain), F_EDICT, FFL_NOSPAWN},
-
-	{"prethink", FOFS(prethink), F_FUNCTION, FFL_NOSPAWN},
-	{"think", FOFS(think), F_FUNCTION, FFL_NOSPAWN},
-	{"blocked", FOFS(blocked), F_FUNCTION, FFL_NOSPAWN},
-	{"touch", FOFS(touch), F_FUNCTION, FFL_NOSPAWN},
-	{"use", FOFS(use), F_FUNCTION, FFL_NOSPAWN},
-	{"pain", FOFS(pain), F_FUNCTION, FFL_NOSPAWN},
-	{"die", FOFS(die), F_FUNCTION, FFL_NOSPAWN},
-
-	{"stand", FOFS(monsterinfo.stand), F_FUNCTION, FFL_NOSPAWN},
-	{"idle", FOFS(monsterinfo.idle), F_FUNCTION, FFL_NOSPAWN},
-	{"search", FOFS(monsterinfo.search), F_FUNCTION, FFL_NOSPAWN},
-	{"walk", FOFS(monsterinfo.walk), F_FUNCTION, FFL_NOSPAWN},
-	{"run", FOFS(monsterinfo.run), F_FUNCTION, FFL_NOSPAWN},
-	{"dodge", FOFS(monsterinfo.dodge), F_FUNCTION, FFL_NOSPAWN},
-	{"attack", FOFS(monsterinfo.attack), F_FUNCTION, FFL_NOSPAWN},
-	{"melee", FOFS(monsterinfo.melee), F_FUNCTION, FFL_NOSPAWN},
-	{"sight", FOFS(monsterinfo.sight), F_FUNCTION, FFL_NOSPAWN},
-	{"checkattack", FOFS(monsterinfo.checkattack), F_FUNCTION, FFL_NOSPAWN},
-	{"currentmove", FOFS(monsterinfo.currentmove), F_MMOVE, FFL_NOSPAWN},
-
-	{"endfunc", FOFS(moveinfo.endfunc), F_FUNCTION, FFL_NOSPAWN},*/
-
-	// temp spawn vars -- only valid when the spawn function is called
-	{"lip", STOFS(lip), F_INT, FFL_SPAWNTEMP},
-	{"distance", STOFS(distance), F_INT, FFL_SPAWNTEMP},
-	{"height", STOFS(height), F_INT, FFL_SPAWNTEMP},
-	{"noise", STOFS(noise), F_LSTRING, FFL_SPAWNTEMP},
-	{"pausetime", STOFS(pausetime), F_FLOAT, FFL_SPAWNTEMP},
-	{"item", STOFS(item), F_LSTRING, FFL_SPAWNTEMP},
-
-//need for item field in edict struct, FFL_SPAWNTEMP item will be skipped on saves
-	{"item", FOFS(item), F_ITEM},
-
-	{"gravity", STOFS(gravity), F_LSTRING, FFL_SPAWNTEMP},
-	{"sky", STOFS(sky), F_LSTRING, FFL_SPAWNTEMP},
-	{"skyrotate", STOFS(skyrotate), F_FLOAT, FFL_SPAWNTEMP},
-	{"skyaxis", STOFS(skyaxis), F_VECTOR, FFL_SPAWNTEMP},
-	{"minyaw", STOFS(minyaw), F_FLOAT, FFL_SPAWNTEMP},
-	{"maxyaw", STOFS(maxyaw), F_FLOAT, FFL_SPAWNTEMP},
-	{"minpitch", STOFS(minpitch), F_FLOAT, FFL_SPAWNTEMP},
-	{"maxpitch", STOFS(maxpitch), F_FLOAT, FFL_SPAWNTEMP},
-	{"nextmap", STOFS(nextmap), F_LSTRING, FFL_SPAWNTEMP},
-
-	{0, 0, 0, 0}
-
+    {"classname", FOFS(classname), F_LSTRING},
+    {"model", FOFS(model), F_LSTRING},
+    {"spawnflags", FOFS(spawnflags), F_INT},
+    {"speed", FOFS(speed), F_FLOAT},
+    {"accel", FOFS(accel), F_FLOAT},
+    {"decel", FOFS(decel), F_FLOAT},
+    {"target", FOFS(target), F_LSTRING},
+    {"targetname", FOFS(targetname), F_LSTRING},
+    {"pathtarget", FOFS(pathtarget), F_LSTRING},
+    {"deathtarget", FOFS(deathtarget), F_LSTRING},
+    {"killtarget", FOFS(killtarget), F_LSTRING},
+    {"combattarget", FOFS(combattarget), F_LSTRING},
+    {"message", FOFS(message), F_LSTRING},
+    {"team", FOFS(team), F_LSTRING},
+    {"wait", FOFS(wait), F_FLOAT},
+    {"delay", FOFS(delay), F_FLOAT},
+    {"random", FOFS(random), F_FLOAT},
+    {"move_origin", FOFS(move_origin), F_VECTOR},
+    {"move_angles", FOFS(move_angles), F_VECTOR},
+    {"style", FOFS(style), F_INT},
+    {"count", FOFS(count), F_INT},
+    {"health", FOFS(health), F_INT},
+    {"sounds", FOFS(sounds), F_INT},
+    {"light", 0, F_IGNORE},
+    {"dmg", FOFS(dmg), F_INT},
+    {"mass", FOFS(mass), F_INT},
+    {"volume", FOFS(volume), F_FLOAT},
+    {"attenuation", FOFS(attenuation), F_FLOAT},
+    {"map", FOFS(map), F_LSTRING},
+    {"origin", FOFS(s.origin), F_VECTOR},
+    {"angles", FOFS(s.angles), F_VECTOR},
+    {"angle", FOFS(s.angles), F_ANGLEHACK},
+    // temp spawn vars -- only valid when the spawn function is called
+    {"lip", STOFS(lip), F_INT, FFL_SPAWNTEMP},
+    {"distance", STOFS(distance), F_INT, FFL_SPAWNTEMP},
+    {"height", STOFS(height), F_INT, FFL_SPAWNTEMP},
+    {"noise", STOFS(noise), F_LSTRING, FFL_SPAWNTEMP},
+    {"pausetime", STOFS(pausetime), F_FLOAT, FFL_SPAWNTEMP},
+    {"item", STOFS(item), F_LSTRING, FFL_SPAWNTEMP},
+    // need for item field in edict struct, FFL_SPAWNTEMP item will be skipped on saves
+    {"item", FOFS(item), F_ITEM},
+    {"gravity", STOFS(gravity), F_LSTRING, FFL_SPAWNTEMP},
+    {"sky", STOFS(sky), F_LSTRING, FFL_SPAWNTEMP},
+    {"skyrotate", STOFS(skyrotate), F_FLOAT, FFL_SPAWNTEMP},
+    {"skyaxis", STOFS(skyaxis), F_VECTOR, FFL_SPAWNTEMP},
+    {"minyaw", STOFS(minyaw), F_FLOAT, FFL_SPAWNTEMP},
+    {"maxyaw", STOFS(maxyaw), F_FLOAT, FFL_SPAWNTEMP},
+    {"minpitch", STOFS(minpitch), F_FLOAT, FFL_SPAWNTEMP},
+    {"maxpitch", STOFS(maxpitch), F_FLOAT, FFL_SPAWNTEMP},
+    {"nextmap", STOFS(nextmap), F_LSTRING, FFL_SPAWNTEMP},
+    {0, 0, 0, 0}
 };
 
-/*
-============
-InitGame
-
-This will be called when the dll is first loaded, which
-only happens when a new game is started or a save game
-is loaded.
-============
-*/
-void InitGame (void)
-{
+/**
+ * This will be called when the dll is first loaded, which only happens
+ * when a new game is started or a save game.
+ is loaded.
+ */
+void InitGame(void) {
     cvar_t *g_features;
     cvar_t *sv_features;
 
-    gi.dprintf ("==== InitGame ====\n");
+    gi.dprintf("==== InitGame ====\n");
 
-    init_genrand ((uint32)time(NULL));
+    init_genrand((uint32) time(NULL));
 
     // these are used for server browser replies
     gi.cvar("time_remaining", "N/A", CVAR_SERVERINFO | CVAR_NOSET);
@@ -157,9 +111,9 @@ void InitGame (void)
     dedicated = gi.cvar("dedicated", "0", CVAR_NOSET);
 
     // latched vars
-    sv_cheats = gi.cvar("cheats", "0", CVAR_SERVERINFO|CVAR_LATCH);
-    gi.cvar("gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_LATCH);
-    gi.cvar("gamedate", __DATE__ , CVAR_SERVERINFO | CVAR_LATCH);
+    sv_cheats = gi.cvar("cheats", "0", CVAR_SERVERINFO | CVAR_LATCH);
+    gi.cvar("gamename", GAMEVERSION, CVAR_SERVERINFO | CVAR_LATCH);
+    gi.cvar("gamedate", __DATE__, CVAR_SERVERINFO | CVAR_LATCH);
 
     maxclients = gi.cvar("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
     maxentities = gi.cvar("maxentities", "1024", CVAR_LATCH);
@@ -177,7 +131,7 @@ void InitGame (void)
 
     run_pitch = gi.cvar("run_pitch", "0.002", 0);
     run_roll = gi.cvar("run_roll", "0.005", 0);
-    bob_up  = gi.cvar("bob_up", "0.005", 0);
+    bob_up = gi.cvar("bob_up", "0.005", 0);
     bob_pitch = gi.cvar("bob_pitch", "0.002", 0);
     bob_roll = gi.cvar("bob_roll", "0.002", 0);
 
@@ -188,7 +142,6 @@ void InitGame (void)
 
     // dm map list
     sv_maplist = gi.cvar("sv_maplist", "", 0);
-
 
     // flood wave control
     flood_waves = gi.cvar("flood_waves", "6", 0);
@@ -205,13 +158,14 @@ void InitGame (void)
     g_1v1flags = gi.cvar("g_1v1flags", "1040", 0);
 
     // password for "admin" command, sets ref status
-    g_admin_password = gi.cvar ("g_admin_password", "", 0);
+    g_admin_password = gi.cvar("g_admin_password", "", 0);
 
     // an admin's vote wins, vote is over
     g_admin_vote_decide = gi.cvar("g_admin_vote_decide", "1", 0);
 
     // let players change alias while a match is in progress
-    g_allow_name_change_during_match = gi.cvar("g_allow_name_change_during_match", "1", 0);
+    g_allow_name_change_during_match = gi.cvar(
+            "g_allow_name_change_during_match", "1", 0);
 
     // let players vote an available LOCAL configuration file (moddir/configs/<configname>)
     g_allow_vote_config = gi.cvar("g_allow_vote_config", "1", 0);
@@ -305,7 +259,7 @@ void InitGame (void)
     g_max_timeout = gi.cvar("g_max_timeout", "300", 0);
 
     // message displayed upon entering the game
-    g_motd_message = gi.cvar("g_motd_message", "" , 0);
+    g_motd_message = gi.cvar("g_motd_message", "", 0);
 
     // seconds added if tied
     g_overtime = gi.cvar("g_overtime", "60", 0);
@@ -380,13 +334,14 @@ void InitGame (void)
     g_vote_attention = gi.cvar("g_vote_attention", "0", 0);
 
     // sound file to play when g_vote_attention is enabled
-    g_vote_attention_sound = gi.cvar("g_vote_attention_sound", "misc/pc_up.wav", CVAR_LATCH);
+    g_vote_attention_sound = gi.cvar("g_vote_attention_sound", "misc/pc_up.wav",
+            CVAR_LATCH);
 
     // which commands are voteable (-1 enables all)
-    g_vote_mask = gi.cvar ("g_vote_mask", "-1", 0);
+    g_vote_mask = gi.cvar("g_vote_mask", "-1", 0);
 
     // seconds votes last
-    g_vote_time = gi.cvar ("g_vote_time", "30", 0);
+    g_vote_time = gi.cvar("g_vote_time", "30", 0);
 
     // enable weapon/ammo counters in the hud
     g_weapon_hud = gi.cvar("g_weapon_hud", "2", CVAR_LATCH);
@@ -397,64 +352,59 @@ void InitGame (void)
     // ...
     sv_mvd_enable = gi.cvar("sv_mvd_enable", "", CVAR_LATCH);
 
-    // items
     InitItems();
 
     // initialize all entities for this game
     game.maxentities = maxentities->value;
-    g_edicts =  gi.TagMalloc (game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
+    g_edicts = gi.TagMalloc(game.maxentities * sizeof(g_edicts[0]), TAG_GAME);
     globals.edicts = g_edicts;
     globals.max_edicts = game.maxentities;
 
-    // initialize all clients for this game
-    game.maxclients = (int)maxclients->value;
-    game.clients = gi.TagMalloc (game.maxclients * sizeof(game.clients[0]), TAG_GAME);
-    globals.num_edicts = game.maxclients+1;
+    // initialize all client slots for this game
+    game.maxclients = (int) maxclients->value;
+    game.clients = gi.TagMalloc(game.maxclients * sizeof(game.clients[0]),
+            TAG_GAME);
+    globals.num_edicts = game.maxclients + 1;
 
     // game/server feature support - export what we support and read what the server supports
 
-    //ensure it has NOSET if it didn't exist
-    g_features = gi.cvar ("g_features", "0", CVAR_NOSET);
-    gi.cvar_forceset ("g_features", va("%d", GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE | GMF_MVDSPEC | GMF_VARIABLE_FPS | GMF_IPV6_ADDRESS_AWARE));
+    // ensure it has NOSET if it didn't exist
+    g_features = gi.cvar("g_features", "0", CVAR_NOSET);
+    gi.cvar_forceset("g_features",
+            va("%d",
+                    GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE
+                            | GMF_MVDSPEC | GMF_VARIABLE_FPS
+                            | GMF_IPV6_ADDRESS_AWARE));
 
-    //init server features
-    sv_features = gi.cvar ("sv_features", NULL, 0);
+    // init server features
+    sv_features = gi.cvar("sv_features", NULL, 0);
     if (sv_features) {
-        game.server_features = (int)sv_features->value;
+        game.server_features = (int) sv_features->value;
     } else {
         game.server_features = 0;
     }
 
     // allocate memory for the random map lists
     memset(&game.random_maps, 0, sizeof(randmap_t) * RM_MAX);
-    for (int i=0; i<RM_MAX; i++) {
-        game.random_maps[i].maps = gi.TagMalloc(sizeof(char *) * MAX_RANDOM_MAPS, TAG_GAME);
+    for (int i = 0; i < RM_MAX; i++) {
+        game.random_maps[i].maps = gi.TagMalloc(sizeof(char*) * MAX_RANDOM_MAPS,
+                TAG_GAME);
         game.random_maps[i].type = i;
     }
     TDM_LoadRandomMapLists();
-    TDM_Init ();
+    TDM_Init();
 }
 
-/*
-============
-WriteGame
-
-This will be called whenever the game goes to a new level,
-and when the user explicitly saves the game.
-
-Game information include cross level data, like multi level
-triggers, help computer info, and all client states.
-
-A single player death will automatically restore from the
-last save position.
-============
-*/
-void DummyWrite (const char *filename, qboolean autosave)
-{
+/**
+ *
+ */
+void DummyWrite(const char *filename, qboolean autosave) {
 }
 
-void DummyRead (const char *filename)
-{
+/**
+ *
+ */
+void DummyRead(const char *filename) {
 }
 
 //==========================================================
