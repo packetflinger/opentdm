@@ -18,9 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-//OpenTDM core. The functions here are mainly 'behind the scenes' things - match
-//setup, timer checks, managing state, configstrings, etc...
-
 #include "g_local.h"
 #include "g_tdm.h"
 #include "g_svcmds.h"
@@ -104,50 +101,38 @@ matchinfo_t current_matchinfo;
 matchinfo_t old_matchinfo;
 
 static char teamStatus[MAX_TEAMS][MAX_TEAMNAME_LENGTH];
-
-//static char teamJoinText[MAX_TEAMS][32];
-
-//copy of last game scoreboard for oldscores command
-char old_scoreboard_string[1400];
-
-//static char	last_player_model[MAX_TEAMS][32];
-
+char old_scoreboard_string[1400];   // for oldscores command
 static const pmenu_t joinmenu[] =
 {
     { NULL,                         PMENU_ALIGN_CENTER, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { "*Spectate",                  PMENU_ALIGN_LEFT, NULL, ToggleChaseCam },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { "*Voting Menu",               PMENU_ALIGN_LEFT, NULL, OpenVoteMenu },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
-    { NULL,                         PMENU_ALIGN_LEFT, NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { "*Spectate",                  PMENU_ALIGN_LEFT,   NULL, ToggleChaseCam },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { "*Voting Menu",               PMENU_ALIGN_LEFT,   NULL, OpenVoteMenu },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
+    { NULL,                         PMENU_ALIGN_LEFT,   NULL, NULL },
     { "Use [ and ] to move cursor", PMENU_ALIGN_CENTER, NULL, NULL },
     { "ENTER select, ESC exit",     PMENU_ALIGN_CENTER, NULL, NULL },
-    { "*" OPENTDM_VERSION,          PMENU_ALIGN_RIGHT, NULL, NULL },
+    { "*" OPENTDM_VERSION,          PMENU_ALIGN_RIGHT,  NULL, NULL },
 };
 
-/*
-==============
-TDM_SetColorText
-==============
-Converts a string to color text (high ASCII)
-*/
-char *TDM_SetColorText (char *buffer)
-{
+/**
+ * Converts a string to color text (high ASCII)
+ */
+char* TDM_SetColorText(char *buffer) {
     size_t len;
     int i;
 
-    len = strlen (buffer);
-    for (i = 0; i < len; i++)
-    {
+    len = strlen(buffer);
+    for (i = 0; i < len; i++) {
         if (buffer[i] != '\n') {
             buffer[i] |= 0x80;
         }
@@ -156,64 +141,55 @@ char *TDM_SetColorText (char *buffer)
     return buffer;
 }
 
-void TDM_SetFrameTime (void)
-{
-    cvar_t	*sv_fps;
+/**
+ *
+ */
+void TDM_SetFrameTime(void) {
+    cvar_t *sv_fps;
 
-    sv_fps = gi.cvar ("sv_fps", NULL, 0);
-    if (!sv_fps)
-    {
+    sv_fps = gi.cvar("sv_fps", NULL, 0);
+    if (!sv_fps) {
         FRAMETIME = 0.1f;
         SERVER_FPS = 10;
-    }
-    else
-    {
+    } else {
         FRAMETIME = 1.0f / sv_fps->value;
-        SERVER_FPS = (int)sv_fps->value;
+        SERVER_FPS = (int) sv_fps->value;
     }
 
-    if ((int)(0.1f / FRAMETIME) == 0) {
-        gi.error ("Invalid server FPS");
+    if ((int) (0.1f / FRAMETIME) == 0) {
+        gi.error("Invalid server FPS");
     }
 }
 
-/*
-==============
-TDM_SaveDefaultCvars
-==============
-Save whatever the server admin set so we can restore later.
-*/
-void TDM_SaveDefaultCvars (void)
-{
+/**
+ * Save whatever the server admin set so we can restore later.
+ */
+void TDM_SaveDefaultCvars(void) {
     cvarsave_t *preserved;
     cvar_t *var;
 
     preserved = preserved_vars;
 
-    while (preserved->variable_name)
-    {
-        var = gi.cvar (preserved->variable_name, NULL, 0);
+    while (preserved->variable_name) {
+        var = gi.cvar(preserved->variable_name, NULL, 0);
         if (!var) {
-            TDM_Error ("TDM_SaveDefaultCvars: Couldn't preserve %s", preserved->variable_name);
+            TDM_Error("TDM_SaveDefaultCvars: Couldn't preserve %s",
+                    preserved->variable_name);
         }
 
         //note, G_CopyString resets on map change - have to do this one ourselves
-        preserved->default_string = gi.TagMalloc (strlen(var->string)+1, TAG_GAME);
-        strcpy (preserved->default_string, var->string);
-
+        preserved->default_string = gi.TagMalloc(strlen(var->string) + 1,
+                TAG_GAME);
+        strcpy(preserved->default_string, var->string);
         preserved++;
     }
 }
 
-/*
-==============
-TDM_ResetLevel
-==============
-Resets the items and triggers / funcs / etc in the level
-in preparation for a match.
-*/
-void TDM_ResetLevel (void)
-{
+/**
+ * Resets the items and triggers / funcs / etc in the level in preparation
+ * for a match.
+ */
+void TDM_ResetLevel(void) {
     int i;
     edict_t *ent;
 
@@ -223,138 +199,136 @@ void TDM_ResetLevel (void)
     }
 
     //free up any stray ents
-    for (ent = g_edicts + 1 + game.maxclients; ent < g_edicts + globals.num_edicts; ent++)
-    {
+    for (ent = g_edicts + 1 + game.maxclients;
+            ent < g_edicts + globals.num_edicts; ent++) {
         if (!ent->inuse) {
             continue;
         }
 
         //handle body que specially, just remove effects and unlink it
-        if (ent->enttype == ENT_BODYQUE)
-        {
+        if (ent->enttype == ENT_BODYQUE) {
             //it could still be an ungibbed body, make sure nothing can happen to it
             ent->takedamage = DAMAGE_NO;
             ent->solid = SOLID_NOT;
-            ent->s.modelindex = ent->s.effects = ent->s.sound = ent->s.renderfx = 0;
-            gi.unlinkentity (ent);
+            ent->s.modelindex = ent->s.effects = ent->s.sound =
+                    ent->s.renderfx = 0;
+            gi.unlinkentity(ent);
             continue;
         }
 
-        if (
-            (ent->enttype == ENT_DOOR_TRIGGER || ent->enttype == ENT_PLAT_TRIGGER || ent->enttype == ENT_GIB)
-            ||
-            (ent->owner >= (g_edicts + 1) && ent->owner <= (g_edicts + game.maxclients))
-            )
-            G_FreeEdict (ent);
+        if ((ent->enttype == ENT_DOOR_TRIGGER
+                || ent->enttype == ENT_PLAT_TRIGGER || ent->enttype == ENT_GIB)
+                || (ent->owner >= (g_edicts + 1)
+                        && ent->owner <= (g_edicts + game.maxclients)))
+            G_FreeEdict(ent);
     }
 
-    ///rerun the level entity string
-    ParseEntityString (true);
+    // rerun the level entity string
+    ParseEntityString(true);
 
-    //immediately droptofloor and setup removed items
-    for (ent = g_edicts + 1 + game.maxclients; ent < g_edicts + globals.num_edicts; ent++)
-    {
+    // immediately droptofloor and setup removed items
+    for (ent = g_edicts + 1 + game.maxclients;
+            ent < g_edicts + globals.num_edicts; ent++) {
         if (!ent->inuse)
             continue;
 
-        //wision: add/remove items
-        if (ent->item)
-        {
+        // add/remove items
+        if (ent->item) {
             // some items will be prevented in deathmatch
-            if ( (int)dmflags->value & DF_NO_ARMOR )
-            {
-                if (ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_BODY || ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_COMBAT || ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_JACKET ||
-                    ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_SHARD || ITEM_INDEX(ent->item) == ITEM_ITEM_POWER_SCREEN || ITEM_INDEX(ent->item) == ITEM_ITEM_POWER_SHIELD)
-                {
-                    G_FreeEdict (ent);
+            if ((int) dmflags->value & DF_NO_ARMOR) {
+                if (ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_BODY
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_COMBAT
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_JACKET ||
+                        ITEM_INDEX(ent->item) == ITEM_ITEM_ARMOR_SHARD
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_POWER_SCREEN
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_POWER_SHIELD) {
+                    G_FreeEdict(ent);
                     continue;
                 }
             }
 
-            if ( (int)dmflags->value & DF_NO_ITEMS )
-            {
-                if (ITEM_INDEX(ent->item) == ITEM_ITEM_QUAD || ITEM_INDEX(ent->item) == ITEM_ITEM_INVULNERABILITY || ITEM_INDEX(ent->item) == ITEM_ITEM_SILENCER ||
-                    ITEM_INDEX(ent->item) == ITEM_ITEM_BREATHER || ITEM_INDEX(ent->item) == ITEM_ITEM_ENVIRO || ITEM_INDEX(ent->item) == ITEM_ITEM_ADRENALINE ||
-                    ITEM_INDEX(ent->item) == ITEM_ITEM_BANDOLIER || ITEM_INDEX(ent->item) == ITEM_ITEM_PACK)
-                {
-                    G_FreeEdict (ent);
+            if ((int) dmflags->value & DF_NO_ITEMS) {
+                if (ITEM_INDEX(ent->item) == ITEM_ITEM_QUAD
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_INVULNERABILITY
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_SILENCER ||
+                        ITEM_INDEX(ent->item) == ITEM_ITEM_BREATHER
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_ENVIRO
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_ADRENALINE ||
+                        ITEM_INDEX(ent->item) == ITEM_ITEM_BANDOLIER
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_PACK) {
+                    G_FreeEdict(ent);
                     continue;
                 }
             }
 
-            if ( (int)dmflags->value & DF_NO_HEALTH )
-            {
-                if (ITEM_INDEX(ent->item) == ITEM_ITEM_HEALTH || ITEM_INDEX(ent->item) == ITEM_ITEM_ANCIENT_HEAD)
-                {
-                    G_FreeEdict (ent);
+            if ((int) dmflags->value & DF_NO_HEALTH) {
+                if (ITEM_INDEX(ent->item) == ITEM_ITEM_HEALTH
+                        || ITEM_INDEX(ent->item) == ITEM_ITEM_ANCIENT_HEAD) {
+                    G_FreeEdict(ent);
                     continue;
                 }
             }
 
-            if ( (int)dmflags->value & DF_INFINITE_AMMO )
-            {
-                if (ent->item->flags & (IT_AMMO|IT_WEAPON))
-                {
-                    G_FreeEdict (ent);
+            if ((int) dmflags->value & DF_INFINITE_AMMO) {
+                if (ent->item->flags & (IT_AMMO | IT_WEAPON)) {
+                    G_FreeEdict(ent);
                     continue;
                 }
             }
 
-            for (i = 0; i < sizeof(weaponvotes) / sizeof(weaponinfo_t); i++)
-            {
-                //this item isn't removed
-                if (!((int)g_itemflags->value & weaponvotes[i].value))
+            for (i = 0; i < sizeof(weaponvotes) / sizeof(weaponinfo_t); i++) {
+                // this item isn't removed
+                if (!((int) g_itemflags->value & weaponvotes[i].value))
                     continue;
 
-                //this is a weapon that should be removed
-                if (ITEM_INDEX (ent->item) == weaponvotes[i].itemindex)
-                {
-                    G_FreeEdict (ent);
+                // this is a weapon that should be removed
+                if (ITEM_INDEX (ent->item) == weaponvotes[i].itemindex) {
+                    G_FreeEdict(ent);
                     break;
                 }
 
-                //this is ammo for a weapon that should be removed
-                if (ITEM_INDEX (ent->item) == GETITEM (weaponvotes[i].itemindex)->ammoindex)
-                {
-                    //special case: cells, grenades, shells
-                    if ((int)g_itemflags->value & GETITEM(GETITEM(weaponvotes[i].itemindex)->ammoindex)->tag)
-                    {
-                        G_FreeEdict (ent);
+                // this is ammo for a weapon that should be removed
+                if (ITEM_INDEX(ent->item)
+                        == GETITEM (weaponvotes[i].itemindex)->ammoindex) {
+                    // special case: cells, grenades, shells
+                    if ((int) g_itemflags->value
+                            & GETITEM(GETITEM(weaponvotes[i].itemindex)->ammoindex)->tag) {
+                        G_FreeEdict(ent);
                         break;
                     }
                 }
             }
 
-            //was removed
-            if (!ent->inuse)
+            // was removed
+            if (!ent->inuse) {
                 continue;
+            }
 
-            //wision: add/remove powerups
-            for (i = 0; i < sizeof(powerupvotes) / sizeof(powerupinfo_t); i++)
-            {
-                //this powerup isn't removed
-                if (!((int)g_powerupflags->value & powerupvotes[i].value))
+            // add/remove powerups
+            for (i = 0; i < sizeof(powerupvotes) / sizeof(powerupinfo_t); i++) {
+                // this powerup isn't removed
+                if (!((int) g_powerupflags->value & powerupvotes[i].value)) {
                     continue;
+                }
 
-                if (ITEM_INDEX (ent->item) == powerupvotes[i].itemindex)
-                {
-                    G_FreeEdict (ent);
+                if (ITEM_INDEX (ent->item) == powerupvotes[i].itemindex) {
+                    G_FreeEdict(ent);
                     break;
                 }
             }
 
             //was removed
-            if (!ent->inuse)
+            if (!ent->inuse) {
                 continue;
+            }
 
             //track how many items have spawned for stats
-            TDM_ItemSpawned (ent);
+            TDM_ItemSpawned(ent);
         }
 
-        if (ent->think == droptofloor)
-        {
+        if (ent->think == droptofloor) {
             ent->nextthink = 0;
-            droptofloor (ent);
+            droptofloor(ent);
         }
     }
 }
@@ -364,8 +338,7 @@ void TDM_ResetLevel (void)
  * closest to the arg entity. This can be above, below,
  * behind a wall, in the water, etc.
  */
-edict_t *TDM_ClosestTeammate(edict_t *ent)
-{
+edict_t* TDM_ClosestTeammate(edict_t *ent) {
     uint8_t i;
     int16 pos[3];
     edict_t *player;
@@ -381,7 +354,7 @@ edict_t *TDM_ClosestTeammate(edict_t *ent)
     // make a local copy of our location
     VectorCopy(ent->client->ps.pmove.origin, pos);
 
-    for (i=0; i<game.maxclients; i++) {
+    for (i = 0; i < game.maxclients; i++) {
         player = g_edicts + 1 + i;
 
         if (!player->inuse) {
@@ -401,12 +374,16 @@ edict_t *TDM_ClosestTeammate(edict_t *ent)
             if (closest.ent == NULL) {
                 closest.ent = player;
 
-                closest.distance[0] = pos[0] - player->client->ps.pmove.origin[0];
-                closest.distance[1] = pos[1] - player->client->ps.pmove.origin[1];
-                closest.distance[2] = pos[2] - player->client->ps.pmove.origin[2];
+                closest.distance[0] = pos[0]
+                        - player->client->ps.pmove.origin[0];
+                closest.distance[1] = pos[1]
+                        - player->client->ps.pmove.origin[1];
+                closest.distance[2] = pos[2]
+                        - player->client->ps.pmove.origin[2];
 
                 // a single number representing our distance
-                closest.overall = closest.distance[0] + closest.distance[1] + closest.distance[2];
+                closest.overall = closest.distance[0] + closest.distance[1]
+                        + closest.distance[2];
 
                 continue;
             }
@@ -417,7 +394,8 @@ edict_t *TDM_ClosestTeammate(edict_t *ent)
             next.distance[1] = pos[1] - player->client->ps.pmove.origin[1];
             next.distance[2] = pos[2] - player->client->ps.pmove.origin[2];
 
-            next.overall = next.distance[0] + next.distance[1] + next.distance[2];
+            next.overall = next.distance[0] + next.distance[1]
+                    + next.distance[2];
 
             if (next.overall < closest.overall) {
                 closest = next;
@@ -431,109 +409,99 @@ edict_t *TDM_ClosestTeammate(edict_t *ent)
 
     return NULL;
 }
-/*
-==============
-TDM_BeginMatch
-==============
-A match has just started (end of countdown)
-*/
-void TDM_BeginMatch (void)
-{
+
+/**
+ * A match has just started (end of countdown)
+ */
+void TDM_BeginMatch(void) {
     edict_t *ent;
 
     //level.match_start_framenum = 0;
-    level.match_end_framenum = level.framenum + SECS_TO_FRAMES(g_match_time->value);
+    level.match_end_framenum = level.framenum
+            + SECS_TO_FRAMES(g_match_time->value);
     tdm_match_status = MM_PLAYING;
 
     //must setup teamplayers before level, or we lose item spawn stats
-    TDM_SetupMatchInfoAndTeamPlayers ();
+    TDM_SetupMatchInfoAndTeamPlayers();
 
     //respawn the map
-    TDM_ResetLevel ();
+    TDM_ResetLevel();
 
-    gi.bprintf (PRINT_HIGH, "Fight!\n");
+    gi.bprintf(PRINT_HIGH, "Fight!\n");
 
     //should already be 0, check this is needed
     teaminfo[TEAM_A].score = teaminfo[TEAM_B].score = 0;
 
     //psuedo-kill everyone first to prevent the spawnspot selection from being able to be controlled
     //by positioning in warmup and also possible telefrag conditions
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
         if (!ent->inuse)
             continue;
 
         //reset invites on players who were invite during warmup, to prevent them joining mid-game
         ent->client->resp.last_invited_by = NULL;
 
-        if (ent->client->pers.team)
-        {
+        if (ent->client->pers.team) {
             //fake kill them first so the spawnpoint code doesn't consider them standing on a spot
             //if they were on one during warmup
             ent->health = 0;
-            gi.unlinkentity (ent);
+            gi.unlinkentity(ent);
         }
     }
 
     //put everyone in the server and go!
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
         if (!ent->inuse)
             continue;
 
-        if (ent->client->pers.team)
-        {
-            respawn (ent);
+        if (ent->client->pers.team) {
+            respawn(ent);
         }
     }
 
-    TDM_UpdateConfigStrings (false);
+    TDM_UpdateConfigStrings(false);
 }
 
-/*
-==============
-TDM_ScoreBoardString
-==============
-Display TDM scoreboard. Must be unicast or multicast after calling this
-function.
-*/
-char *TDM_ScoreBoardString (edict_t *ent)
-{
-    char        entry[1024];
+/**
+ * Display TDM scoreboard. Must be unicast or multicast after calling this
+ * function.
+ */
+char* TDM_ScoreBoardString(edict_t *ent) {
+    char entry[1024];
     static char string[1024];
-    int         len;
-    int         i, j, k;
-    int         sorted[2][MAX_CLIENTS];
-    int         sortedscores[2][MAX_CLIENTS];
-    int         score, total[2], totalscore[2];
-    float       averageping[2];
-    int         last[2];
-    int         width[2];
-    int         maxplayers;
-    int         offset;
-    static int  firstteam = TEAM_A;
-    static int  secondteam = TEAM_B;
-    cvar_t      *hostname;
-    char        serverinfo[51];
-    struct tm   *ts;
-    time_t      t;
-    qboolean    drawn_header;
+    int len;
+    int i, j, k;
+    int sorted[2][MAX_CLIENTS];
+    int sortedscores[2][MAX_CLIENTS];
+    int score, total[2], totalscore[2];
+    float averageping[2];
+    int last[2];
+    int width[2];
+    int maxplayers;
+    int offset;
+    static int firstteam = TEAM_A;
+    static int secondteam = TEAM_B;
+    cvar_t *hostname;
+    char serverinfo[51];
+    struct tm *ts;
+    time_t t;
+    qboolean drawn_header;
+    gclient_t *cl;
+    teamplayer_t *tmpl;
+    edict_t *cl_ent;
+    int team;
+    const int maxsize = 1000;
 
-    gclient_t   *cl;
-    teamplayer_t    *tmpl;
-    edict_t     *cl_ent;
-    int         team;
-    const int   maxsize = 1000;
+    t = time(NULL);
+    ts = localtime(&t);
 
-    t = time (NULL);
-    ts = localtime (&t);
+    hostname = gi.cvar("hostname", NULL, 0);
 
-    hostname = gi.cvar ("hostname", NULL, 0);
-
-    if (hostname)
-        Q_strncpy (serverinfo, hostname->string, sizeof(serverinfo)-1);
-    else
-        strcpy (serverinfo, "unnamed server");
+    if (hostname) {
+        Q_strncpy(serverinfo, hostname->string, sizeof(serverinfo) - 1);
+    } else {
+        strcpy(serverinfo, "unnamed server");
+    }
 
     // sort the clients by team and score
     total[0] = total[1] = 0;
@@ -546,60 +514,49 @@ char *TDM_ScoreBoardString (edict_t *ent)
     len = 0;
 
     // team info bars
-    sprintf (string,
-        "xv 72 yv 0 string2 \" Team          Frags\" "
-        "yv 8 string \"%-15.15s %4d\" "
-        "yv 16 string \"%-15.15s %4d\" ",
-        teaminfo[firstteam].name,
-        teaminfo[firstteam].score,
-        teaminfo[secondteam].name,
-        teaminfo[secondteam].score
-        );
+    sprintf(string, "xv 72 yv 0 string2 \" Team          Frags\" "
+            "yv 8 string \"%-15.15s %4d\" "
+            "yv 16 string \"%-15.15s %4d\" ", teaminfo[firstteam].name,
+            teaminfo[firstteam].score, teaminfo[secondteam].name,
+            teaminfo[secondteam].score);
 
     // time info
-    sprintf (string + strlen(string),
-        "yv 32 string \" [%d-%02d-%02d %02d:%02d]\" ",
-        ts->tm_year + 1900,
-        ts->tm_mon + 1,
-        ts->tm_mday,
-        ts->tm_hour,
-        ts->tm_min
-        );
-
+    sprintf(string + strlen(string),
+            "yv 32 string \" [%d-%02d-%02d %02d:%02d]\" ", ts->tm_year + 1900,
+            ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min);
 
     // wision: match scoreboard
-    if (current_matchinfo.teamplayers)
-    {
+    if (current_matchinfo.teamplayers) {
         int ping;
 
-        for (i = 0; i < current_matchinfo.num_teamplayers; i++)
-        {
+        for (i = 0; i < current_matchinfo.num_teamplayers; i++) {
             // skip players which are not supposed to be drawn during the match (disconnected, moved to observer)
-            if ((current_matchinfo.teamplayers[i].client == NULL || current_matchinfo.teamplayers[i].client->client->pers.team == TEAM_SPEC) &&
-                    tdm_match_status != MM_SCOREBOARD)
+            if ((current_matchinfo.teamplayers[i].client == NULL
+                    || current_matchinfo.teamplayers[i].client->client->pers.team
+                            == TEAM_SPEC) && tdm_match_status != MM_SCOREBOARD) {
                 continue;
+            }
 
-            if (current_matchinfo.teamplayers[i].team == TEAM_A)
+            if (current_matchinfo.teamplayers[i].team == TEAM_A) {
                 team = 0;
-            else if (current_matchinfo.teamplayers[i].team == TEAM_B)
+            } else if (current_matchinfo.teamplayers[i].team == TEAM_B) {
                 team = 1;
-            else
+            } else {
                 continue; // unknown team?
+            }
 
             score = current_matchinfo.teamplayers[i].enemy_kills
-                        - current_matchinfo.teamplayers[i].team_kills
-                        - current_matchinfo.teamplayers[i].suicides;
+                    - current_matchinfo.teamplayers[i].team_kills
+                    - current_matchinfo.teamplayers[i].suicides;
 
-            for (j = 0; j < total[team]; j++)
-            {
+            for (j = 0; j < total[team]; j++) {
                 if (score > sortedscores[team][j])
                     break;
             }
 
-            for (k = total[team]; k > j; k--)
-            {
-                sorted[team][k] = sorted[team][k-1];
-                sortedscores[team][k] = sortedscores[team][k-1];
+            for (k = total[team]; k > j; k--) {
+                sorted[team][k] = sorted[team][k - 1];
+                sortedscores[team][k] = sortedscores[team][k - 1];
             }
 
             sorted[team][j] = i;
@@ -608,42 +565,48 @@ char *TDM_ScoreBoardString (edict_t *ent)
             totalscore[team] += score;
             total[team]++;
 
-            if (current_matchinfo.teamplayers[i].client)
-                ping = TDM_PingHandicap(current_matchinfo.teamplayers[i].client->client->ping);
-            else
+            if (current_matchinfo.teamplayers[i].client) {
+                ping = TDM_PingHandicap(
+                        current_matchinfo.teamplayers[i].client->client->ping);
+            } else {
                 ping = TDM_PingHandicap(current_matchinfo.teamplayers[i].ping);
+            }
 
-            if (ping > 999)
+            if (ping > 999) {
                 averageping[team] += 999;
-            else
-                averageping[team] += (float)ping;
+            } else {
+                averageping[team] += (float) ping;
+            }
         }
 
-        if (total[0] > 0)
-            averageping[0] = averageping[0] / (float)total[0];
+        if (total[0] > 0) {
+            averageping[0] = averageping[0] / (float) total[0];
+        }
 
-        if (total[1] > 0)
-            averageping[1] = averageping[1] / (float)total[1];
+        if (total[1] > 0) {
+            averageping[1] = averageping[1] / (float) total[1];
+        }
 
-        maxplayers = total[firstteam-1];
+        maxplayers = total[firstteam - 1];
 
-        for (i = 0; i < MAX_TEAMS - 1; i++)
-        {
+        for (i = 0; i < MAX_TEAMS - 1; i++) {
             //determine how wide to draw team score
-            len = abs(teaminfo[i+1].score);
+            len = abs(teaminfo[i + 1].score);
 
-            if (len > 999)
+            if (len > 999) {
                 width[i] = 4;
-            else if (len > 99)
+            } else if (len > 99) {
                 width[i] = 3;
-            else if (len > 9)
+            } else if (len > 9) {
                 width[i] = 2;
-            else
+            } else {
                 width[i] = 1;
+            }
 
             //for negative sign
-            if (teaminfo[i+1].score < 0)
+            if (teaminfo[i + 1].score < 0) {
                 width[i]++;
+            }
         }
 
         //figure out how far the other team needs to be drawn below
@@ -651,51 +614,41 @@ char *TDM_ScoreBoardString (edict_t *ent)
 
         // print more info into old scoreboard
         // ent is NULL only when we request the scoreboard for preserving
-        if (!ent)
-        {
-            sprintf (entry, "oldscoreboard: %s", level.mapname);
-            sprintf (string + strlen(string), "xv %d yv 24 string2 \"%s\" ",
-                    (int)((36-strlen(entry))/2)*8 + 8,
-                    entry
-                    );
+        if (!ent) {
+            sprintf(entry, "oldscoreboard: %s", level.mapname);
+            sprintf(string + strlen(string), "xv %d yv 24 string2 \"%s\" ",
+                    (int) ((36 - strlen(entry)) / 2) * 8 + 8, entry);
         }
 
         // headers
-        sprintf (entry, "%s:%.f(%s)", teaminfo[firstteam].name, averageping[firstteam-1], teaminfo[firstteam].skin);
-        sprintf (string + strlen(string),
-            "xv %d yv 40 string \"%s\" ",
-            (int)((36-strlen(entry))/2)*8 + 8,
-            entry
-            );
+        sprintf(entry, "%s:%.f(%s)", teaminfo[firstteam].name,
+                averageping[firstteam - 1], teaminfo[firstteam].skin);
+        sprintf(string + strlen(string), "xv %d yv 40 string \"%s\" ",
+                (int) ((36 - strlen(entry)) / 2) * 8 + 8, entry);
 
-        sprintf (entry, "%s:%.f(%s)", teaminfo[secondteam].name, averageping[secondteam-1], teaminfo[secondteam].skin);
-        sprintf (string + strlen(string),
-            "xv %d yv %d string \"%s\" ",
-            (int)((36-strlen(entry))/2)*8 + 8,
-            offset + 40, entry
-            );
+        sprintf(entry, "%s:%.f(%s)", teaminfo[secondteam].name,
+                averageping[secondteam - 1], teaminfo[secondteam].skin);
+        sprintf(string + strlen(string), "xv %d yv %d string \"%s\" ",
+                (int) ((36 - strlen(entry)) / 2) * 8 + 8, offset + 40, entry);
 
-        sprintf (string + strlen(string),
-            "xv 8 yv 48 string2 \" Name            Frags Dths Net Ping\" "
-            );
+        sprintf(string + strlen(string),
+                "xv 8 yv 48 string2 \" Name            Frags Dths Net Ping\" ");
 
-        sprintf (string + strlen(string),
-            "yv %d string2 \" Name            Frags Dths Net Ping\" ",
-            offset + 48
-            );
+        sprintf(string + strlen(string),
+                "yv %d string2 \" Name            Frags Dths Net Ping\" ",
+                offset + 48);
 
         len = strlen(string);
 
         //now the players
-        for (i = 0; i < current_matchinfo.num_teamplayers; i++)
-        {
-            if (i >= total[firstteam-1] && i >= total[secondteam-1])
+        for (i = 0; i < current_matchinfo.num_teamplayers; i++) {
+            if (i >= total[firstteam - 1] && i >= total[secondteam - 1]) {
                 break; // we're done
+            }
 
             // top
-            if (i < total[firstteam-1])
-            {
-                tmpl = &current_matchinfo.teamplayers[sorted[firstteam-1][i]];
+            if (i < total[firstteam - 1]) {
+                tmpl = &current_matchinfo.teamplayers[sorted[firstteam - 1][i]];
                 cl_ent = tmpl->client;
 
                 if (!cl_ent)
@@ -706,238 +659,223 @@ char *TDM_ScoreBoardString (edict_t *ent)
                 // calculate player's score
                 j = tmpl->enemy_kills - tmpl->team_kills - tmpl->suicides;
 
-                sprintf (entry,
-                    "yv %d string \"%-15.15s   %4d  %3d %3d  %3d\" ",
-                    i * 8 + 56,
-                    tmpl->name,
-                    j,
-                    tmpl->deaths,
-                    tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
-                    (ping > 999) ? 999 : ping);
+                sprintf(entry, "yv %d string \"%-15.15s   %4d  %3d %3d  %3d\" ",
+                        i * 8 + 56, tmpl->name, j, tmpl->deaths,
+                        tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
+                        (ping > 999) ? 999 : ping);
 
                 // this is the captain
-                if ((int)g_highlight_captain->value && teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
+                if ((int) g_highlight_captain->value
+                        && teaminfo[TEAM_A].captain == cl_ent
+                        && teaminfo[TEAM_A].players > 1) {
                     strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
                 }
 
-                if (maxsize - len > strlen(entry))
-                {
-                    strcat (string, entry);
+                if (maxsize - len > strlen(entry)) {
+                    strcat(string, entry);
                     len = strlen(string);
-                    last[firstteam-1] = i;
+                    last[firstteam - 1] = i;
                 }
             }
 
             // bottom
-            if (i < total[secondteam-1])
-            {
-                tmpl = &current_matchinfo.teamplayers[sorted[secondteam-1][i]];
+            if (i < total[secondteam - 1]) {
+                tmpl =
+                        &current_matchinfo.teamplayers[sorted[secondteam - 1][i]];
 
                 cl_ent = tmpl->client;
 
-                if (!cl_ent)
+                if (!cl_ent) {
                     ping = tmpl->ping;
-                else
+                } else {
                     ping = TDM_PingHandicap(cl_ent->client->ping);
+                }
 
                 // calculate player's score
                 j = tmpl->enemy_kills - tmpl->team_kills - tmpl->suicides;
 
-                sprintf (entry,
-                    "yv %d string \"%-15.15s   %4d  %3d %3d  %3d\" ",
-                    i * 8 + 56 + offset,
-                    tmpl->name,
-                    j,
-                    tmpl->deaths,
-                    tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
-                    (ping > 999) ? 999 : ping);
+                sprintf(entry, "yv %d string \"%-15.15s   %4d  %3d %3d  %3d\" ",
+                        i * 8 + 56 + offset, tmpl->name, j, tmpl->deaths,
+                        tmpl->enemy_kills - tmpl->team_kills - tmpl->deaths,
+                        (ping > 999) ? 999 : ping);
 
                 // this is the captain
-                if ((int)g_highlight_captain->value && teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
+                if ((int) g_highlight_captain->value
+                        && teaminfo[TEAM_B].captain == cl_ent
+                        && teaminfo[TEAM_B].players > 1) {
                     strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
                 }
 
-                if (maxsize - len > strlen(entry))
-                {
-                    strcat (string, entry);
+                if (maxsize - len > strlen(entry)) {
+                    strcat(string, entry);
                     len = strlen(string);
-                    last[secondteam-1] = i;
+                    last[secondteam - 1] = i;
                 }
             }
         }
     }
     // warmup scoreboard
-    else
-    {
-        for (i=0 ; i < game.maxclients ; i++)
-        {
+    else {
+        for (i = 0; i < game.maxclients; i++) {
             cl_ent = g_edicts + 1 + i;
 
-            if (!cl_ent->inuse)
+            if (!cl_ent->inuse) {
                 continue;
-
-            if (game.clients[i].pers.team == TEAM_A)
-                team = 0;
-            else if (game.clients[i].pers.team == TEAM_B)
-                team = 1;
-            else
-                continue; // unknown team?
-
-            score = game.clients[i].resp.score;
-            for (j = 0; j < total[team]; j++)
-            {
-                if (score > sortedscores[team][j])
-                    break;
             }
 
-            for (k = total[team]; k > j; k--)
-            {
-                sorted[team][k] = sorted[team][k-1];
-                sortedscores[team][k] = sortedscores[team][k-1];
+            if (game.clients[i].pers.team == TEAM_A) {
+                team = 0;
+            } else if (game.clients[i].pers.team == TEAM_B) {
+                team = 1;
+            } else {
+                continue; // unknown team?
+            }
+
+            score = game.clients[i].resp.score;
+            for (j = 0; j < total[team]; j++) {
+                if (score > sortedscores[team][j]) {
+                    break;
+                }
+            }
+
+            for (k = total[team]; k > j; k--) {
+                sorted[team][k] = sorted[team][k - 1];
+                sortedscores[team][k] = sortedscores[team][k - 1];
             }
             sorted[team][j] = i;
             sortedscores[team][j] = score;
             totalscore[team] += score;
             total[team]++;
 
-            if (game.clients[i].ping > 999)
+            if (game.clients[i].ping > 999) {
                 averageping[team] += 999;
-            else
-                averageping[team] += (float)TDM_PingHandicap(game.clients[i].ping);
+            } else {
+                averageping[team] += (float) TDM_PingHandicap(
+                        game.clients[i].ping);
+            }
         }
 
         // calculate average ping
-        if (total[1] > 0)
-            averageping[1] = averageping[1] / (float)total[1];
-        if (total[0] > 0)
-            averageping[0] = averageping[0] / (float)total[0];
+        if (total[1] > 0) {
+            averageping[1] = averageping[1] / (float) total[1];
+        }
+        if (total[0] > 0) {
+            averageping[0] = averageping[0] / (float) total[0];
+        }
 
         // set TEAM_B as 1st team if TEAM_A is without players
-        if (total[0] < total[1])
-        {
+        if (total[0] < total[1]) {
             maxplayers = total[1];
-        }
-        else
-        {
+        } else {
             maxplayers = total[0];
         }
 
-        for (i = 0; i < MAX_TEAMS - 1; i++)
-        {
+        for (i = 0; i < MAX_TEAMS - 1; i++) {
             //determine how wide to draw team score
-            len = abs(teaminfo[i+1].score);
+            len = abs(teaminfo[i + 1].score);
 
-            if (len > 999)
+            if (len > 999) {
                 width[i] = 4;
-            else if (len > 99)
+            } else if (len > 99) {
                 width[i] = 3;
-            else if (len > 9)
+            } else if (len > 9) {
                 width[i] = 2;
-            else
+            } else {
                 width[i] = 1;
+            }
 
             //for negative sign
-            if (teaminfo[i+1].score < 0)
+            if (teaminfo[i + 1].score < 0) {
                 width[i]++;
+            }
         }
 
         //figure out how far the other team needs to be drawn below
         offset = maxplayers * 8 + 24;
 
         // headers
-        if (total[firstteam-1] > 0)
-        {
-            sprintf (entry, "%s:%.f(%s)", teaminfo[firstteam].name, averageping[firstteam-1], teaminfo[firstteam].skin);
-            sprintf (string + strlen(string),
-                "xv %d yv 40 string \"%s\" "
-                // draw name on X=0 later, so we don't have to set it for all the players below
-                "xv 264 yv 48 string2 \"Ping\" xv 8 string2 \" Name\" ",
-                (int)((36-strlen(entry))/2)*8 + 8,
-                entry
-                );
+        if (total[firstteam - 1] > 0) {
+            sprintf(entry, "%s:%.f(%s)", teaminfo[firstteam].name,
+                    averageping[firstteam - 1], teaminfo[firstteam].skin);
+            sprintf(string + strlen(string),
+                    "xv %d yv 40 string \"%s\" "
+                    // draw name on X=0 later, so we don't have to set it for all the players below
+                            "xv 264 yv 48 string2 \"Ping\" xv 8 string2 \" Name\" ",
+                    (int) ((36 - strlen(entry)) / 2) * 8 + 8, entry);
         }
-        if (total[secondteam-1] > 0)
-        {
-            sprintf (entry, "%s:%.f(%s)", teaminfo[secondteam].name, averageping[secondteam-1], teaminfo[secondteam].skin);
-            sprintf (string + strlen(string),
-                "xv %d yv %d string \"%s\" "
-                // draw name on X=0 later, so we don't have to set it for all the players below
-                "xv 264 yv %d string2 \"Ping\" xv 8 string2 \" Name\" ",
-                (int)((36-strlen(entry))/2)*8 + 8, offset + 40,
-                entry,	offset + 48
-                );
+        if (total[secondteam - 1] > 0) {
+            sprintf(entry, "%s:%.f(%s)", teaminfo[secondteam].name,
+                    averageping[secondteam - 1], teaminfo[secondteam].skin);
+            sprintf(string + strlen(string),
+                    "xv %d yv %d string \"%s\" "
+                    // draw name on X=0 later, so we don't have to set it for all the players below
+                            "xv 264 yv %d string2 \"Ping\" xv 8 string2 \" Name\" ",
+                    (int) ((36 - strlen(entry)) / 2) * 8 + 8, offset + 40,
+                    entry, offset + 48);
         }
 
         len = strlen(string);
 
         //now the players
-        for (i = 0; i < 16; i++)
-        {
-            if (i >= total[firstteam-1] && i >= total[secondteam-1])
+        for (i = 0; i < 16; i++) {
+            if (i >= total[firstteam - 1] && i >= total[secondteam - 1]) {
                 break; // we're done
+            }
 
             // top
-            if (i < total[firstteam-1])
-            {
-                cl = &game.clients[sorted[firstteam-1][i]];
-                cl_ent = g_edicts + 1 + sorted[firstteam-1][i];
+            if (i < total[firstteam - 1]) {
+                cl = &game.clients[sorted[firstteam - 1][i]];
+                cl_ent = g_edicts + 1 + sorted[firstteam - 1][i];
 
-
-                sprintf (entry,
-                    "yv %d string \"%-15.15s   %13.13s  %3d\" ",
-                    i * 8 + 56,
-                    cl->pers.netname,
-                    cl->resp.ready ? "[READY]    " : "",
-                    (cl->ping > 999) ? 999 : TDM_PingHandicap(cl->ping)
-                );
+                sprintf(entry, "yv %d string \"%-15.15s   %13.13s  %3d\" ",
+                        i * 8 + 56, cl->pers.netname,
+                        cl->resp.ready ? "[READY]    " : "",
+                        (cl->ping > 999) ? 999 : TDM_PingHandicap(cl->ping));
 
                 // this is the captain
-                if ((int)g_highlight_captain->value && teaminfo[TEAM_A].captain == cl_ent && teaminfo[TEAM_A].players > 1) {
+                if ((int) g_highlight_captain->value
+                        && teaminfo[TEAM_A].captain == cl_ent
+                        && teaminfo[TEAM_A].players > 1) {
                     strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
                 }
 
-
-                if (maxsize - len > strlen(entry))
-                {
-                    strcat (string, entry);
+                if (maxsize - len > strlen(entry)) {
+                    strcat(string, entry);
                     len = strlen(string);
-                    last[firstteam-1] = i;
+                    last[firstteam - 1] = i;
                 }
             }
 
             // bottom
-            if (i < total[secondteam-1])
-            {
-                cl = &game.clients[sorted[secondteam-1][i]];
-                cl_ent = g_edicts + 1 + sorted[secondteam-1][i];
+            if (i < total[secondteam - 1]) {
+                cl = &game.clients[sorted[secondteam - 1][i]];
+                cl_ent = g_edicts + 1 + sorted[secondteam - 1][i];
 
-                sprintf (entry,
-                    "yv %d string \"%-15.15s   %13.13s  %3d\" ",
-                    i * 8 + 56 + offset,
-                    cl->pers.netname,
-                    cl->resp.ready ? "[READY]    " : "",
-                    (cl->ping > 999) ? 999 : TDM_PingHandicap(cl->ping)
-                );
+                sprintf(entry, "yv %d string \"%-15.15s   %13.13s  %3d\" ",
+                        i * 8 + 56 + offset, cl->pers.netname,
+                        cl->resp.ready ? "[READY]    " : "",
+                        (cl->ping > 999) ? 999 : TDM_PingHandicap(cl->ping));
 
                 // this is the captain
-                if ((int)g_highlight_captain->value && teaminfo[TEAM_B].captain == cl_ent && teaminfo[TEAM_B].players > 1) {
+                if ((int) g_highlight_captain->value
+                        && teaminfo[TEAM_B].captain == cl_ent
+                        && teaminfo[TEAM_B].players > 1) {
                     strcat(entry, va(" xv -4 string2 \"*\" xv 8 "));
                 }
 
-                if (maxsize - len > strlen(entry))
-                {
-                    strcat (string, entry);
+                if (maxsize - len > strlen(entry)) {
+                    strcat(string, entry);
                     len = strlen(string);
-                    last[secondteam-1] = i;
+                    last[secondteam - 1] = i;
                 }
             }
         }
     }
 
     // put server info on the bottom of screen
-    if (maxsize - len > (strlen(serverinfo) + 25))
-    {
-        sprintf (string + strlen(string), "xl 8 yb -37 string2 \"%s\" ", serverinfo);
+    if (maxsize - len > (strlen(serverinfo) + 25)) {
+        sprintf(string + strlen(string), "xl 8 yb -37 string2 \"%s\" ",
+                serverinfo);
         len = strlen(string);
     }
 
@@ -946,38 +884,35 @@ char *TDM_ScoreBoardString (edict_t *ent)
 
     drawn_header = false;
 
-    if (maxsize - len > 50)
-    {
-        for (i = 0; i < game.maxclients; i++)
-        {
+    if (maxsize - len > 50) {
+        for (i = 0; i < game.maxclients; i++) {
             cl_ent = g_edicts + 1 + i;
             cl = &game.clients[i];
-            if (!cl_ent->inuse ||
-                cl_ent->solid != SOLID_NOT ||
-                cl_ent->client->pers.team != TEAM_SPEC ||
-                cl_ent->client->pers.mvdclient)
+            if (!cl_ent->inuse || cl_ent->solid != SOLID_NOT
+                    || cl_ent->client->pers.team != TEAM_SPEC
+                    || cl_ent->client->pers.mvdclient)
                 continue;
 
-            if (!drawn_header)
-            {
+            if (!drawn_header) {
                 drawn_header = true;
-                sprintf (entry, "xv 64 yv %d string2 \" Spectators\" ", j);
-                strcat (string, entry);
+                sprintf(entry, "xv 64 yv %d string2 \" Spectators\" ", j);
+                strcat(string, entry);
                 len = strlen(string);
                 j += 8;
             }
 
-            sprintf (entry,
-                "yv %d string \"%s:%d%s\" ",
-                //0, // x
-                j+8, // y
-                cl->pers.netname,
-                cl->ping > 999 ? 999 : TDM_PingHandicap(cl->ping),
-                cl->chase_target ? va("->%-12.12s", cl->chase_target->client->pers.netname) : "");
+            sprintf(entry, "yv %d string \"%s:%d%s\" ",
+                    //0, // x
+                    j + 8, // y
+                    cl->pers.netname,
+                    cl->ping > 999 ? 999 : TDM_PingHandicap(cl->ping),
+                    cl->chase_target ?
+                            va("->%-12.12s",
+                                    cl->chase_target->client->pers.netname) :
+                            "");
 
-            if (maxsize - len > strlen(entry))
-            {
-                strcat (string, entry);
+            if (maxsize - len > strlen(entry)) {
+                strcat(string, entry);
                 len = strlen(string);
             }
 
@@ -985,43 +920,40 @@ char *TDM_ScoreBoardString (edict_t *ent)
         }
     }
 
-    if (maxsize - len > 80)
-    {
-        if (total[firstteam-1] - last[firstteam-1] > 1) // couldn't fit everyone
-            sprintf (string + strlen(string), "xv 8 yv %d string \"..and %d more\" ",
-                offset + 56 + (last[firstteam-1]+1)*8, total[firstteam-1] - last[firstteam-1] - 1);
+    if (maxsize - len > 80) {
+        if (total[firstteam - 1] - last[firstteam - 1] > 1) { // couldn't fit everyone
+            sprintf(string + strlen(string),
+                    "xv 8 yv %d string \"..and %d more\" ",
+                    offset + 56 + (last[firstteam - 1] + 1) * 8,
+                    total[firstteam - 1] - last[firstteam - 1] - 1);
+        }
 
-        if (total[secondteam-1] - last[secondteam-1] > 1) // couldn't fit everyone
-            sprintf (string + strlen(string), "xv 8 yv %d string \"..and %d more\" ",
-                offset + 56 + (last[secondteam-1]+1)*8, total[secondteam-1] - last[secondteam-1] - 1);
+        if (total[secondteam - 1] - last[secondteam - 1] > 1) { // couldn't fit everyone
+            sprintf(string + strlen(string),
+                    "xv 8 yv %d string \"..and %d more\" ",
+                    offset + 56 + (last[secondteam - 1] + 1) * 8,
+                    total[secondteam - 1] - last[secondteam - 1] - 1);
+        }
     }
 
     return string;
 }
 
-/*
-==============
-TDM_Is1V1
-==============
-Return true if it's 1v1, regardless of game mode. Used to avoid printing
-team name when teamname = playername due to the 'pseudo 1v1' mode.
-*/
-qboolean TDM_Is1V1 (void)
-{
-    if (level.tdm_pseudo_1v1mode || g_gamemode->value == GAMEMODE_1V1)
+/**
+ * Return true if it's 1v1, regardless of game mode. Used to avoid printing
+ * team name when teamname = playername due to the 'pseudo 1v1' mode.
+ */
+qboolean TDM_Is1V1(void) {
+    if (level.tdm_pseudo_1v1mode || g_gamemode->value == GAMEMODE_1V1) {
         return true;
-
+    }
     return false;
 }
 
-/*
-==============
-TDM_MakeDemoName
-==============
-All players are ready so start the countdown
-*/
-const char *TDM_MakeDemoName (edict_t *ent)
-{
+/**
+ * All players are ready so start the countdown
+ */
+const char* TDM_MakeDemoName(edict_t *ent) {
     int i;
     int len;
     struct tm *ts;
@@ -1029,56 +961,51 @@ const char *TDM_MakeDemoName (edict_t *ent)
     cvar_t *hostname;
     cvar_t *demohostname;
     char *servername;
-    static char	string[1400];
+    static char string[1400];
 
-    hostname = gi.cvar ("hostname", NULL, 0);
+    hostname = gi.cvar("hostname", NULL, 0);
 
-    if (hostname)
+    if (hostname) {
         servername = hostname->string;
-    else
+    } else {
         servername = "unnamed_server";
+    }
 
     demohostname = gi.cvar("g_demo_hostname", servername, 0);
 
-
-    t = time (NULL);
-    ts = localtime (&t);
+    t = time(NULL);
+    ts = localtime(&t);
 
     // team1-team2_server_map_date-time
-    Com_sprintf (string, sizeof(string), "%s-%s_%s_%s_%d%02d%02d-%02d%02d%02d",
-        teaminfo[ent->client->pers.team].name,
-        teaminfo[(ent->client->pers.team%2)+1].name,
-        demohostname->string,
-        level.mapname,
-        ts->tm_year + 1900,
-        ts->tm_mon + 1,
-        ts->tm_mday,
-        ts->tm_hour,
-        ts->tm_min,
-        ts->tm_sec
-    );
+    Com_sprintf(string, sizeof(string), "%s-%s_%s_%s_%d%02d%02d-%02d%02d%02d",
+            teaminfo[ent->client->pers.team].name,
+            teaminfo[(ent->client->pers.team % 2) + 1].name,
+            demohostname->string, level.mapname, ts->tm_year + 1900,
+            ts->tm_mon + 1, ts->tm_mday, ts->tm_hour, ts->tm_min, ts->tm_sec);
 
     // filter not allowed characters
     len = strlen(string);
 
     for (i = 0; i < len; i++) {
-        if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
-                string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
-                string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ')
+        if ((string[i] < '!' && string[i] > '~') || string[i] == '\\'
+                || string[i] == '\"' || string[i] == ':' || string[i] == '*'
+                || string[i] == '/' || string[i] == '?' || string[i] == '>'
+                || string[i] == '<' || string[i] == '|' || string[i] == ' ')
             string[i] = '_';
     }
 
     return string;
 }
 
-
-char *TDM_MakeServerDemoName(void)
-{
-    int         i;
-    size_t      len;
-    struct tm   *ts;
-    time_t      t;
-    cvar_t      *demohostname;
+/**
+ *
+ */
+char* TDM_MakeServerDemoName(void) {
+    int i;
+    size_t len;
+    struct tm *ts;
+    time_t t;
+    cvar_t *demohostname;
     static char string[1400];
 
     demohostname = gi.cvar("g_demo_hostname", "noname", 0);
@@ -1088,37 +1015,28 @@ char *TDM_MakeServerDemoName(void)
 
     // servershortname_date-time_map
     Com_sprintf(string, sizeof(string), "%s_%d%02d%02d-%02d%02d%02d_%s",
-        demohostname->string,
-        ts->tm_year + 1900,
-        ts->tm_mon + 1,
-        ts->tm_mday,
-        ts->tm_hour,
-        ts->tm_min,
-        ts->tm_sec,
-        level.mapname
-    );
+            demohostname->string, ts->tm_year + 1900, ts->tm_mon + 1,
+            ts->tm_mday, ts->tm_hour, ts->tm_min, ts->tm_sec, level.mapname);
 
     // filter not allowed characters
     len = strlen(string);
 
     for (i = 0; i < len; i++) {
-        if ((string[i] < '!' && string[i] > '~') || string[i] == '\\' || string[i] == '\"' ||
-                string[i] == ':' || string[i] == '*' || string[i] == '/' || string[i] == '?' ||
-                string[i] == '>' || string[i] == '<' || string[i] == '|' || string[i] == ' ') {
+        if ((string[i] < '!' && string[i] > '~') || string[i] == '\\'
+                || string[i] == '\"' || string[i] == ':' || string[i] == '*'
+                || string[i] == '/' || string[i] == '?' || string[i] == '>'
+                || string[i] == '<' || string[i] == '|' || string[i] == ' ') {
             string[i] = '_';
         }
     }
 
     return string;
 }
-/*
-==============
-TDM_BeginCountdown
-==============
-All players are ready so start the countdown
-*/
-void TDM_BeginCountdown (void)
-{
+
+/**
+ * All players are ready so start the countdown
+ */
+void TDM_BeginCountdown(void) {
     edict_t *client;
 
     //set this here so settingsstring knows about it
@@ -1128,13 +1046,15 @@ void TDM_BeginCountdown (void)
         level.tdm_pseudo_1v1mode = false;
     }
 
-    gi.bprintf (PRINT_HIGH, "Match Settings:\n%s", TDM_SettingsString ());
+    gi.bprintf(PRINT_HIGH, "Match Settings:\n%s", TDM_SettingsString());
 
-    gi.bprintf (PRINT_HIGH, "All players ready! Starting countdown (%g secs)...\n", g_match_countdown->value);
+    gi.bprintf(PRINT_HIGH,
+            "All players ready! Starting countdown (%g secs)...\n",
+            g_match_countdown->value);
 
     //remove any vote so it doesn't change settings mid-match :D
     if (vote.active) {
-        TDM_RemoveVote ();
+        TDM_RemoveVote();
     }
 
     tdm_match_status = MM_COUNTDOWN;
@@ -1148,41 +1068,46 @@ void TDM_BeginCountdown (void)
     //called to apply a temporary hack for people who do 1v1 on tdm mode
     TDM_UpdateTeamNames();
 
-    level.match_start_framenum = level.framenum + SECS_TO_FRAMES(g_match_countdown->value);
+    level.match_start_framenum = level.framenum
+            + SECS_TO_FRAMES(g_match_countdown->value);
 
     // force players to record
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
-        if (client->inuse && client->client->pers.team &&
-                (g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
-            G_StuffCmd (client, "record \"%s\"\n", TDM_MakeDemoName(client));
+    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
+            client++) {
+        if (client->inuse && client->client->pers.team
+                && (g_force_record->value == 1
+                        || client->client->pers.config.auto_record
+                        || UF(client, AUTORECORD))) {
+            G_StuffCmd(client, "record \"%s\"\n", TDM_MakeDemoName(client));
         }
     }
 
     TDM_RecordMVD();
 }
 
-/*
-==============
-TDM_EndIntermission
-==============
-Intermission timer expired or all clients are ready. Reset for another game.
-*/
-void TDM_EndIntermission (void)
-{
+/**
+ * Intermission timer expired or all clients are ready. Reset for another game.
+ */
+void TDM_EndIntermission(void) {
     edict_t *client;
     int i;
 
     //for bugs
-    gi.bprintf (PRINT_CHAT, "Please report issues at https://github.com/packetflinger/opentdm\n");
+    gi.bprintf(PRINT_CHAT,
+            "Please report issues at https://github.com/packetflinger/opentdm\n");
 
     // stop demo recording if we enforce it
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++) {
-        if (!client->inuse)
+    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
+            client++) {
+        if (!client->inuse) {
             continue;
+        }
 
-        if (client->client->pers.team &&
-                (g_force_record->value == 1 || client->client->pers.config.auto_record || UF(client, AUTORECORD))) {
-            G_StuffCmd (client, "stop\n");
+        if (client->client->pers.team
+                && (g_force_record->value == 1
+                        || client->client->pers.config.auto_record
+                        || UF(client, AUTORECORD))) {
+            G_StuffCmd(client, "stop\n");
         }
     }
 
@@ -1191,10 +1116,9 @@ void TDM_EndIntermission (void)
     game.match_count++;
 
     //shuffle current stats to old and cleanup any players who never reconnected
-    if (current_matchinfo.teamplayers)
-    {
+    if (current_matchinfo.teamplayers) {
         if (old_matchinfo.teamplayers)
-            gi.TagFree (old_matchinfo.teamplayers);
+            gi.TagFree(old_matchinfo.teamplayers);
 
         current_matchinfo.scores[TEAM_A] = teaminfo[TEAM_A].score;
         current_matchinfo.scores[TEAM_B] = teaminfo[TEAM_B].score;
@@ -1204,12 +1128,10 @@ void TDM_EndIntermission (void)
         current_matchinfo.teamplayers = NULL;
         current_matchinfo.num_teamplayers = 0;
 
-        for (i = 0; i < old_matchinfo.num_teamplayers; i++)
-        {
-            if (old_matchinfo.teamplayers[i].saved_client)
-            {
-                gi.TagFree (old_matchinfo.teamplayers[i].saved_client);
-                gi.TagFree (old_matchinfo.teamplayers[i].saved_entity);
+        for (i = 0; i < old_matchinfo.num_teamplayers; i++) {
+            if (old_matchinfo.teamplayers[i].saved_client) {
+                gi.TagFree(old_matchinfo.teamplayers[i].saved_client);
+                gi.TagFree(old_matchinfo.teamplayers[i].saved_entity);
 
                 old_matchinfo.teamplayers[i].saved_entity = NULL;
                 old_matchinfo.teamplayers[i].saved_client = NULL;
@@ -1219,118 +1141,112 @@ void TDM_EndIntermission (void)
             old_matchinfo.teamplayers[i].matchinfo = &old_matchinfo;
         }
 
-        memset (&current_matchinfo, 0, sizeof(current_matchinfo));
+        memset(&current_matchinfo, 0, sizeof(current_matchinfo));
+    } else {
+        TDM_Error(
+                "TDM_EndIntermission: We should have current_teamplayers but we don't!");
     }
-    else
-        TDM_Error ("TDM_EndIntermission: We should have current_teamplayers but we don't!");
 
     level.match_score_end_framenum = 0;
-    TDM_ResetGameState ();
-
-    TDM_FixDeltaAngles ();
+    TDM_ResetGameState();
+    TDM_FixDeltaAngles();
 }
 
-/*
-==============
-TDM_BeginIntermission
-==============
-Match has ended, move all clients to spectator mode and set origin, note this
-is not the same as EndDMLevel since we aren't changing maps.
-*/
-void TDM_BeginIntermission (void)
-{
+/**
+ * Match has ended, move all clients to spectator mode and set origin, note this
+ * is not the same as EndDMLevel since we aren't changing maps.
+ */
+void TDM_BeginIntermission(void) {
     int i;
     edict_t *ent, *client;
 
-    level.match_score_end_framenum = level.framenum + SECS_TO_FRAMES (g_intermission_time->value);
+    level.match_score_end_framenum = level.framenum
+            + SECS_TO_FRAMES(g_intermission_time->value);
 
-    //remove any weapons or similar stuff still in flight
-    for (ent = g_edicts + game.maxclients + 1; ent < g_edicts + globals.num_edicts; ent++)
-    {
-        if ((ent->owner && ent->owner->client) || ent->enttype == ENT_GHOST)
-            G_FreeEdict (ent);
-    }
-
-    // find an intermission spot
-    ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
-    if (!ent)
-    {
-        // the map creator forgot to put in an intermission point...
-        ent = G_Find (NULL, FOFS(classname), "info_player_start");
-        if (!ent)
-            ent = G_Find (NULL, FOFS(classname), "info_player_deathmatch");
-    }
-    else
-    {
-        // chose one of four spots
-        i = genrand_int32() & 3;
-        while (i--)
-        {
-            ent = G_Find (ent, FOFS(classname), "info_player_intermission");
-            if (!ent)	// wrap around the list
-                ent = G_Find (ent, FOFS(classname), "info_player_intermission");
+    // remove any weapons or similar stuff still in flight
+    for (ent = g_edicts + game.maxclients + 1;
+            ent < g_edicts + globals.num_edicts; ent++) {
+        if ((ent->owner && ent->owner->client) || ent->enttype == ENT_GHOST) {
+            G_FreeEdict(ent);
         }
     }
 
-    VectorCopy (ent->s.origin, level.intermission_origin);
-    VectorCopy (ent->s.angles, level.intermission_angle);
-
-    //take a copy of the scoreboard, have to do this before we destroy
-    //teamplayers or no scores are written!
-    strcpy (current_matchinfo.scoreboard_string, TDM_ScoreBoardString(NULL));
-
-    // move all clients to the intermission point
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
-    {
-        if (!client->inuse)
-            continue;
-
-        MoveClientToIntermission (client);
+    // find an intermission spot
+    ent = G_Find(NULL, FOFS(classname), "info_player_intermission");
+    if (!ent) {
+        // the map creator forgot to put in an intermission point...
+        ent = G_Find(NULL, FOFS(classname), "info_player_start");
+        if (!ent) {
+            ent = G_Find(NULL, FOFS(classname), "info_player_deathmatch");
+        }
+    } else {
+        // chose one of four spots
+        i = genrand_int32() & 3;
+        while (i--) {
+            ent = G_Find(ent, FOFS(classname), "info_player_intermission");
+            if (!ent) { // wrap around the list
+                ent = G_Find(ent, FOFS(classname), "info_player_intermission");
+            }
+        }
     }
 
-    //disable chasecams after moving clients to intermission, that way the scoreboard
-    //will remember who was chasing who.
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
-    {
-        if (!client->inuse)
+    VectorCopy(ent->s.origin, level.intermission_origin);
+    VectorCopy(ent->s.angles, level.intermission_angle);
+
+    // take a copy of the scoreboard, have to do this before we destroy
+    // teamplayers or no scores are written!
+    strcpy(current_matchinfo.scoreboard_string, TDM_ScoreBoardString(NULL));
+
+    // move all clients to the intermission point
+    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
+            client++) {
+        if (!client->inuse) {
             continue;
+        }
+
+        MoveClientToIntermission(client);
+    }
+
+    // disable chasecams after moving clients to intermission, that way the scoreboard
+    // will remember who was chasing who.
+    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
+            client++) {
+        if (!client->inuse) {
+            continue;
+        }
 
         //reset any invites
         client->client->resp.last_invited_by = NULL;
 
-        if (client->client->chase_target)
-            DisableChaseCam (client);
+        if (client->client->chase_target) {
+            DisableChaseCam(client);
+        }
     }
 }
 
-/*
-==============
-TDM_EndMatch
-==============
-A match has ended through some means.
-Overtime / SD is handled in CheckTimes.
-*/
-    void TDM_EndMatch (void)
-    {
+/**
+ * A match has ended through some means.
+ * Overtime / SD is handled in CheckTimes.
+ */
+void TDM_EndMatch(void) {
     qboolean forfeit;
     int winner, loser;
     edict_t *ent;
 
     //cancel any mid-game vote (restart, etc)
-    TDM_RemoveVote ();
+    TDM_RemoveVote();
 
     //have to set this here so the stats system doesn't think we're still playing
     tdm_match_status = MM_SCOREBOARD;
 
     //show stats
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (ent->inuse && ent->client->pers.team)
-        {
-            if (!ent->client->resp.teamplayerinfo)
-                TDM_Error ("TDM_EndMatch: Missing teamplayerinfo for client %d", (int)(ent - g_edicts - 1));
-
-            TDM_Stats_f (ent, ent->client->resp.teamplayerinfo->matchinfo);
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (ent->inuse && ent->client->pers.team) {
+            if (!ent->client->resp.teamplayerinfo) {
+                TDM_Error("TDM_EndMatch: Missing teamplayerinfo for client %d",
+                        (int) (ent - g_edicts - 1));
+            }
+            TDM_Stats_f(ent, ent->client->resp.teamplayerinfo->matchinfo);
         }
     }
 
@@ -1338,50 +1254,39 @@ Overtime / SD is handled in CheckTimes.
     loser = 0;
     forfeit = false;
 
-    if (teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0)
-    {
+    if (teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0) {
         winner = TEAM_SPEC;
         loser = TEAM_SPEC;
-        gi.bprintf (PRINT_HIGH, "Match canceled, no players remaining.\n");
-    }
-    else if (teaminfo[TEAM_A].players == 0)
-    {
+        gi.bprintf(PRINT_HIGH, "Match canceled, no players remaining.\n");
+    } else if (teaminfo[TEAM_A].players == 0) {
         winner = TEAM_B;
         loser = TEAM_A;
         forfeit = true;
-    }
-    else if (teaminfo[TEAM_B].players == 0)
-    {
+    } else if (teaminfo[TEAM_B].players == 0) {
         winner = TEAM_A;
         loser = TEAM_B;
         forfeit = true;
-    }
-    else if (teaminfo[TEAM_A].score > teaminfo[TEAM_B].score)
-    {
+    } else if (teaminfo[TEAM_A].score > teaminfo[TEAM_B].score) {
         winner = TEAM_A;
         loser = TEAM_B;
-    }
-    else if (teaminfo[TEAM_B].score > teaminfo[TEAM_A].score)
-    {
+    } else if (teaminfo[TEAM_B].score > teaminfo[TEAM_A].score) {
         winner = TEAM_B;
         loser = TEAM_A;
-    }
-    else
-    {
-        gi.bprintf (PRINT_HIGH, "Tie game, %d to %d.\n", teaminfo[TEAM_A].score, teaminfo[TEAM_A].score);
+    } else {
+        gi.bprintf(PRINT_HIGH, "Tie game, %d to %d.\n", teaminfo[TEAM_A].score,
+                teaminfo[TEAM_A].score);
     }
 
-    if (winner)
-    {
-        if (forfeit)
-        {
-            gi.bprintf (PRINT_HIGH, "Match ended.\n");
-            gi.bprintf (PRINT_HIGH, "%s wins by forfeit!\n", teaminfo[winner].name);
-        }
-        else
-        {
-            gi.bprintf (PRINT_HIGH, "Timelimit hit. Match ended.\n");
-            gi.bprintf (PRINT_HIGH, "%s wins, %d to %d.\n", teaminfo[winner].name, teaminfo[winner].score, teaminfo[loser].score);
+    if (winner) {
+        if (forfeit) {
+            gi.bprintf(PRINT_HIGH, "Match ended.\n");
+            gi.bprintf(PRINT_HIGH, "%s wins by forfeit!\n",
+                    teaminfo[winner].name);
+        } else {
+            gi.bprintf(PRINT_HIGH, "Timelimit hit. Match ended.\n");
+            gi.bprintf(PRINT_HIGH, "%s wins, %d to %d.\n",
+                    teaminfo[winner].name, teaminfo[winner].score,
+                    teaminfo[loser].score);
         }
     }
 
@@ -1391,114 +1296,113 @@ Overtime / SD is handled in CheckTimes.
     level.match_resume_framenum = 0;
     level.match_end_framenum = 0;
 
-    TDM_BeginIntermission ();
+    TDM_BeginIntermission();
 }
 
-void TDM_Overtime (void)
-{
-    level.match_end_framenum = level.framenum + SECS_TO_FRAMES ((int)g_overtime->value);
+/**
+ *
+ */
+void TDM_Overtime(void) {
+    level.match_end_framenum = level.framenum
+            + SECS_TO_FRAMES((int )g_overtime->value);
 
-    gi.bprintf (PRINT_HIGH, "Scores are tied %d - %d, adding %g minute%s overtime.\n",
-        teaminfo[TEAM_A].score, teaminfo[TEAM_A].score, g_overtime->value / 60, g_overtime->value / 60 == 1 ? "" : "s");
+    gi.bprintf(PRINT_HIGH,
+            "Scores are tied %d - %d, adding %g minute%s overtime.\n",
+            teaminfo[TEAM_A].score, teaminfo[TEAM_A].score,
+            g_overtime->value / 60, g_overtime->value / 60 == 1 ? "" : "s");
 
     tdm_match_status = MM_OVERTIME;
 }
 
-void TDM_SuddenDeath (void)
-{
-    gi.bprintf (PRINT_HIGH, "Scores are tied %d - %d, entering Sudden Death!\n", teaminfo[TEAM_A].score, teaminfo[TEAM_A].score);
-
+/**
+ *
+ */
+void TDM_SuddenDeath(void) {
+    gi.bprintf(PRINT_HIGH, "Scores are tied %d - %d, entering Sudden Death!\n",
+            teaminfo[TEAM_A].score, teaminfo[TEAM_A].score);
     tdm_match_status = MM_SUDDEN_DEATH;
 }
 
-/*
-==============
-TDM_NagUnreadyPlayers
-==============
-Show who isn't ready, only called if >= 50% of other players are ready.
-*/
-void TDM_NagUnreadyPlayers (void)
-{
+/**
+ * Show who isn't ready, only called if >= 50% of other players are ready.
+ */
+void TDM_NagUnreadyPlayers(void) {
     char message[1000];
     edict_t *ent;
     int len;
 
     len = 0;
-
     message[0] = '\0';
-
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (!ent->inuse)
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
             continue;
-
-        if (ent->client->pers.team == TEAM_SPEC)
-            continue;
-
-        if (ent->client->resp.ready)
-            continue;
-
-        if (message[0])
-        {
-            len += 2;
-            strcat (message, ", ");
         }
 
-        len += strlen (ent->client->pers.netname);
-        strcat (message, ent->client->pers.netname);
+        if (ent->client->pers.team == TEAM_SPEC) {
+            continue;
+        }
 
-        if (len >= sizeof(message)-20)
+        if (ent->client->resp.ready) {
+            continue;
+        }
+
+        if (message[0]) {
+            len += 2;
+            strcat(message, ", ");
+        }
+
+        len += strlen(ent->client->pers.netname);
+        strcat(message, ent->client->pers.netname);
+
+        if (len >= sizeof(message) - 20) {
             break;
+        }
     }
 
-    gi.bprintf (PRINT_CHAT, "Waiting on %s\n", message);
+    gi.bprintf(PRINT_CHAT, "Waiting on %s\n", message);
 }
 
-/*
-==============
-TDM_FixDeltaAngles
-==============
-Set angles after a restart of a match otherwise movement done during frozen
-will screw things up.
-*/
-void TDM_FixDeltaAngles (void)
-{
+/**
+ * Set angles after a restart of a match otherwise movement done during
+ * frozen will screw things up.
+ */
+void TDM_FixDeltaAngles(void) {
     int i;
     edict_t *ent;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (!ent->inuse)
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
             continue;
+        }
 
         //set the delta angle
-        for (i=0 ; i<3 ; i++)
-            ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(ent->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
+        for (i = 0; i < 3; i++) {
+            ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(
+                    ent->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
+        }
     }
 }
 
-/*
-==============
-TDM_UpdateServerInfo
-==============
-Update server info visible to browsers.
-*/
-void TDM_UpdateServerInfo (void)
-{
+/**
+ * Update server info visible to browsers.
+ */
+void TDM_UpdateServerInfo(void) {
     char buff[12];
 
-    if (tdm_match_status < MM_PLAYING)
-    {
+    if (tdm_match_status < MM_PLAYING) {
         gi.cvar_forceset("time_remaining", "WARMUP");
         gi.cvar_forceset("Score_B", "WARMUP");
         gi.cvar_forceset("Score_A", "WARMUP");
-    }
-    else
-    {
-        if (level.match_end_framenum - level.framenum >= 0)
-            gi.cvar_forceset("time_remaining", TDM_SecsToString (FRAMES_TO_SECS(level.match_end_framenum - level.framenum)));
-        else
+    } else {
+        if (level.match_end_framenum - level.framenum >= 0) {
+            gi.cvar_forceset("time_remaining",
+                    TDM_SecsToString(
+                            FRAMES_TO_SECS(
+                                    level.match_end_framenum
+                                            - level.framenum)));
+        } else {
             gi.cvar_forceset("time_remaining", "N/A");
+        }
 
         sprintf(buff, "%d", teaminfo[TEAM_B].score);
         gi.cvar_forceset("Score_B", buff);
@@ -1506,174 +1410,151 @@ void TDM_UpdateServerInfo (void)
         gi.cvar_forceset("Score_A", buff);
     }
 
-    if (g_gamemode->value == GAMEMODE_TDM && !(level.tdm_pseudo_1v1mode))
+    if (g_gamemode->value == GAMEMODE_TDM && !(level.tdm_pseudo_1v1mode)) {
         gi.cvar_forceset("match_type", "TDM");
-    else if (level.tdm_pseudo_1v1mode || g_gamemode->value == GAMEMODE_1V1)
+    } else if (level.tdm_pseudo_1v1mode || g_gamemode->value == GAMEMODE_1V1) {
         gi.cvar_forceset("match_type", "Duel");
-    else if (g_gamemode->value == GAMEMODE_ITDM)
+    } else if (g_gamemode->value == GAMEMODE_ITDM) {
         gi.cvar_forceset("match_type", "ITDM");
-    else
+    } else {
         gi.cvar_forceset("match_type", "N/A");
+    }
 }
 
-/*
-==============
-TDM_CheckTimes
-==============
-Check miscellaneous timers, eg match start countdown
-*/
-void TDM_CheckTimes (void)
-{
+/**
+ * Check miscellaneous timers, eg match start countdown
+ */
+void TDM_CheckTimes(void) {
     edict_t *ent;
     int vote_yes, vote_no;
 
-    if (tdm_match_status < MM_PLAYING && level.match_start_framenum)
-    {
+    if (tdm_match_status < MM_PLAYING && level.match_start_framenum) {
         int remaining;
 
         remaining = level.match_start_framenum - level.framenum;
 
-        if (remaining == SECS_TO_FRAMES(10.4f))
-        {
-            gi.sound (world, 0, gi.soundindex ("world/10_0.wav"), 1, ATTN_NONE, 0);
-        }
-        else if (remaining > 0 && remaining <= SECS_TO_FRAMES(5) && remaining % SECS_TO_FRAMES(1) == 0)
-        {
-            gi.bprintf (PRINT_HIGH, "%d\n", (int)(remaining / SERVER_FPS));
-        }
-        else if (remaining == 0)
-        {
-            TDM_BeginMatch ();
+        if (remaining == SECS_TO_FRAMES(10.4f)) {
+            gi.sound(world, 0, gi.soundindex("world/10_0.wav"), 1, ATTN_NONE,
+                    0);
+        } else if (remaining > 0 && remaining <= SECS_TO_FRAMES(5)
+                && remaining % SECS_TO_FRAMES(1) == 0) {
+            gi.bprintf(PRINT_HIGH, "%d\n", (int) (remaining / SERVER_FPS));
+        } else if (remaining == 0) {
+            TDM_BeginMatch();
         }
     }
 
-    if (level.match_resume_framenum)
-    {
+    if (level.match_resume_framenum) {
         int remaining;
-
         remaining = level.match_resume_framenum - level.realframenum;
 
-        if (remaining > 0 && remaining <= SECS_TO_FRAMES(5) && remaining % SECS_TO_FRAMES(1) == 0)
-        {
-            gi.bprintf (PRINT_HIGH, "%d\n", (int)(remaining / SERVER_FPS));
-        }
-        else if (remaining == 0)
-        {
-            TDM_FixDeltaAngles ();
-            gi.bprintf (PRINT_HIGH, "Fight!\n");
-
+        if (remaining > 0 && remaining <= SECS_TO_FRAMES(5)
+                && remaining % SECS_TO_FRAMES(1) == 0) {
+            gi.bprintf(PRINT_HIGH, "%d\n", (int) (remaining / SERVER_FPS));
+        } else if (remaining == 0) {
+            TDM_FixDeltaAngles();
+            gi.bprintf(PRINT_HIGH, "Fight!\n");
             level.tdm_timeout_caller = NULL;
             level.match_resume_framenum = 0;
             tdm_match_status = level.last_tdm_match_status;
-
-            UpdateMatchStatus ();
+            UpdateMatchStatus();
         }
     }
 
-    if (level.match_end_framenum)
-    {
+    if (level.match_end_framenum) {
         int remaining;
 
-        if (tdm_match_status == MM_SUDDEN_DEATH)
-        {
-            if (teaminfo[TEAM_A].score != teaminfo[TEAM_B].score)
-                TDM_EndMatch ();
-        }
-        else
-        {
+        if (tdm_match_status == MM_SUDDEN_DEATH) {
+            if (teaminfo[TEAM_A].score != teaminfo[TEAM_B].score) {
+                TDM_EndMatch();
+            }
+        } else {
             remaining = level.match_end_framenum - level.framenum;
 
-            if (remaining == SECS_TO_FRAMES(10.4f))
-            {
-                gi.sound (world, 0, gi.soundindex ("world/10_0.wav"), 1, ATTN_NONE, 0);
-            }
-            /*else if (remaining > 0 && remaining <= (int)(5.0f / FRAMETIME) && remaining % (int)(1.0f / FRAMETIME) == 0)
-            {
-                gi.bprintf (PRINT_HIGH, "%d\n", (int)(remaining * FRAMETIME));
-            }*/
-            else if (remaining <= 0) // you can vote match time less than there is available
-            {
-                if (teaminfo[TEAM_A].score == teaminfo[TEAM_B].score)
-                {
-                    if (g_tie_mode->value == 1)
-                        TDM_Overtime ();
-                    else if (g_tie_mode->value == 2)
-                        TDM_SuddenDeath ();
-                    else
-                        TDM_EndMatch ();
+            if (remaining == SECS_TO_FRAMES(10.4f)) {
+                gi.sound(world, 0, gi.soundindex("world/10_0.wav"), 1,
+                        ATTN_NONE, 0);
+            } else if (remaining <= 0) { // you can vote match time less than there is available
+                if (teaminfo[TEAM_A].score == teaminfo[TEAM_B].score) {
+                    if (g_tie_mode->value == 1) {
+                        TDM_Overtime();
+                    } else if (g_tie_mode->value == 2) {
+                        TDM_SuddenDeath();
+                    } else {
+                        TDM_EndMatch();
+                    }
+                } else {
+                    TDM_EndMatch();
                 }
-                else
-                    TDM_EndMatch ();
             }
         }
     }
 
     //end timeout, regardless of what's happening. prevents single player from
     //destroying server should they disconnect eg in 1v1 and never reconnect
-    if (level.timeout_end_framenum)
-    {
+    if (level.timeout_end_framenum) {
         int remaining;
 
         remaining = level.timeout_end_framenum - level.realframenum;
 
-        if (remaining == SECS_TO_FRAMES(60))
-        {
-            gi.bprintf (PRINT_HIGH, "Automatically resuming in 1 minute.\n");
+        if (remaining == SECS_TO_FRAMES(60)) {
+            gi.bprintf(PRINT_HIGH, "Automatically resuming in 1 minute.\n");
         }
 
-        if (remaining == 0)
-            TDM_ResumeGame ();
+        if (remaining == 0) {
+            TDM_ResumeGame();
+        }
     }
 
     //end of map intermission - same as regular dm style
-    if (level.intermissionframe && level.framenum - level.intermissionframe >= 0)
-    {
+    if (level.intermissionframe
+            && level.framenum - level.intermissionframe >= 0) {
         level.exitintermission = 1;
     }
 
-    if (level.next_ready_nag_framenum && level.next_ready_nag_framenum == level.framenum)
-    {
-        TDM_NagUnreadyPlayers ();
+    if (level.next_ready_nag_framenum
+            && level.next_ready_nag_framenum == level.framenum) {
+        TDM_NagUnreadyPlayers();
         level.next_ready_nag_framenum = level.framenum + SECS_TO_FRAMES(20);
     }
 
     //between match intermission - scores only
-    if (level.match_score_end_framenum)
-    {
-        int	remaining;
+    if (level.match_score_end_framenum) {
+        int remaining;
 
         remaining = level.match_score_end_framenum - level.framenum;
 
-        if (remaining <= 0)
-            TDM_EndIntermission ();
+        if (remaining <= 0) {
+            TDM_EndIntermission();
+        }
 
         // take screenshot 5 frames after the intermission began
-        if (remaining == SECS_TO_FRAMES (g_intermission_time->value) - 5)
-        {
+        if (remaining == SECS_TO_FRAMES (g_intermission_time->value) - 5) {
             edict_t *client;
 
-            for (client = g_edicts + 1; client <= g_edicts + game.maxclients; client++)
-            {
-                if (!client->inuse)
+            for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
+                    client++) {
+                if (!client->inuse) {
                     continue;
+                }
 
-                if (client->client->pers.team &&
-                        (g_force_screenshot->value == 1 || client->client->pers.config.auto_screenshot || UF(client, AUTOSCREENSHOT)))
-                    G_StuffCmd (client, "screenshot\n");
+                if (client->client->pers.team
+                        && (g_force_screenshot->value == 1
+                                || client->client->pers.config.auto_screenshot
+                                || UF(client, AUTOSCREENSHOT))) {
+                    G_StuffCmd(client, "screenshot\n");
+                }
             }
         }
     }
 
-    if (vote.active)
-    {
+    if (vote.active) {
         // update vote string every second since we display the timer
-        if ((vote.end_frame - level.framenum) % SERVER_FPS == 0)
-        {
-            TDM_UpdateVoteConfigString ();
+        if ((vote.end_frame - level.framenum) % SERVER_FPS == 0) {
+            TDM_UpdateVoteConfigString();
         }
 
-        if (level.framenum == vote.end_frame)
-        {
+        if (level.framenum == vote.end_frame) {
             // end of vote, compare yes/no and ignore non-voters and ratio
             vote_yes = vote_no = 0;
             for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
@@ -1689,49 +1570,51 @@ void TDM_CheckTimes (void)
 
             if (vote_yes > vote_no) {
                 vote.success = VOTE_SUCCESS;
-                gi.bprintf (PRINT_HIGH, "Vote passed!\n");
-                TDM_ApplyVote ();
+                gi.bprintf(PRINT_HIGH, "Vote passed!\n");
+                TDM_ApplyVote();
             } else {
-                gi.bprintf (PRINT_HIGH, "Vote failed.\n");
+                gi.bprintf(PRINT_HIGH, "Vote failed.\n");
             }
 
             TDM_RemoveVote();
         }
     }
 
-    if (tdm_match_status == MM_WARMUP && tdm_settings_not_default && level.framenum >= SECS_TO_FRAMES(300) &&
-        teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0)
-    {
-        qboolean	reset = true;
+    if (tdm_match_status == MM_WARMUP && tdm_settings_not_default
+            && level.framenum >= SECS_TO_FRAMES(300)
+            && teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0) {
+        qboolean reset = true;
 
-        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-        {
-            if (!ent->client)
+        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+            if (!ent->client) {
                 continue;
+            }
 
-            if (FRAMES_TO_SECS (level.framenum - ent->client->last_activity_frame) < 300)
-            {
+            if (FRAMES_TO_SECS(
+                    level.framenum - ent->client->last_activity_frame)
+                    < 300) {
                 reset = false;
                 break;
             }
         }
 
-        if (reset)
-        {
-            gi.bprintf (PRINT_HIGH, "No active players for five minutes, restoring default match settings.\n");
-            TDM_ResetVotableVariables ();
+        if (reset) {
+            gi.bprintf(PRINT_HIGH,
+                    "No active players for five minutes, restoring default match settings.\n");
+            TDM_ResetVotableVariables();
         }
     }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (!ent->inuse)
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
             continue;
+        }
 
         //r1: only show motd once per connect, not on level change
-        if (!ent->client->pers.shown_motd && !ent->client->showmotd && level.framenum - ent->client->resp.enterframe == SECS_TO_FRAMES(10))
-        {
-            TDM_Motd_f (ent);
+        if (!ent->client->pers.shown_motd && !ent->client->showmotd
+                && level.framenum - ent->client->resp.enterframe
+                        == SECS_TO_FRAMES(10)) {
+            TDM_Motd_f(ent);
             ent->client->pers.shown_motd = true;
         }
     }
@@ -1741,34 +1624,31 @@ void TDM_CheckTimes (void)
 #endif
 }
 
-/*
-==============
-TDM_CheckMatchStart
-==============
-See if everyone is ready and there are enough players to start a countdown
-*/
-void TDM_CheckMatchStart (void)
-{
+/**
+ * See if everyone is ready and there are enough players to start a countdown
+ */
+void TDM_CheckMatchStart(void) {
     edict_t *ent;
     int ready[MAX_TEAMS];
     int total_players, total_ready;
 
-    if (tdm_match_status >= MM_PLAYING)
+    if (tdm_match_status >= MM_PLAYING) {
         return;
+    }
 
     ready[TEAM_A] = ready[TEAM_B] = 0;
     total_ready = total_players = 0;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (!ent->inuse)
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
             continue;
+        }
 
-        if (ent->client->pers.team == TEAM_SPEC)
+        if (ent->client->pers.team == TEAM_SPEC) {
             continue;
+        }
 
-        if (ent->client->resp.ready)
-        {
+        if (ent->client->resp.ready) {
             total_ready++;
             ready[ent->client->pers.team]++;
         }
@@ -1776,70 +1656,67 @@ void TDM_CheckMatchStart (void)
         total_players++;
     }
 
-    if (teaminfo[TEAM_A].players && ready[TEAM_A] == teaminfo[TEAM_A].players)
+    if (teaminfo[TEAM_A].players && ready[TEAM_A] == teaminfo[TEAM_A].players) {
         teaminfo[TEAM_A].ready = true;
-    else
+    } else {
         teaminfo[TEAM_A].ready = false;
+    }
 
-    if (teaminfo[TEAM_B].players && ready[TEAM_B] == teaminfo[TEAM_B].players)
+    if (teaminfo[TEAM_B].players && ready[TEAM_B] == teaminfo[TEAM_B].players) {
         teaminfo[TEAM_B].ready = true;
-    else
+    } else {
         teaminfo[TEAM_B].ready = false;
+    }
 
-    if (teaminfo[TEAM_A].ready && teaminfo[TEAM_B].ready)
-    {
+    if (teaminfo[TEAM_A].ready && teaminfo[TEAM_B].ready) {
         level.next_ready_nag_framenum = 0;
         teaminfo[TEAM_A].safety = false;
         teaminfo[TEAM_B].safety = false;
 
-        if (tdm_match_status < MM_COUNTDOWN)
-            TDM_BeginCountdown ();
-    }
-    else
-    {
-        if (teaminfo[TEAM_A].players && teaminfo[TEAM_B].players &&
-            total_players >= 2 && total_ready >= total_players / 2.0f)
-        {
-            if (!level.next_ready_nag_framenum)
-                level.next_ready_nag_framenum = level.framenum + SECS_TO_FRAMES(20);
+        if (tdm_match_status < MM_COUNTDOWN) {
+            TDM_BeginCountdown();
         }
-        else
+    } else {
+        if (teaminfo[TEAM_A].players && teaminfo[TEAM_B].players
+                && total_players >= 2 && total_ready >= total_players / 2.0f) {
+            if (!level.next_ready_nag_framenum) {
+                level.next_ready_nag_framenum = level.framenum
+                        + SECS_TO_FRAMES(20);
+            }
+        } else {
             level.next_ready_nag_framenum = 0;
+        }
 
-        if (level.match_start_framenum)
-        {
+        if (level.match_start_framenum) {
             //stop the .wav file, icky.
-            G_StuffCmd (NULL, "stopsound\n");
-            gi.bprintf (PRINT_CHAT, "Countdown aborted!\n");
+            G_StuffCmd(NULL, "stopsound\n");
+            gi.bprintf(PRINT_CHAT, "Countdown aborted!\n");
             level.match_start_framenum = 0;
             level.tdm_pseudo_1v1mode = false;
             tdm_match_status = MM_WARMUP;
 
             // stop everyone from recording
             for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
-                if (ent->inuse && ent->client->pers.team &&
-                        (g_force_record->value == 1 || ent->client->pers.config.auto_record || UF(ent, AUTORECORD))) {
-                    G_StuffCmd (ent, "stop\n");
+                if (ent->inuse && ent->client->pers.team
+                        && (g_force_record->value == 1
+                                || ent->client->pers.config.auto_record
+                                || UF(ent, AUTORECORD))) {
+                    G_StuffCmd(ent, "stop\n");
                 }
             }
 
             //reset teamnames if we entered pseudo-1v1 mode
-            TDM_UpdateTeamNames ();
+            TDM_UpdateTeamNames();
         }
-
         TDM_StopMVD();
     }
 }
 
-/*
-==============
-LookupPlayer
-==============
-Look up a player by partial subname, full name or client id. If multiple
-matches, show a list. Return 0 on failure. Case insensitive.
-*/
-int LookupPlayer (const char *match, edict_t **out, edict_t *ent)
-{
+/**
+ * Look up a player by partial subname, full name or client id. If multiple
+ * matches, show a list. Return 0 on failure. Case insensitive.
+ */
+int LookupPlayer(const char *match, edict_t **out, edict_t *ent) {
     int matchcount;
     int numericMatch;
     edict_t *p;
@@ -1847,85 +1724,80 @@ int LookupPlayer (const char *match, edict_t **out, edict_t *ent)
     char lowermatch[32];
     const char *m;
 
-    if (!match[0])
+    if (!match[0]) {
         return 0;
+    }
 
     matchcount = 0;
     numericMatch = 0;
 
     m = match;
 
-    while (m[0])
-    {
-        if (!isdigit (m[0]))
-        {
+    while (m[0]) {
+        if (!isdigit(m[0])) {
             numericMatch = -1;
             break;
         }
         m++;
     }
 
-    if (numericMatch == 0)
-    {
-        numericMatch = strtoul (match, NULL, 10);
+    if (numericMatch == 0) {
+        numericMatch = strtoul(match, NULL, 10);
 
-        if (numericMatch < 0 || numericMatch >= game.maxclients)
-        {
-            if (ent)
-                gi.cprintf (ent, PRINT_HIGH, "Invalid client id %d.\n", numericMatch);
+        if (numericMatch < 0 || numericMatch >= game.maxclients) {
+            if (ent) {
+                gi.cprintf(ent, PRINT_HIGH, "Invalid client id %d.\n",
+                        numericMatch);
+            }
             return 0;
         }
     }
 
-    if (numericMatch == -1)
-    {
-        Q_strncpy (lowermatch, match, sizeof(lowermatch)-1);
-        Q_strlwr (lowermatch);
+    if (numericMatch == -1) {
+        Q_strncpy(lowermatch, match, sizeof(lowermatch) - 1);
+        Q_strlwr(lowermatch);
 
-        for (p = g_edicts + 1; p <= g_edicts + game.maxclients; p++)
-        {
-            if (!p->inuse)
+        for (p = g_edicts + 1; p <= g_edicts + game.maxclients; p++) {
+            if (!p->inuse) {
                 continue;
+            }
 
-            if (p->client->pers.mvdclient)
+            if (p->client->pers.mvdclient) {
                 continue;
+            }
 
-            Q_strncpy (lowered, p->client->pers.netname, sizeof(lowered)-1);
-            Q_strlwr (lowered);
+            Q_strncpy(lowered, p->client->pers.netname, sizeof(lowered) - 1);
+            Q_strlwr(lowered);
 
-            if (!strcmp (lowered, lowermatch))
-            {
+            if (!strcmp(lowered, lowermatch)) {
                 *out = p;
                 return 1;
             }
 
-            if (strstr (lowered, lowermatch))
-            {
+            if (strstr(lowered, lowermatch)) {
                 matchcount++;
                 *out = p;
                 continue;
             }
         }
 
-        if (matchcount == 1)
-        {
+        if (matchcount == 1) {
             return 1;
-        }
-        else if (matchcount > 1)
-        {
-            if (ent)
-                gi.cprintf (ent, PRINT_HIGH, "'%s' matches multiple players.\n", match);
+        } else if (matchcount > 1) {
+            if (ent) {
+                gi.cprintf(ent, PRINT_HIGH, "'%s' matches multiple players.\n",
+                        match);
+            }
             return 0;
         }
-    }
-    else
-    {
+    } else {
         p = g_edicts + 1 + numericMatch;
 
-        if (!p->inuse || p->client->pers.mvdclient)
-        {
-            if (ent)
-                gi.cprintf (ent, PRINT_HIGH, "Client %d is not active.\n", numericMatch);
+        if (!p->inuse || p->client->pers.mvdclient) {
+            if (ent) {
+                gi.cprintf(ent, PRINT_HIGH, "Client %d is not active.\n",
+                        numericMatch);
+            }
             return 0;
         }
 
@@ -1933,239 +1805,218 @@ int LookupPlayer (const char *match, edict_t **out, edict_t *ent)
         return 1;
     }
 
-    if (ent)
-        gi.cprintf (ent, PRINT_HIGH, "No player match found for '%s'\n", match);
+    if (ent) {
+        gi.cprintf(ent, PRINT_HIGH, "No player match found for '%s'\n", match);
+    }
     return 0;
 }
 
-/*
-==============
-TDM_UpdateTeamNames
-==============
-A rather messy function to handle team names in TDM and 1v1. Assigns "dynamic" team names
-if two players start a 1v1 game while in game mode TDM.
-*/
-void TDM_UpdateTeamNames (void)
-{
+/**
+ * A rather messy function to handle team names in TDM and 1v1. Assigns
+ * "dynamic" team names if two players start a 1v1 game while in game mode
+ * TDM.
+ */
+void TDM_UpdateTeamNames(void) {
     edict_t *ent;
 
-    if (g_gamemode->value == GAMEMODE_1V1)
-    {
-        if (teaminfo[TEAM_A].captain)
-        {
-            if (strcmp (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname))
-            {
-                Q_strncpy (teaminfo[TEAM_A].name, teaminfo[TEAM_A].captain->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
+    if (g_gamemode->value == GAMEMODE_1V1) {
+        if (teaminfo[TEAM_A].captain) {
+            if (strcmp(teaminfo[TEAM_A].name,
+                    teaminfo[TEAM_A].captain->client->pers.netname)) {
+                Q_strncpy(teaminfo[TEAM_A].name,
+                        teaminfo[TEAM_A].captain->client->pers.netname,
+                        sizeof(teaminfo[TEAM_A].name)-1);
                 g_team_a_name->modified = true;
             }
-        }
-        else
-        {
-            if (strcmp (teaminfo[TEAM_A].name, "Player 1"))
-            {
-                strcpy (teaminfo[TEAM_A].name, "Player 1");
+        } else {
+            if (strcmp(teaminfo[TEAM_A].name, "Player 1")) {
+                strcpy(teaminfo[TEAM_A].name, "Player 1");
                 g_team_a_name->modified = true;
             }
         }
 
-        if (teaminfo[TEAM_B].captain)
-        {
-            if (strcmp (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname))
-            {
-                Q_strncpy (teaminfo[TEAM_B].name, teaminfo[TEAM_B].captain->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
+        if (teaminfo[TEAM_B].captain) {
+            if (strcmp(teaminfo[TEAM_B].name,
+                    teaminfo[TEAM_B].captain->client->pers.netname)) {
+                Q_strncpy(teaminfo[TEAM_B].name,
+                        teaminfo[TEAM_B].captain->client->pers.netname,
+                        sizeof(teaminfo[TEAM_B].name)-1);
+                g_team_b_name->modified = true;
+            }
+        } else {
+            if (strcmp(teaminfo[TEAM_B].name, "Player 2")) {
+                strcpy(teaminfo[TEAM_B].name, "Player 2");
                 g_team_b_name->modified = true;
             }
         }
-        else
-        {
-            if (strcmp (teaminfo[TEAM_B].name, "Player 2"))
-            {
-                strcpy (teaminfo[TEAM_B].name, "Player 2");
-                g_team_b_name->modified = true;
-            }
-        }
-    }
-    else
-    {
-        if (TDM_Is1V1())
-        {
-            edict_t	*p1, *p2;
+    } else {
+        if (TDM_Is1V1()) {
+            edict_t *p1, *p2;
 
-            p1 = TDM_FindPlayerForTeam (TEAM_A);
-            p2 = TDM_FindPlayerForTeam (TEAM_B);
+            p1 = TDM_FindPlayerForTeam(TEAM_A);
+            p2 = TDM_FindPlayerForTeam(TEAM_B);
 
             //one of the players might have disappeared due to a disconnect
-            if (p1 && p2)
-            {
-                if (strcmp (teaminfo[TEAM_A].name, p1->client->pers.netname))
-                {
-                    Q_strncpy (teaminfo[TEAM_A].name, p1->client->pers.netname, sizeof(teaminfo[TEAM_A].name)-1);
+            if (p1 && p2) {
+                if (strcmp(teaminfo[TEAM_A].name, p1->client->pers.netname)) {
+                    Q_strncpy(teaminfo[TEAM_A].name, p1->client->pers.netname,
+                            sizeof(teaminfo[TEAM_A].name)-1);
                     g_team_a_name->modified = true;
                 }
 
-                if (strcmp (teaminfo[TEAM_B].name, p2->client->pers.netname))
-                {
-                    Q_strncpy (teaminfo[TEAM_B].name, p2->client->pers.netname, sizeof(teaminfo[TEAM_B].name)-1);
+                if (strcmp(teaminfo[TEAM_B].name, p2->client->pers.netname)) {
+                    Q_strncpy(teaminfo[TEAM_B].name, p2->client->pers.netname,
+                            sizeof(teaminfo[TEAM_B].name)-1);
                     g_team_b_name->modified = true;
                 }
             }
-        }
-        else
-        {
-            if (strcmp (teaminfo[TEAM_A].name, g_team_a_name->string))
-            {
-                Q_strncpy (teaminfo[TEAM_A].name, g_team_a_name->string, sizeof(teaminfo[TEAM_A].name)-1);
+        } else {
+            if (strcmp(teaminfo[TEAM_A].name, g_team_a_name->string)) {
+                Q_strncpy(teaminfo[TEAM_A].name, g_team_a_name->string,
+                        sizeof(teaminfo[TEAM_A].name)-1);
                 g_team_a_name->modified = true;
             }
 
-            if (strcmp (teaminfo[TEAM_B].name, g_team_b_name->string))
-            {
-                Q_strncpy (teaminfo[TEAM_B].name, g_team_b_name->string, sizeof(teaminfo[TEAM_B].name)-1);
+            if (strcmp(teaminfo[TEAM_B].name, g_team_b_name->string)) {
+                Q_strncpy(teaminfo[TEAM_B].name, g_team_b_name->string,
+                        sizeof(teaminfo[TEAM_B].name)-1);
                 g_team_b_name->modified = true;
             }
         }
     }
 
-    if (!g_team_a_name->modified && !g_team_b_name->modified)
+    if (!g_team_a_name->modified && !g_team_b_name->modified) {
         return;
+    }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (!ent->inuse)
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
             continue;
-
-        if (ent->client->pers.team == TEAM_A && g_team_a_name->modified)
-        {
-            if (TDM_Is1V1())
-                gi.configstring (CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1, ent->client->pers.netname);
-            else
-                gi.configstring (CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1, va("%s (%s)", ent->client->pers.netname, teaminfo[TEAM_A].name));
         }
-        else if (ent->client->pers.team == TEAM_B && g_team_b_name->modified)
-        {
-            if (TDM_Is1V1())
-                gi.configstring (CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1, ent->client->pers.netname);
-            else
-                gi.configstring (CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1, va("%s (%s)", ent->client->pers.netname, teaminfo[TEAM_B].name));
+
+        if (ent->client->pers.team == TEAM_A && g_team_a_name->modified) {
+            if (TDM_Is1V1()) {
+                gi.configstring(CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1,
+                        ent->client->pers.netname);
+            } else {
+                gi.configstring(CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1,
+                        va("%s (%s)", ent->client->pers.netname,
+                                teaminfo[TEAM_A].name));
+            }
+        } else if (ent->client->pers.team == TEAM_B
+                && g_team_b_name->modified) {
+            if (TDM_Is1V1()) {
+                gi.configstring(CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1,
+                        ent->client->pers.netname);
+            } else {
+                gi.configstring(CS_TDM_SPECTATOR_STRINGS + (ent - g_edicts) - 1,
+                        va("%s (%s)", ent->client->pers.netname,
+                                teaminfo[TEAM_B].name));
+            }
         }
     }
 }
 
-/*
-==============
-TDM_ResetVotableVariables
-==============
-Everyone has left the server, so reset anything they voted back to defaults
-*/
-void TDM_ResetVotableVariables (void)
-{
+/**
+ * Everyone has left the server, so reset anything they voted back to defaults
+ */
+void TDM_ResetVotableVariables(void) {
     cvarsave_t *var;
 
-    gi.dprintf ("Resetting votable variables to defaults.\n");
-
+    gi.dprintf("Resetting votable variables to defaults.\n");
     var = preserved_vars;
-
-    while (var->variable_name)
-    {
-        if (!var->default_string)
-            TDM_Error ("TDM_ResetVotableVariables: Preserved variable %s with no default", var->variable_name);
-        gi.cvar_forceset (var->variable_name, var->default_string);
+    while (var->variable_name) {
+        if (!var->default_string) {
+            TDM_Error(
+                    "TDM_ResetVotableVariables: Preserved variable %s with no default",
+                    var->variable_name);
+        }
+        gi.cvar_forceset(var->variable_name, var->default_string);
         var++;
     }
 
     tdm_settings_not_default = false;
 
-    if (g_gamemode->value == GAMEMODE_ITDM)
-        dmflags = gi.cvar_set ("dmflags", g_itdmflags->string);
-    else if (g_gamemode->value == GAMEMODE_TDM)
-        dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
-    else if (g_gamemode->value == GAMEMODE_1V1)
-        dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
+    if (g_gamemode->value == GAMEMODE_ITDM) {
+        dmflags = gi.cvar_set("dmflags", g_itdmflags->string);
+    } else if (g_gamemode->value == GAMEMODE_TDM) {
+        dmflags = gi.cvar_set("dmflags", g_tdmflags->string);
+    } else if (g_gamemode->value == GAMEMODE_1V1) {
+        dmflags = gi.cvar_set("dmflags", g_1v1flags->string);
+    }
 
-    gi.AddCommandString ("exec defaults.cfg\nsv applysettings\n");
+    gi.AddCommandString("exec defaults.cfg\nsv applysettings\n");
 
-    TDM_ResetLevel ();
-    TDM_UpdateConfigStrings (true);
-}	
+    TDM_ResetLevel();
+    TDM_UpdateConfigStrings(true);
+}
 
-void TDM_ResumeGame (void)
-{
-    if (tdm_match_status != MM_TIMEOUT)
-        TDM_Error ("TDM_ResumeGame called with match state %d", tdm_match_status);
+/**
+ *
+ */
+void TDM_ResumeGame(void) {
+    if (tdm_match_status != MM_TIMEOUT) {
+        TDM_Error("TDM_ResumeGame called with match state %d",
+                tdm_match_status);
+    }
 
-    if (teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0)
-    {
+    if (teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0) {
         TDM_EndMatch();
         return;
     }
 
-    gi.sound (world, 0, gi.soundindex ("world/10_0.wav"), 1, ATTN_NONE, 0);
-    gi.bprintf (PRINT_CHAT, "Game resuming in 10 seconds. Match time remaining: %s\n", TDM_SecsToString(FRAMES_TO_SECS(level.match_end_framenum - level.framenum)));
+    gi.sound(world, 0, gi.soundindex("world/10_0.wav"), 1, ATTN_NONE, 0);
+    gi.bprintf(PRINT_CHAT,
+            "Game resuming in 10 seconds. Match time remaining: %s\n",
+            TDM_SecsToString(
+                    FRAMES_TO_SECS(level.match_end_framenum - level.framenum)));
 
     level.timeout_end_framenum = 0;
     level.match_resume_framenum = level.realframenum + SECS_TO_FRAMES(10.4f);
 }
 
-/*
-==============
-TDM_SetCaptain
-==============
-Set ent to be a captain of team, ent can be NULL to remove captain
-*/
-void TDM_SetCaptain (int team, edict_t *ent)
-{
+/**
+ * Set ent to be a captain of team, ent can be NULL to remove captain
+ */
+void TDM_SetCaptain(int team, edict_t *ent) {
     teaminfo[team].captain = ent;
 
     //no announce in 1v1, but captain is still silently used.
-    if (ent && g_gamemode->value != GAMEMODE_1V1)
-    {
-        gi.bprintf (PRINT_HIGH, "%s became captain of '%s'\n", ent->client->pers.netname, teaminfo[team].name);
+    if (ent && g_gamemode->value != GAMEMODE_1V1) {
+        gi.bprintf(PRINT_HIGH, "%s became captain of '%s'\n",
+                ent->client->pers.netname, teaminfo[team].name);
     }
 }
 
-/*
-==============
-TDM_SetupSounds
-==============
-First time setup of sound paths, caches commonly used client sounds indexes.
-*/
-void TDM_SetupSounds (void)
-{
+/**
+ * First time setup of sound paths, caches commonly used client sounds indexes.
+ */
+void TDM_SetupSounds(void) {
     int i;
     char path[MAX_QPATH];
 
-    strcpy (path, "*");
-
-    for (i = 0; i < SND_MAX; i++)
-    {
-        strcpy (path + 1, soundnames[i]);
-        soundcache[i] = gi.soundindex (path);
+    strcpy(path, "*");
+    for (i = 0; i < SND_MAX; i++) {
+        strcpy(path + 1, soundnames[i]);
+        soundcache[i] = gi.soundindex(path);
     }
 }
 
-/*
-==============
-CountPlayers
-==============
-Count how many players each team has.
-*/
-void CountPlayers (void)
-{
+/**
+ * Count how many players each team has.
+ */
+void CountPlayers(void) {
     edict_t *ent;
     int i;
     int total;
 
-    for (i = 0; i < MAX_TEAMS; i++)
+    for (i = 0; i < MAX_TEAMS; i++) {
         teaminfo[i].players = 0;
-
+    }
     total = 0;
-
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (ent->inuse)
-        {
-            if (!ent->client->pers.mvdclient)
-            {
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (ent->inuse) {
+            if (!ent->client->pers.mvdclient) {
                 teaminfo[ent->client->pers.team].players++;
                 total++;
             }
@@ -2173,441 +2024,393 @@ void CountPlayers (void)
     }
 }
 
-/*
-==============
-UpdateMatchStatus
-==============
-Update match status (end match when whole team leaves i.e.)
-*/
-void UpdateMatchStatus (void)
-{
+/**
+ * Update match status (end match when whole team leaves i.e.)
+ */
+void UpdateMatchStatus(void) {
     int team;
 
     //unlock if a team emptied out
-    for (team = 1; team < MAX_TEAMS; team++)
-        if (teaminfo[team].players == 0)
-        {
+    for (team = 1; team < MAX_TEAMS; team++) {
+        if (teaminfo[team].players == 0) {
             teaminfo[team].locked = false;
             teaminfo[team].speclocked = false;
         }
+    }
 
-    if (tdm_match_status < MM_PLAYING || tdm_match_status == MM_SCOREBOARD)
-        return;
-
-    if (tdm_match_status == MM_TIMEOUT)
-    {
-        if (teaminfo[TEAM_A].players + teaminfo[TEAM_B].players == 0)
-            TDM_EndMatch ();
+    if (tdm_match_status < MM_PLAYING || tdm_match_status == MM_SCOREBOARD) {
         return;
     }
 
-    for (team = 1; team < MAX_TEAMS; team++)
-    {
-        if (teaminfo[team].players < 1)
-        {
-            TDM_EndMatch ();
+    if (tdm_match_status == MM_TIMEOUT) {
+        if (teaminfo[TEAM_A].players + teaminfo[TEAM_B].players == 0) {
+            TDM_EndMatch();
+        }
+        return;
+    }
+
+    for (team = 1; team < MAX_TEAMS; team++) {
+        if (teaminfo[team].players < 1) {
+            TDM_EndMatch();
             break;
         }
     }
 }
 
-/*
-==============
-UpdatePlayerTeamMenu
-==============
-Update the join menu to reflect team names / player counts
-*/
-static char	openTDMBanner[32];
+static char openTDMBanner[32];
 
-void UpdatePlayerTeamMenu (edict_t *ent)
-{
+/**
+ * Update the join menu to reflect team names / player counts
+ */
+void UpdatePlayerTeamMenu(edict_t *ent) {
     void *teamJoinLeaveFunc[MAX_TEAMS];
     unsigned i;
 
-    memcpy (ent->client->pers.joinmenu, joinmenu, sizeof(joinmenu));
-
-    for (i = 0; i < MAX_TEAMS; i++)
-    {
-        if (ent->client->pers.team == i)
-        {
-            sprintf (ent->client->pers.joinmenu_values.string_teamJoinText[i], "*Leave %.20s", teaminfo[i].name);
+    memcpy(ent->client->pers.joinmenu, joinmenu, sizeof(joinmenu));
+    for (i = 0; i < MAX_TEAMS; i++) {
+        if (ent->client->pers.team == i) {
+            sprintf(ent->client->pers.joinmenu_values.string_teamJoinText[i],
+                    "*Leave %.20s", teaminfo[i].name);
             teamJoinLeaveFunc[i] = ToggleChaseCam;
-        }
-        else
-        {
-            sprintf (ent->client->pers.joinmenu_values.string_teamJoinText[i], "*Join %.20s", teaminfo[i].name);
+        } else {
+            sprintf(ent->client->pers.joinmenu_values.string_teamJoinText[i],
+                    "*Join %.20s", teaminfo[i].name);
 
-            if (i == 1)
+            if (i == 1) {
                 teamJoinLeaveFunc[i] = JoinTeam1;
-            else if (i == 2)
+            } else if (i == 2) {
                 teamJoinLeaveFunc[i] = JoinTeam2;
+            }
         }
     }
 
     ent->client->pers.joinmenu[0].text = openTDMBanner;
-
-    ent->client->pers.joinmenu[3].text = ent->client->pers.joinmenu_values.string_teamJoinText[1];
+    ent->client->pers.joinmenu[3].text =
+            ent->client->pers.joinmenu_values.string_teamJoinText[1];
     ent->client->pers.joinmenu[3].SelectFunc = teamJoinLeaveFunc[1];
     ent->client->pers.joinmenu[4].text = teamStatus[1];
-
-    ent->client->pers.joinmenu[6].text = ent->client->pers.joinmenu_values.string_teamJoinText[2];
+    ent->client->pers.joinmenu[6].text =
+            ent->client->pers.joinmenu_values.string_teamJoinText[2];
     ent->client->pers.joinmenu[6].SelectFunc = teamJoinLeaveFunc[2];
     ent->client->pers.joinmenu[7].text = teamStatus[2];
-
     ent->client->pers.joinmenu[10].text = teamStatus[0];
 
     /* we might just update the join/leave message.. no need to update it for the client */
-    if (ent->client->pers.menu.active && ent->client->pers.menu.entries == ent->client->pers.joinmenu)
-    {
-        PMenu_Update (ent);
-        gi.unicast (ent, true);
+    if (ent->client->pers.menu.active
+            && ent->client->pers.menu.entries == ent->client->pers.joinmenu) {
+        PMenu_Update(ent);
+        gi.unicast(ent, true);
     }
 }
 
-/*
-==============
-UpdateTeamMenu
-==============
-Update the join menu for all players
-*/
-void UpdateTeamMenu (void)
-{
+/**
+ * Update the join menu for all players
+ */
+void UpdateTeamMenu(void) {
     unsigned i;
     edict_t *ent;
-    static const char *gameString[] = {
-        "TDM",
-        "ITDM",
-        "1v1"
-    };
+    static const char *gameString[] = { "TDM", "ITDM", "1v1" };
 
-    for (i = 0; i < MAX_TEAMS; i++)
-        sprintf (teamStatus[i], "  (%d player%s)", teaminfo[i].players, teaminfo[i].players == 1 ? "" : "s");
+    for (i = 0; i < MAX_TEAMS; i++) {
+        sprintf(teamStatus[i], "  (%d player%s)", teaminfo[i].players,
+                teaminfo[i].players == 1 ? "" : "s");
+    }
 
-    sprintf (openTDMBanner, "*Quake II - OpenTDM (%s)", gameString[(int)g_gamemode->value]);
+    sprintf(openTDMBanner, "*Quake II - OpenTDM (%s)",
+            gameString[(int) g_gamemode->value]);
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-        if (ent->inuse)
-            UpdatePlayerTeamMenu (ent);
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (ent->inuse) {
+            UpdatePlayerTeamMenu(ent);
+        }
+    }
 }
 
-/*
-==============
-TDM_TeamsChanged
-==============
-The teams have changed in some way, so check everything out
-*/
-void TDM_TeamsChanged (void)
-{
-    CountPlayers ();
-    TDM_UpdateTeamNames ();
-    UpdateTeamMenu ();
-    UpdateMatchStatus ();
+/**
+ * The teams have changed in some way, so check everything out
+ */
+void TDM_TeamsChanged(void) {
+    CountPlayers();
+    TDM_UpdateTeamNames();
+    UpdateTeamMenu();
+    UpdateMatchStatus();
     TDM_CheckSafety();
-    TDM_CheckMatchStart ();
-    TDM_CheckVote ();
+    TDM_CheckMatchStart();
+    TDM_CheckVote();
 }
 
-/*
-==============
-TDM_SetupSpawns
-==============
-Keeps track of spawn points rather than counting/looping each time.
-*/
-void TDM_SetupSpawns (void)
-{
+/**
+ * Keeps track of spawn points rather than counting/looping each time.
+ */
+void TDM_SetupSpawns(void) {
     int count;
     edict_t *spot;
 
     count = 0;
     spot = NULL;
 
-    while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
-    {
+    while ((spot = G_Find(spot, FOFS(classname), "info_player_deathmatch"))
+            != NULL) {
         level.spawns[count] = spot;
         count++;
 
-        if (count > TDM_MAX_MAP_SPAWNPOINTS)
-        {
-            TDM_Error ("TDM_SetupSpawns: too many spawn points");
+        if (count > TDM_MAX_MAP_SPAWNPOINTS) {
+            TDM_Error("TDM_SetupSpawns: too many spawn points");
             break;
         }
     }
 
     level.numspawns = count;
-    gi.dprintf ("Map has %d spawn points.\n", level.numspawns);
+    gi.dprintf("Map has %d spawn points.\n", level.numspawns);
 }
 
-/*
-==============
-TDM_CheckMap_FileExists
-==============
-Check map name.
-Not used since we don't check if file exists.
-*/
-qboolean TDM_CheckMapExists (const char *mapname)
-{
+/**
+ * Check map name.
+ * Not used since we don't check if file exists.
+ */
+qboolean TDM_CheckMapExists(const char *mapname) {
     cvar_t *gamedir;    // our mod dir
     cvar_t *basedir;    // our root dir
     FILE *mf;
     char buffer[MAX_QPATH + 1];
 
-    gamedir = gi.cvar ("gamedir", NULL, 0);   // created by engine, we need to expose it for mod
-    basedir = gi.cvar ("basedir", NULL, 0);   // created by engine, we need to expose it for mod
+    gamedir = gi.cvar("gamedir", NULL, 0); // created by engine, we need to expose it for mod
+    basedir = gi.cvar("basedir", NULL, 0); // created by engine, we need to expose it for mod
 
-    buffer[sizeof(buffer)-1] = '\0';
+    buffer[sizeof(buffer) - 1] = '\0';
 
-    if (basedir)
-    {
+    if (basedir) {
         // check basedir
-        snprintf (buffer, sizeof(buffer)-1, "%s/baseq2/maps/%s.bsp", basedir->string, mapname);
+        snprintf(buffer, sizeof(buffer) - 1, "%s/baseq2/maps/%s.bsp",
+                basedir->string, mapname);
 
-        mf = fopen (buffer, "r");
-        if (mf != NULL)
-        {
-            fclose (mf);
+        mf = fopen(buffer, "r");
+        if (mf != NULL) {
+            fclose(mf);
             return true;
         }
     }
 
-    if (gamedir)
-    {
+    if (gamedir) {
         // check gamedir
-        snprintf (buffer, sizeof(buffer)-1, "%s/maps/%s.bsp", gamedir->string, mapname);
-        mf = fopen (buffer, "r");
-        if (mf == NULL)
+        snprintf(buffer, sizeof(buffer) - 1, "%s/maps/%s.bsp", gamedir->string,
+                mapname);
+        mf = fopen(buffer, "r");
+        if (mf == NULL) {
             return false;
-        else
-        {
-            fclose (mf);
+        } else {
+            fclose(mf);
             return true;
         }
     }
-
     return false;
 }
 
-/*
-==============
-TDM_WriteMaplist
-==============
-Prints the maplist to the client.
-*/
-void TDM_WriteMaplist (edict_t *ent)
-{
+/**
+ * Prints the maplist to the client.
+ */
+void TDM_WriteMaplist(edict_t *ent) {
     int i, j;
     static char maplist_string[1024];
     static qboolean short_maplist = false;
 
     // maplist fits the string, so no need to create new maplist again
-    if (short_maplist)
-        gi.cprintf (ent, PRINT_HIGH, "%s", maplist_string);
-    else
-    {
+    if (short_maplist) {
+        gi.cprintf(ent, PRINT_HIGH, "%s", maplist_string);
+    } else {
         short_maplist = true;
 
         maplist_string[0] = 0;
-        j = sprintf (maplist_string, "Allowed maplist:\n----------------\n");
+        j = sprintf(maplist_string, "Allowed maplist:\n----------------\n");
 
-        for (i = 0; tdm_maplist[i] != NULL; i++)
-        {
-            if (strlen(tdm_maplist[i]) + 4 + j >= sizeof(maplist_string) - 1)
-            {
+        for (i = 0; tdm_maplist[i] != NULL; i++) {
+            if (strlen(tdm_maplist[i]) + 4 + j >= sizeof(maplist_string) - 1) {
                 j = 0;
                 short_maplist = false;
-                gi.cprintf (ent, PRINT_HIGH, "%s", maplist_string);
+                gi.cprintf(ent, PRINT_HIGH, "%s", maplist_string);
                 maplist_string[j] = 0;
             }
-            j += sprintf (maplist_string + j, "  %s\n", tdm_maplist[i]);
+            j += sprintf(maplist_string + j, "  %s\n", tdm_maplist[i]);
         }
-
-        gi.cprintf (ent, PRINT_HIGH, "%s", maplist_string);
+        gi.cprintf(ent, PRINT_HIGH, "%s", maplist_string);
     }
 }
 
-/*
-==============
-TDM_CreateMaplist
-==============
-Return array of allowed maps in maplist.
-*/
-void TDM_CreateMaplist (void)
-{
-    qboolean    start = true;
-    int         len;
-    int         entries_num = 100;
-    cvar_t      *gamedir;
-    int         i = 0, j = 0;
-    FILE        *maplst;
-    char        buffer[MAX_QPATH + 1];
-    char        *entry;
+/**
+ * Return array of allowed maps in maplist.
+ */
+void TDM_CreateMaplist(void) {
+    qboolean start = true;
+    int len;
+    int entries_num = 100;
+    cvar_t *gamedir;
+    int i = 0, j = 0;
+    FILE *maplst;
+    char buffer[MAX_QPATH + 1];
+    char *entry;
 
-    if (tdm_maplist)
-    {
-        gi.TagFree (tdm_maplist);
+    if (tdm_maplist) {
+        gi.TagFree(tdm_maplist);
         tdm_maplist = NULL;
     }
 
     // maplist is not in use
-    if (!g_maplistfile || !g_maplistfile->string[0])
+    if (!g_maplistfile || !g_maplistfile->string[0]) {
         return;
+    }
 
     // created by engine, we need to expose it for mod
-    gamedir = gi.cvar ("gamedir", NULL, 0);
+    gamedir = gi.cvar("gamedir", NULL, 0);
 
     // Make sure we can find the game directory.
-    if (!gamedir || !gamedir->string[0])
+    if (!gamedir || !gamedir->string[0]) {
         return;
+    }
 
-    buffer[sizeof(buffer)-1] = '\0';
+    buffer[sizeof(buffer) - 1] = '\0';
 
-    snprintf (buffer, sizeof(buffer)-1, "./%s/%s", gamedir->string, g_maplistfile->string);
-    maplst = fopen (buffer, "r");
-    if (maplst == NULL)
+    snprintf(buffer, sizeof(buffer) - 1, "./%s/%s", gamedir->string,
+            g_maplistfile->string);
+    maplst = fopen(buffer, "r");
+    if (maplst == NULL) {
         return;
+    }
 
-    tdm_maplist = gi.TagMalloc (sizeof(char *) * entries_num, TAG_GAME);
+    tdm_maplist = gi.TagMalloc(sizeof(char*) * entries_num, TAG_GAME);
 
-    for (;;)
-    {
-        entry = fgets (buffer, sizeof (buffer), maplst);
+    for (;;) {
+        entry = fgets(buffer, sizeof(buffer), maplst);
 
-        if (entry == NULL)
+        if (entry == NULL) {
             break;
+        }
 
-        len = strlen (buffer);
+        len = strlen(buffer);
 
         // cut only first column from the line
-        for (i = 0; i < len; i++)
-        {
-            if (buffer[i] == ' ' || (!isalnum (buffer[i]) && buffer[i] != '_' && buffer[i] != '-'))
-            {
+        for (i = 0; i < len; i++) {
+            if (buffer[i] == ' '
+                    || (!isalnum(buffer[i]) && buffer[i] != '_'
+                            && buffer[i] != '-')) {
                 buffer[i] = '\0';
 
                 if (start)
                     entry++;
-            }
-            else
+            } else {
                 start = false;
+            }
         }
 
-        if (!entry[0])
+        if (!entry[0]) {
             continue;
+        }
 
-        tdm_maplist[j] = gi.TagMalloc (strlen(entry) + 1, TAG_GAME);
-        strcpy (tdm_maplist[j], entry);
+        tdm_maplist[j] = gi.TagMalloc(strlen(entry) + 1, TAG_GAME);
+        strcpy(tdm_maplist[j], entry);
         j++;
 
         // realloc
-        if (j % entries_num == 0)
-        {
-            char	**tmp;
+        if (j % entries_num == 0) {
+            char **tmp;
 
-            tmp = gi.TagMalloc (sizeof(char *) * (j + entries_num), TAG_GAME);
-            memcpy (tmp, tdm_maplist, j * sizeof(char *));
+            tmp = gi.TagMalloc(sizeof(char*) * (j + entries_num), TAG_GAME);
+            memcpy(tmp, tdm_maplist, j * sizeof(char*));
 
-            gi.TagFree (tdm_maplist);
+            gi.TagFree(tdm_maplist);
             tdm_maplist = tmp;
         }
     }
 
     // close the maplist
-    if (maplst != NULL)
-        fclose (maplst);
+    if (maplst != NULL) {
+        fclose(maplst);
+    }
 
-    if (j)
+    if (j) {
         // set NULL so we know where is the end
         tdm_maplist[j] = NULL;
-    else
-    {
-        gi.TagFree (tdm_maplist);
+    } else {
+        gi.TagFree(tdm_maplist);
         tdm_maplist = NULL;
     }
 }
 
-/*
-==============
-TDM_CheckMap
-==============
-Check map name.
-Modified code from QwazyWabbit. http://www.clanwos.org/forums/viewtopic.php?t=3983
-*/
-qboolean TDM_Checkmap (edict_t *ent, const char *mapname)
-{
+/**
+ * Check map name.
+ */
+qboolean TDM_Checkmap(edict_t *ent, const char *mapname) {
     int i;
     size_t len;
 
-    len = strlen (mapname);
-
-    if (len >= MAX_QPATH - 1)
-    {
-        gi.cprintf (ent, PRINT_HIGH, "Invalid map name.\n");
+    len = strlen(mapname);
+    if (len >= MAX_QPATH - 1) {
+        gi.cprintf(ent, PRINT_HIGH, "Invalid map name.\n");
         return false;
     }
 
-    for (i = 0; i < len; i++)
-    {
-        if (!isalnum (mapname[i]) && mapname[i] != '_' && mapname[i] != '-')
-        {
-            gi.cprintf (ent, PRINT_HIGH, "Invalid map name.\n");
+    for (i = 0; i < len; i++) {
+        if (!isalnum(mapname[i]) && mapname[i] != '_' && mapname[i] != '-') {
+            gi.cprintf(ent, PRINT_HIGH, "Invalid map name.\n");
             return false;
         }
     }
 
     // allow map on maplist failure
-    if (tdm_maplist == NULL)
+    if (tdm_maplist == NULL) {
         return true;
-
-    for (i = 0; tdm_maplist[i] != NULL; i++)
-    {
-        if (!Q_stricmp (tdm_maplist[i], mapname) /* && TDM_CheckMapExists (buffer)) */)
-            return true;
     }
 
-    gi.cprintf (ent, PRINT_HIGH, "Map '%s' was not found\n", mapname);
+    for (i = 0; tdm_maplist[i] != NULL; i++) {
+        if (!Q_stricmp(tdm_maplist[i],
+                mapname) /* && TDM_CheckMapExists (buffer)) */) {
+            return true;
+        }
+    }
+    gi.cprintf(ent, PRINT_HIGH, "Map '%s' was not found\n", mapname);
     return false;
 }
 
-/*
-==============
-TDM_MapChanged
-==============
-Called when a new level is about to begin.
-*/
-void TDM_MapChanged (void)
-{
+/**
+ * Called when a new level is about to begin.
+ */
+void TDM_MapChanged(void) {
     //check console didn't try to set gamemode to invalid value
-    if (g_gamemode->value > 2 || g_gamemode->value < 0)
-        gi.error ("g_gamemode: invalid value");
+    if (g_gamemode->value > 2 || g_gamemode->value < 0) {
+        gi.error("g_gamemode: invalid value");
+    }
 
     //check for common config error
-    if (timelimit->value)
-        gi.dprintf ("WARNING: The cvar 'timelimit' is no longer used. Did you intend to set g_match_time?\n");
+    if (timelimit->value) {
+        gi.dprintf(
+                "WARNING: The cvar 'timelimit' is no longer used. Did you intend to set g_match_time?\n");
+    }
 
     //cancel any vote if the map was changed by admin
-    TDM_RemoveVote ();
-    TDM_ResetGameState ();
-    TDM_SetSkins ();
-    TDM_SetupSounds ();
-    TDM_UpdateConfigStrings (true);
-    TDM_SetupSpawns ();
+    TDM_RemoveVote();
+    TDM_ResetGameState();
+    TDM_SetSkins();
+    TDM_SetupSounds();
+    TDM_UpdateConfigStrings(true);
+    TDM_SetupSpawns();
 }
 
 /**
  * Start recording a multi-view demo (q2pro server only)
  */
-void TDM_RecordMVD(void)
-{
+void TDM_RecordMVD(void) {
     if (game.mvd.recording) {
         return;
     }
 
     if (MVD_CAPABLE && g_record_mvd->value && !game.mvd.recording) {
-        Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(), sizeof(game.mvd.filename)-1);
-        Q_strncpy(game.mvd.tempname, game.mvd.filename, sizeof(game.mvd.tempname)-1);
+        Q_strncpy(game.mvd.filename, TDM_MakeServerDemoName(),
+                sizeof(game.mvd.filename) - 1);
+        Q_strncpy(game.mvd.tempname, game.mvd.filename,
+                sizeof(game.mvd.tempname) - 1);
         game.mvd.tempname[0] = '_';
 
         // compress demo on the fly if instructed to
-        if ((int)g_record_mvd->value == 2) {
+        if ((int) g_record_mvd->value == 2) {
             game.mvd.compressed = true;
             gi.AddCommandString(va("mvdrecord -z %s\n", game.mvd.tempname));
         } else {
@@ -2622,8 +2425,7 @@ void TDM_RecordMVD(void)
 /**
  * Stop recording a multi-view demo
  */
-void TDM_StopMVD(void)
-{
+void TDM_StopMVD(void) {
     cvar_t *mod;
     char *cur;
     char *final;
@@ -2634,23 +2436,21 @@ void TDM_StopMVD(void)
     }
 
     d = &game.mvd;
-
     gi.cprintf(NULL, PRINT_HIGH, "Stopping MVD\n");
     gi.AddCommandString("mvdstop\n");
-
     mod = gi.cvar("game", "baseq2", 0);
-    cur = va("%s/demos/%s.mvd2%s", mod->string, d->tempname, (d->compressed) ? ".gz":"");
-    final = va("%s/demos/%s.mvd2%s", mod->string, d->filename, (d->compressed) ? ".gz":"");
+    cur = va("%s/demos/%s.mvd2%s", mod->string, d->tempname,
+            (d->compressed) ? ".gz" : "");
+    final = va("%s/demos/%s.mvd2%s", mod->string, d->filename,
+            (d->compressed) ? ".gz" : "");
     rename(cur, final);
-
     memset(&game.mvd, 0x0, sizeof(server_demo_t));
 }
 
 /**
  * Unlink a server demo
  */
-void TDM_DeleteMVD(char *name)
-{
+void TDM_DeleteMVD(char *name) {
     server_demo_t *d = &game.mvd;
     char *fullname;
 
@@ -2659,14 +2459,10 @@ void TDM_DeleteMVD(char *name)
     gi.cprintf(NULL, PRINT_HIGH, "Deleted MVD %s\n", fullname);
 }
 
-/*
-==============
-TDM_ResetGameState
-==============
-Reset the game state after a match has completed or a map / mode change.
-*/
-void TDM_ResetGameState (void)
-{
+/**
+ * Reset the game state after a match has completed or a map / mode change.
+ */
+void TDM_ResetGameState(void) {
     edict_t *ent;
 
     level.tdm_pseudo_1v1mode = false;
@@ -2674,8 +2470,8 @@ void TDM_ResetGameState (void)
     level.warmup_start_framenum = level.framenum;
 
     tdm_match_status = MM_WARMUP;
-    TDM_ResetLevel ();
-    TDM_SetFrameTime ();
+    TDM_ResetLevel();
+    TDM_SetFrameTime();
 
     //don't memset, since we have info we do actually want to preserve
     teaminfo[TEAM_A].score = teaminfo[TEAM_B].score = 0;
@@ -2684,38 +2480,30 @@ void TDM_ResetGameState (void)
     teaminfo[TEAM_A].ready = teaminfo[TEAM_B].ready = false;
 
     //preserve captains as per bug #0000001
-    if (!g_auto_rejoin_match->value)
+    if (!g_auto_rejoin_match->value) {
         teaminfo[TEAM_A].captain = teaminfo[TEAM_B].captain = NULL;
+    }
 
-    TDM_UpdateTeamNames ();
+    TDM_UpdateTeamNames();
 
     //note, this block of code only runs on a reset from the same map. a map change
     //will have every client ->inuse false until they are reconnected.
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (ent->inuse)
-        {
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (ent->inuse) {
             ent->client->resp.last_command_frame = 0;
             ent->client->resp.last_invited_by = NULL;
             ent->client->resp.score = 0;
             ent->client->resp.teamplayerinfo = NULL;
             ent->client->resp.ready = false;
-
             ent->client->showmotd = false;
             ent->client->showscores = false;
             ent->client->showoldscores = false;
-
             ent->viewheight = 0;
             ent->health = 0;
-
-            if (ent->client->pers.team != TEAM_SPEC && g_auto_rejoin_match->value)
-            {
-                //preserve teams as per bug #0000001
-                //ent->client->pers.team = TEAM_SPEC;
-                JoinedTeam (ent, false, false);
-            }
-            else
-            {
+            if (ent->client->pers.team != TEAM_SPEC
+                    && g_auto_rejoin_match->value) {
+                JoinedTeam(ent, false, false);
+            } else {
                 ent->client->pers.team = TEAM_SPEC;
                 respawn(ent);
             }
@@ -2723,82 +2511,65 @@ void TDM_ResetGameState (void)
     }
 
     //run these functions only after we've moved everyone to spec mode
-    CountPlayers ();
-    UpdateTeamMenu ();
+    CountPlayers();
+    UpdateTeamMenu();
 
     //show menu for players in spec
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (ent->inuse && !ent->client->pers.team)
-            TDM_ShowTeamMenu (ent);
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (ent->inuse && !ent->client->pers.team) {
+            TDM_ShowTeamMenu(ent);
+        }
     }
 
     //re-resolve otdm server in case of DNS change
-    HTTP_ResolveOTDMServer ();
+    HTTP_ResolveOTDMServer();
 }
 
-/*
-==============
-TDM_Init
-==============
-Single time initialization stuff.
-*/
-void TDM_Init (void)
-{
+/**
+ * Single time initialization stuff.
+ */
+void TDM_Init(void) {
     cvar_t *var;
 
-    HTTP_Init ();
+    HTTP_Init();
 
-    var = gi.cvar ("game", NULL, 0);
-    if (!var)
-        gi.error ("Couldn't determine game directory");
+    var = gi.cvar("game", NULL, 0);
+    if (!var) {
+        gi.error("Couldn't determine game directory");
+    }
 
-    Q_strncpy (game.gamedir, var->string, sizeof(game.gamedir)-1);
+    Q_strncpy(game.gamedir, var->string, sizeof(game.gamedir) - 1);
 
     //ensure R1Q2 entflags are available since we use them for all projectiles
-    var = gi.cvar ("sv_new_entflags", NULL, 0);
-    if (!var)
-    {
+    var = gi.cvar("sv_new_entflags", NULL, 0);
+    if (!var) {
         //if sv_features is set, server is assumed to be running Q2PRO
-        if (!game.server_features)
-        {
+        if (!game.server_features) {
             //super cheesy notice!
-            /*
-            gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-            gi.dprintf ("               W A R N I N G !\n");
-            gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-            gi.dprintf ("\n");
-            gi.dprintf ("  OpenTDM is designed to use some of the new\n");
-            gi.dprintf ("  features in R1Q2. Your server does not\n");
-            gi.dprintf ("  appear to be running R1Q2, or is out of\n");
-            gi.dprintf ("  date. Some features may not work correctly.\n");
-            gi.dprintf ("\n");
-            gi.dprintf ("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-            */
         }
-    }
-    else
-    {
-        gi.cvar_set ("sv_new_entflags", "1");
+    } else {
+        gi.cvar_set("sv_new_entflags", "1");
     }
 
-    TDM_SetFrameTime ();
+    TDM_SetFrameTime();
 
-    strcpy (teaminfo[0].name, "Spectators");
-    strcpy (teaminfo[0].skin, "male/grunt");
+    strcpy(teaminfo[0].name, "Spectators");
+    strcpy(teaminfo[0].skin, "male/grunt");
 
     //this is used as index in some arrays, must be valid!
-    if (g_gamemode->value > 2 || g_gamemode->value < 0)
-        gi.error ("g_gamemode: invalid value");
+    if (g_gamemode->value > 2 || g_gamemode->value < 0) {
+        gi.error("g_gamemode: invalid value");
+    }
 
-    TDM_SaveDefaultCvars ();
+    TDM_SaveDefaultCvars();
 
-    if (g_gamemode->value == GAMEMODE_ITDM)
-        dmflags = gi.cvar_set ("dmflags", g_itdmflags->string);
-    else if (g_gamemode->value == GAMEMODE_TDM)
-        dmflags = gi.cvar_set ("dmflags", g_tdmflags->string);
-    else if (g_gamemode->value == GAMEMODE_1V1)
-        dmflags = gi.cvar_set ("dmflags", g_1v1flags->string);
+    if (g_gamemode->value == GAMEMODE_ITDM) {
+        dmflags = gi.cvar_set("dmflags", g_itdmflags->string);
+    } else if (g_gamemode->value == GAMEMODE_TDM) {
+        dmflags = gi.cvar_set("dmflags", g_tdmflags->string);
+    } else if (g_gamemode->value == GAMEMODE_1V1) {
+        dmflags = gi.cvar_set("dmflags", g_1v1flags->string);
+    }
 
 #ifdef OPENTDM_REVISION
     //show opentdm version to browsers
@@ -2806,415 +2577,395 @@ void TDM_Init (void)
     gi.cvar_forceset ("revision", va("%d", OPENTDM_REVISION));
 #endif
 
-    TDM_ResetGameState ();
-
-    TDM_CreateMaplist ();
-    TDM_CreateConfiglist ();
+    TDM_ResetGameState();
+    TDM_CreateMaplist();
+    TDM_CreateConfiglist();
 }
 
-/*
-==============
-TDM_SetTeamSkins
-==============
-Setup teamskin/enemyskin configstrings.
-*/
-void TDM_SetTeamSkins (edict_t *cl, edict_t *target_to_set_skins_for)
-{
+/**
+ * Setup teamskin/enemyskin configstrings.
+ */
+void TDM_SetTeamSkins(edict_t *cl, edict_t *target_to_set_skins_for) {
     edict_t *ent;
     const char *teamskin, *enemyskin;
 
     //not using teamskins
-    if (!cl->client->pers.config.teamskin[0] && !cl->client->pers.config.enemyskin[0])
+    if (!cl->client->pers.config.teamskin[0]
+            && !cl->client->pers.config.enemyskin[0]) {
         return;
+    }
 
     teamskin = cl->client->pers.config.teamskin;
     enemyskin = cl->client->pers.config.enemyskin;
 
-    if (!enemyskin[0])
-    {
+    if (!enemyskin[0]) {
         //don't care about enemyskin
-        if (!strcmp (teamskin, g_team_a_skin->string))
+        if (!strcmp(teamskin, g_team_a_skin->string)) {
             enemyskin = g_team_b_skin->string;
-        else
+        } else {
             enemyskin = g_team_a_skin->string;
-    }
-    else if (!teamskin[0])
-    {
+        }
+    } else if (!teamskin[0]) {
         //don't care about teamskin
-        if (!strcmp (enemyskin, g_team_a_skin->string))
+        if (!strcmp(enemyskin, g_team_a_skin->string)) {
             teamskin = g_team_b_skin->string;
-        else
+        } else {
             teamskin = g_team_a_skin->string;
+        }
     }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (target_to_set_skins_for && ent != target_to_set_skins_for)
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (target_to_set_skins_for && ent != target_to_set_skins_for) {
             continue;
+        }
 
-        if (!ent->inuse)
+        if (!ent->inuse) {
             continue;
+        }
 
-        if (ent->client->pers.team)
-        {
-            gi.WriteByte (SVC_CONFIGSTRING);
-            gi.WriteShort (CS_PLAYERSKINS + (ent - g_edicts) -1);
+        if (ent->client->pers.team) {
+            gi.WriteByte(SVC_CONFIGSTRING);
+            gi.WriteShort(CS_PLAYERSKINS + (ent - g_edicts) - 1);
 
             //spectators get team A as teamskin, team B as enemyskin
-            if (ent->client->pers.team == cl->client->pers.team ||
-                (cl->client->pers.team == TEAM_SPEC && ent->client->pers.team == TEAM_A))
-                gi.WriteString (va ("%s\\%s", ent->client->pers.netname, teamskin));
-            else
-                gi.WriteString (va ("%s\\%s", ent->client->pers.netname, enemyskin));
-
-            gi.unicast (cl, true);
-
-            //gi.dprintf ("TS DEBUG: Setting skin of %s for %s.\n", ent->client->pers.netname, cl->client->pers.netname);
+            if (ent->client->pers.team == cl->client->pers.team
+                    || (cl->client->pers.team == TEAM_SPEC
+                            && ent->client->pers.team == TEAM_A)) {
+                gi.WriteString(
+                        va("%s\\%s", ent->client->pers.netname, teamskin));
+            } else {
+                gi.WriteString(
+                        va("%s\\%s", ent->client->pers.netname, enemyskin));
+            }
+            gi.unicast(cl, true);
         }
     }
 }
 
-void TDM_SetAllTeamSkins (edict_t *target_to_set_skins_for)
-{
+/**
+ *
+ */
+void TDM_SetAllTeamSkins(edict_t *target_to_set_skins_for) {
     edict_t *ent;
 
     //now reset anyone who had teamskin/enemyskin set. ew.
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (!ent->inuse)
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
             continue;
-
-        TDM_SetTeamSkins (ent, target_to_set_skins_for);
+        }
+        TDM_SetTeamSkins(ent, target_to_set_skins_for);
     }
 }
 
-/*
-==============
-TDM_SetSkins
-==============
-Setup skin configstrings.
-*/
-void TDM_SetSkins (void)
-{
+/**
+ * Setup skin configstrings.
+ */
+void TDM_SetSkins(void) {
     edict_t *ent;
     const char *newskin, *oldskin;
     unsigned i;
 
-    for (i = TEAM_A; i <= TEAM_B; i++)
-    {
+    for (i = TEAM_A; i <= TEAM_B; i++) {
         oldskin = teaminfo[i].skin;
 
-        if (i == TEAM_A)
-        {
+        if (i == TEAM_A) {
             //index = CS_TDM_TEAM_A_PIC;
             newskin = g_team_a_skin->string;
-        }
-        else
-        {
+        } else {
             //index = CS_TDM_TEAM_B_PIC;
             newskin = g_team_b_skin->string;
         }
 
-        if (!strcmp (oldskin, newskin))
+        if (!strcmp(oldskin, newskin)) {
             continue;
+        }
 
-        Q_strncpy (teaminfo[i].skin, newskin, sizeof(teaminfo[i].skin)-1);
+        Q_strncpy(teaminfo[i].skin, newskin, sizeof(teaminfo[i].skin) - 1);
 
-        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-        {
-            if (!ent->inuse)
+        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+            if (!ent->inuse) {
                 continue;
+            }
 
-            if (ent->client->pers.team == i)
-            {
-                gi.configstring (CS_PLAYERSKINS + (ent - g_edicts) - 1, va("%s\\%s", ent->client->pers.netname, teaminfo[i].skin));
+            if (ent->client->pers.team == i) {
+                gi.configstring(CS_PLAYERSKINS + (ent - g_edicts) - 1,
+                        va("%s\\%s", ent->client->pers.netname,
+                                teaminfo[i].skin));
             }
         }
     }
-
-    TDM_SetAllTeamSkins (NULL);
+    TDM_SetAllTeamSkins(NULL);
 }
 
-/*
-==============
-TDM_SecsToString
-==============
-Convert secs to mm:ss string.
-*/
-const char *TDM_SecsToString (int seconds)
-{
+/**
+ * Convert secs to mm:ss string.
+ */
+const char* TDM_SecsToString(int seconds) {
     static char time_buffer[32];
     int mins;
 
     mins = seconds / 60;
     seconds -= (mins * 60);
-
-    sprintf (time_buffer, "%d:%.2d", mins, seconds);
-
+    sprintf(time_buffer, "%d:%.2d", mins, seconds);
     return time_buffer;
 }
 
-/*
-==============
-TDM_UpdateConfigStrings
-==============
-Check any cvar and other changes and update relevant configstrings
-*/
-void TDM_UpdateConfigStrings (qboolean forceUpdate)
-{
-    static int          last_timeout_remaining = -1;
-    static int          last_time_remaining = -1;
-    static int          last_scores[MAX_TEAMS] = {-9999, -9999, -9999};
-    static qboolean     last_ready_status[MAX_TEAMS] = {false, false, false};
-    static matchmode_t  last_mode = MM_INVALID;
-    int                 time_remaining;
-    int                 timeout_remaining;
-    qboolean            need_serverinfo_update;
+/**
+ * Check any cvar and other changes and update relevant configstrings
+ */
+void TDM_UpdateConfigStrings(qboolean forceUpdate) {
+    static int last_timeout_remaining = -1;
+    static int last_time_remaining = -1;
+    static int last_scores[MAX_TEAMS] = { -9999, -9999, -9999 };
+    static qboolean last_ready_status[MAX_TEAMS] = { false, false, false };
+    static matchmode_t last_mode = MM_INVALID;
+    int time_remaining;
+    int timeout_remaining;
+    qboolean need_serverinfo_update;
 
     need_serverinfo_update = false;
 
-    if (g_team_a_name->modified || forceUpdate)
-    {
+    if (g_team_a_name->modified || forceUpdate) {
         g_team_a_name->modified = false;
-        sprintf (teaminfo[TEAM_A].statname, "%31s", teaminfo[TEAM_A].name);
-        gi.configstring (CS_TDM_TEAM_A_NAME, teaminfo[TEAM_A].statname);
+        sprintf(teaminfo[TEAM_A].statname, "%31s", teaminfo[TEAM_A].name);
+        gi.configstring(CS_TDM_TEAM_A_NAME, teaminfo[TEAM_A].statname);
     }
 
-    if (g_team_b_name->modified || forceUpdate)
-    {
+    if (g_team_b_name->modified || forceUpdate) {
         g_team_b_name->modified = false;
-        sprintf (teaminfo[TEAM_B].statname, "%31s", teaminfo[TEAM_B].name);
-        gi.configstring (CS_TDM_TEAM_B_NAME, teaminfo[TEAM_B].statname);
+        sprintf(teaminfo[TEAM_B].statname, "%31s", teaminfo[TEAM_B].name);
+        gi.configstring(CS_TDM_TEAM_B_NAME, teaminfo[TEAM_B].statname);
     }
 
-    if (g_team_a_skin->modified || g_team_b_skin->modified || forceUpdate)
-    {
+    if (g_team_a_skin->modified || g_team_b_skin->modified || forceUpdate) {
         g_team_a_skin->modified = g_team_b_skin->modified = false;
-        TDM_SetSkins ();
+        TDM_SetSkins();
     }
 
-    if (tdm_match_status != last_mode || forceUpdate ||
-        last_ready_status[TEAM_A] != teaminfo[TEAM_A].ready ||
-        last_ready_status[TEAM_B] != teaminfo[TEAM_B].ready)
-    {
+    if (tdm_match_status != last_mode || forceUpdate
+            || last_ready_status[TEAM_A] != teaminfo[TEAM_A].ready
+            || last_ready_status[TEAM_B] != teaminfo[TEAM_B].ready) {
         last_mode = tdm_match_status;
 
-        switch (tdm_match_status)
-        {
-            //force scores to update
-            case MM_PLAYING:
-                gi.configstring (CS_TDM_GAME_STATUS, "Match");
-                last_scores[TEAM_A] = last_scores[TEAM_B] = -9999;
-                break;
+        switch (tdm_match_status) {
+        //force scores to update
+        case MM_PLAYING:
+            gi.configstring(CS_TDM_GAME_STATUS, "Match");
+            last_scores[TEAM_A] = last_scores[TEAM_B] = -9999;
+            break;
 
             //note, we shouldn't need to do anything when we are mm_countdown, but fall through just to be safe
-            case MM_COUNTDOWN:
-                gi.configstring (CS_TDM_GAME_STATUS, "Countdown");
-            case MM_WARMUP:
-                if (tdm_match_status == MM_WARMUP)
-                    gi.configstring (CS_TDM_GAME_STATUS, "Warmup");
+        case MM_COUNTDOWN:
+            gi.configstring(CS_TDM_GAME_STATUS, "Countdown");
+        case MM_WARMUP:
+            if (tdm_match_status == MM_WARMUP) {
+                gi.configstring(CS_TDM_GAME_STATUS, "Warmup");
+            }
 
-                if (teaminfo[TEAM_A].ready != last_ready_status[TEAM_A] || forceUpdate)
-                {
-                    last_ready_status[TEAM_A] = teaminfo[TEAM_A].ready;
+            if (teaminfo[TEAM_A].ready != last_ready_status[TEAM_A]
+                    || forceUpdate) {
+                last_ready_status[TEAM_A] = teaminfo[TEAM_A].ready;
 
-                    if (teaminfo[TEAM_A].ready)
-                        sprintf (teaminfo[TEAM_A].statstatus, "%15s", "READY");
-                    else
-                        sprintf (teaminfo[TEAM_A].statstatus, "%15s", "WARMUP");
-
-                    gi.configstring (CS_TDM_TEAM_A_STATUS, teaminfo[TEAM_A].statstatus);
+                if (teaminfo[TEAM_A].ready) {
+                    sprintf(teaminfo[TEAM_A].statstatus, "%15s", "READY");
+                } else {
+                    sprintf(teaminfo[TEAM_A].statstatus, "%15s", "WARMUP");
                 }
 
-                if (teaminfo[TEAM_B].ready != last_ready_status[TEAM_B] || forceUpdate)
-                {
-                    last_ready_status[TEAM_B] = teaminfo[TEAM_B].ready;
+                gi.configstring(CS_TDM_TEAM_A_STATUS,
+                        teaminfo[TEAM_A].statstatus);
+            }
 
-                    if (teaminfo[TEAM_B].ready)
-                        sprintf (teaminfo[TEAM_B].statstatus, "%15s", "READY");
-                    else
-                        sprintf (teaminfo[TEAM_B].statstatus, "%15s", "WARMUP");
+            if (teaminfo[TEAM_B].ready != last_ready_status[TEAM_B]
+                    || forceUpdate) {
+                last_ready_status[TEAM_B] = teaminfo[TEAM_B].ready;
 
-                    gi.configstring (CS_TDM_TEAM_B_STATUS, teaminfo[TEAM_B].statstatus);
+                if (teaminfo[TEAM_B].ready) {
+                    sprintf(teaminfo[TEAM_B].statstatus, "%15s", "READY");
+                } else {
+                    sprintf(teaminfo[TEAM_B].statstatus, "%15s", "WARMUP");
                 }
-                break;
 
-            case MM_SUDDEN_DEATH:
-                gi.configstring (CS_TDM_TIMELIMIT_STRING, "Sudden Death");
-                break;
+                gi.configstring(CS_TDM_TEAM_B_STATUS,
+                        teaminfo[TEAM_B].statstatus);
+            }
+            break;
 
-            case MM_OVERTIME:
-                gi.configstring (CS_TDM_GAME_STATUS, "Overtime");
-                break;
+        case MM_SUDDEN_DEATH:
+            gi.configstring(CS_TDM_TIMELIMIT_STRING, "Sudden Death");
+            break;
 
-            case MM_SCOREBOARD:
-                gi.configstring (CS_TDM_GAME_STATUS, "Match End");
-                break;
+        case MM_OVERTIME:
+            gi.configstring(CS_TDM_GAME_STATUS, "Overtime");
+            break;
 
-            default:
-                gi.configstring (CS_TDM_GAME_STATUS, "Match");
-                //nothing to do!
-                break;
+        case MM_SCOREBOARD:
+            gi.configstring(CS_TDM_GAME_STATUS, "Match End");
+            break;
+
+        default:
+            gi.configstring(CS_TDM_GAME_STATUS, "Match");
+            //nothing to do!
+            break;
         }
     }
 
-    if (tdm_match_status >= MM_PLAYING)
-    {
+    if (tdm_match_status >= MM_PLAYING) {
         int i;
 
-        for (i = TEAM_A; i <= TEAM_B; i++)
-        {
-            if (last_scores[i] != teaminfo[i].score || forceUpdate)
-            {
+        for (i = TEAM_A; i <= TEAM_B; i++) {
+            if (last_scores[i] != teaminfo[i].score || forceUpdate) {
                 last_scores[i] = teaminfo[i].score;
-                sprintf (teaminfo[i].statstatus, "%15d", teaminfo[i].score);
-                gi.configstring (CS_TDM_TEAM_A_STATUS + (i - TEAM_A), teaminfo[i].statstatus);
+                sprintf(teaminfo[i].statstatus, "%15d", teaminfo[i].score);
+                gi.configstring(CS_TDM_TEAM_A_STATUS + (i - TEAM_A),
+                        teaminfo[i].statstatus);
                 need_serverinfo_update = true;
             }
         }
     }
 
-    switch (tdm_match_status)
-    {
-        case MM_COUNTDOWN:
-            timeout_remaining = 0;
-            time_remaining = level.match_start_framenum - level.framenum;
-            break;
-        case MM_TIMEOUT:
-            if (level.match_resume_framenum)
-                timeout_remaining = level.match_resume_framenum - level.realframenum;
-            else
-                timeout_remaining = level.timeout_end_framenum - level.realframenum;
-            time_remaining = level.match_end_framenum - level.framenum;
-            break;
-        case MM_WARMUP:
-            timeout_remaining = 0;
-            time_remaining = SECS_TO_FRAMES(g_match_time->value) - 1;
-            break;
-        case MM_SUDDEN_DEATH:
-            timeout_remaining = 0;
-            time_remaining = 0;
-            break;
-        default:
-            timeout_remaining = 0;
-            time_remaining = level.match_end_framenum - level.framenum;
-            break;
+    switch (tdm_match_status) {
+    case MM_COUNTDOWN:
+        timeout_remaining = 0;
+        time_remaining = level.match_start_framenum - level.framenum;
+        break;
+    case MM_TIMEOUT:
+        if (level.match_resume_framenum) {
+            timeout_remaining = level.match_resume_framenum
+                    - level.realframenum;
+        } else {
+            timeout_remaining = level.timeout_end_framenum - level.realframenum;
+        }
+        time_remaining = level.match_end_framenum - level.framenum;
+        break;
+    case MM_WARMUP:
+        timeout_remaining = 0;
+        time_remaining = SECS_TO_FRAMES(g_match_time->value) - 1;
+        break;
+    case MM_SUDDEN_DEATH:
+        timeout_remaining = 0;
+        time_remaining = 0;
+        break;
+    default:
+        timeout_remaining = 0;
+        time_remaining = level.match_end_framenum - level.framenum;
+        break;
     }
 
-    if (time_remaining != last_time_remaining || forceUpdate)
-    {
+    if (time_remaining != last_time_remaining || forceUpdate) {
         static int last_secs = -1;
         char time_buffer[32];
         int mins, secs;
 
         last_time_remaining = time_remaining;
 
-        secs = ceil((float)time_remaining * FRAMETIME);
+        secs = ceil((float) time_remaining * FRAMETIME);
 
-        if (secs < 0)
+        if (secs < 0) {
             secs = 0;
+        }
 
-        if (secs != last_secs || forceUpdate)
-        {
+        if (secs != last_secs || forceUpdate) {
             last_secs = secs;
 
             mins = secs / 60;
             secs -= (mins * 60);
 
-            sprintf (time_buffer, "%2d:%.2d", mins, secs);
+            sprintf(time_buffer, "%2d:%.2d", mins, secs);
 
-            if (last_secs < 60)
-                TDM_SetColorText (time_buffer);
-            else if (last_secs == 60 && tdm_match_status >= MM_PLAYING)
-            {
-                gi.sound (world, 0, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NONE, 0);
-                gi.bprintf (PRINT_HIGH, "1 minute remaining.\n");
+            if (last_secs < 60) {
+                TDM_SetColorText(time_buffer);
+            } else if (last_secs == 60 && tdm_match_status >= MM_PLAYING) {
+                gi.sound(world, 0, gi.soundindex("misc/talk1.wav"), 1,
+                        ATTN_NONE, 0);
+                gi.bprintf(PRINT_HIGH, "1 minute remaining.\n");
             }
 
-            gi.configstring (CS_TDM_TIMELIMIT_STRING, time_buffer);
-
+            gi.configstring(CS_TDM_TIMELIMIT_STRING, time_buffer);
             need_serverinfo_update = true;
         }
     }
 
-    if (timeout_remaining != last_timeout_remaining)
-    {
+    if (timeout_remaining != last_timeout_remaining) {
         static int last_secs = -1;
         char time_buffer[32];
         int mins, secs;
 
         last_timeout_remaining = timeout_remaining;
+        secs = ceil((float) timeout_remaining * FRAMETIME);
 
-        secs = ceil((float)timeout_remaining * FRAMETIME);
-
-        if (secs < 0)
+        if (secs < 0) {
             secs = 0;
+        }
 
-        if (secs != last_secs || forceUpdate)
-        {
+        if (secs != last_secs || forceUpdate) {
             last_secs = secs;
 
             mins = secs / 60;
             secs -= (mins * 60);
 
-            sprintf (time_buffer, "%2d:%.2d", mins, secs);
+            sprintf(time_buffer, "%2d:%.2d", mins, secs);
 
-            if (last_secs < 60)
-                TDM_SetColorText (time_buffer);
-
-            gi.configstring (CS_TDM_TIMEOUT_STRING, time_buffer);
+            if (last_secs < 60) {
+                TDM_SetColorText(time_buffer);
+            }
+            gi.configstring(CS_TDM_TIMEOUT_STRING, time_buffer);
         }
     }
 
-    if (need_serverinfo_update)
-        TDM_UpdateServerInfo ();
+    if (need_serverinfo_update) {
+        TDM_UpdateServerInfo();
+    }
 }
 
-/*
-==============
-TDM_Error
-==============
-Die horribly.
-*/
-void TDM_Error (const char *fmt, ...)
-{
+/**
+ * Die horribly.
+ */
+void TDM_Error(const char *fmt, ...) {
     va_list argptr;
     char text[512];
     edict_t *ent;
 
-    va_start (argptr,fmt);
-    Q_vsnprintf (text, sizeof(text), fmt, argptr);
-    va_end (argptr);
-    text[sizeof(text)-1] = 0;
+    va_start(argptr, fmt);
+    Q_vsnprintf(text, sizeof(text), fmt, argptr);
+    va_end(argptr);
+    text[sizeof(text) - 1] = 0;
 
-    gi.dprintf ("An internal OpenTDM error has occured. Please save the following information and post it on the forums at www.opentdm.net.\n");
-    gi.dprintf ("ERROR: %s\n", text);
-    gi.dprintf ("Match state: %d\n", tdm_match_status);
-    gi.dprintf ("Team status: %d - %d - %d\n", teaminfo[TEAM_SPEC].players, teaminfo[TEAM_A].players, teaminfo[TEAM_B].players);
-    gi.dprintf ("Level times: frame: %d, start: %d, end: %d, resume: %d, scores: %d\n", level.framenum, level.match_start_framenum, level.match_end_framenum,
-        level.match_resume_framenum, level.match_score_end_framenum);
-    gi.dprintf ("Vote status: Active: %d, type: %d, end: %d, initiator %d\n", vote.active, vote.flags, vote.end_frame, vote.initiator ? (int)(vote.initiator - g_edicts) : 0);
+    gi.dprintf(
+            "An internal OpenTDM error has occured. Please save the following information and post it on the forums at www.opentdm.net.\n");
+    gi.dprintf("ERROR: %s\n", text);
+    gi.dprintf("Match state: %d\n", tdm_match_status);
+    gi.dprintf("Team status: %d - %d - %d\n", teaminfo[TEAM_SPEC].players,
+            teaminfo[TEAM_A].players, teaminfo[TEAM_B].players);
+    gi.dprintf(
+            "Level times: frame: %d, start: %d, end: %d, resume: %d, scores: %d\n",
+            level.framenum, level.match_start_framenum,
+            level.match_end_framenum, level.match_resume_framenum,
+            level.match_score_end_framenum);
+    gi.dprintf("Vote status: Active: %d, type: %d, end: %d, initiator %d\n",
+            vote.active, vote.flags, vote.end_frame,
+            vote.initiator ? (int) (vote.initiator - g_edicts) : 0);
 
-    gi.dprintf ("Client dump:\n");
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
-    {
-        if (!ent->inuse)
+    gi.dprintf("Client dump:\n");
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
             continue;
+        }
 
-        gi.dprintf ("%d: %s, connected %d, team %d, info %p\n", (int)(ent - g_edicts - 1), ent->client->pers.netname, ent->client->pers.connected, ent->client->pers.team, ent->client->resp.teamplayerinfo);
+        gi.dprintf("%d: %s, connected %d, team %d, info %p\n",
+                (int) (ent - g_edicts - 1), ent->client->pers.netname,
+                ent->client->pers.connected, ent->client->pers.team,
+                ent->client->resp.teamplayerinfo);
     }
 
-    gi.error ("%s", text);
+    gi.error("%s", text);
 }
 
-/*
-==============
-TDM_ProcessText
-==============
-Generic function for processing a bunch of text a line at a time. Destroys input!
-*/
-qboolean TDM_ProcessText (char *buff, int len, qboolean (*func)(char *, int, void *), void *param)
-{
+/**
+ * Generic function for processing a bunch of text a line at a time. Destroys input!
+ */
+qboolean TDM_ProcessText(char *buff, int len,
+        qboolean (*func)(char*, int, void*), void *param) {
     char line[256];
     char *q;
     char *ptr;
@@ -3225,68 +2976,55 @@ qboolean TDM_ProcessText (char *buff, int len, qboolean (*func)(char *, int, voi
 
     line_number = 1;
 
-    while (len)
-    {
-        switch (buff[0])
-        {
-            case '\n':
-            case '\r':
-                buff[0] = 0;
-                if (q)
-                {
-                    qboolean parse;
-                    char *p;
+    while (len) {
+        switch (buff[0]) {
+        case '\n':
+        case '\r':
+            buff[0] = 0;
+            if (q) {
+                qboolean parse;
+                char *p;
 
-                    Q_strncpy (line, q, sizeof(line)-1);
-                    parse = true;
+                Q_strncpy(line, q, sizeof(line) - 1);
+                parse = true;
 
-                    p = strchr (line, '\n');
-                    if (p)
-                        p[0] = 0;
-
-                    p = strchr (line, '\r');
-                    if (p)
-                        p[0] = 0;
-
-                    if (line[0] == '#' || line[0] == '/' || line[0] == '\0')
-                        parse = false;
-                    else if (line[0] == '\\')
-                    {
-                        /*if (!strncmp (line + 1, "include ", 8))
-                        {
-                            char	*path;
-
-                            path = line + 9;
-
-                            if (!TDM_ProcessFile (path, func))
-                                gi.dprintf ("WARNING: Unable to read included file '%s' on line %d\n", path, line_number);
-                        }
-                        else*/
-                        {
-                            gi.dprintf ("WARNING: Unknown directive '%s' on line %d\n", line + 1, line_number);
-                        }
-
-                        parse = false;
-                    }
-
-                    if (parse)
-                    {
-                        if (!func (line, line_number, param))
-                            return false;
-                    }
-                    q = NULL;
-                    line_number++;
+                p = strchr(line, '\n');
+                if (p) {
+                    p[0] = 0;
                 }
-                buff++;
-                break;
-            case '\0':
-                buff++;
-                break;
-            default:
-                if (!q)
-                    q = buff;
-                buff++;
-                break;
+
+                p = strchr(line, '\r');
+                if (p) {
+                    p[0] = 0;
+                }
+
+                if (line[0] == '#' || line[0] == '/' || line[0] == '\0') {
+                    parse = false;
+                } else if (line[0] == '\\') {
+                    gi.dprintf(
+                            "WARNING: Unknown directive '%s' on line %d\n",
+                            line + 1, line_number);
+                    parse = false;
+                }
+
+                if (parse) {
+                    if (!func(line, line_number, param)) {
+                        return false;
+                    }
+                }
+                q = NULL;
+                line_number++;
+            }
+            buff++;
+            break;
+        case '\0':
+            buff++;
+            break;
+        default:
+            if (!q)
+                q = buff;
+            buff++;
+            break;
         }
         len--;
     }
@@ -3294,143 +3032,121 @@ qboolean TDM_ProcessText (char *buff, int len, qboolean (*func)(char *, int, voi
     return true;
 }
 
-/*
-==============
-TDM_HandleDownload
-==============
-A download we requested for something has finished. Do stuff.
-*/
-void TDM_HandleDownload (tdm_download_t *download, char *buff, int len, int code)
-{
+/**
+ * A download we requested for something has finished. Do stuff.
+ */
+void TDM_HandleDownload(tdm_download_t *download, char *buff, int len, int code) {
     //handle went invalid (client->pers->download = zeroed), just ignore this download completely.
-    if (!download->inuse)
+    if (!download->inuse) {
         return;
+    }
 
     //FIXME: observed a crash here due to NULL initiator
-    if (!download->initiator)
+    if (!download->initiator) {
         TDM_Error("TDM_HandleDownload: NULL initiator");
+    }
 
     //player left before download finished, lame!
     //note on an extremely poor connection it's possible another player since occupied their slot, but
     //for that to happen, the download must take 3+ seconds which should be unrealistic, so i don't
     //deal with it.
-    if (!download->initiator->inuse || download->initiator->client->pers.uniqueid != download->unique_id) {
+    if (!download->initiator->inuse
+            || download->initiator->client->pers.uniqueid
+                    != download->unique_id) {
         download->initiator = NULL;
     }
 
-    download->onFinish (download, code, (byte *)buff, len);
+    download->onFinish(download, code, (byte*) buff, len);
 }
 
-/*
-==============
-TDM_GetTeamFromArgs
-==============
-Generic function to return a team index from gi.arg*, used to lookup
-team based on user input. -1 on error.
-*/
-int TDM_GetTeamFromArg (edict_t *ent, const char *value)
-{
-    if (!Q_stricmp (value, "1") || !Q_stricmp (value, "A") || !Q_stricmp (value, teaminfo[TEAM_A].name))
-    {
+
+/**
+ * Generic function to return a team index from gi.arg*, used to lookup
+ * team based on user input. -1 on error.
+ */
+int TDM_GetTeamFromArg(edict_t *ent, const char *value) {
+    if (!Q_stricmp(value, "1") || !Q_stricmp(value, "A")
+            || !Q_stricmp(value, teaminfo[TEAM_A].name)) {
         return TEAM_A;
-    }
-    else if (!Q_stricmp (value, "2") || !Q_stricmp (value, "B") || !Q_stricmp (value, teaminfo[TEAM_B].name))
-    {
+    } else if (!Q_stricmp(value, "2") || !Q_stricmp(value, "B")
+            || !Q_stricmp(value, teaminfo[TEAM_B].name)) {
         return TEAM_B;
-    }
-    else if (!Q_stricmp (value, "0") || !Q_stricmp (value, "S") || !Q_stricmp (value, "O") ||
-        !Q_stricmp (value, "spec") || !Q_stricmp (value, "obs"))
-    {
+    } else if (!Q_stricmp(value, "0") || !Q_stricmp(value, "S")
+            || !Q_stricmp(value, "O") || !Q_stricmp(value, "spec")
+            || !Q_stricmp(value, "obs")) {
         return TEAM_SPEC;
     }
-
     return -1;
 }
 
-/*
-==============
-TDM_UpdateSpectator
-==============
-Updates the spectator according to chosen mode.
-*/
-void TDM_UpdateSpectator (edict_t *ent)
-{
+/**
+ * Updates the spectator according to chosen mode.
+ */
+void TDM_UpdateSpectator(edict_t *ent) {
     int score = -999;
     edict_t *target = NULL, *tmp = NULL;
 
-    for (target = g_edicts + 1; target <= g_edicts + game.maxclients; target++)
-    {
+    for (target = g_edicts + 1; target <= g_edicts + game.maxclients;
+            target++) {
         // skip if client is not a player or we are not allowed to spectate his team and we are not an admin
-        if (!target->inuse || !target->client->pers.team ||
-                (teaminfo[target->client->pers.team].speclocked &&
-                 !ent->client->pers.specinvite[target->client->pers.team] &&
-                 !ent->client->pers.admin))
+        if (!target->inuse || !target->client->pers.team
+                || (teaminfo[target->client->pers.team].speclocked
+                        && !ent->client->pers.specinvite[target->client->pers.team]
+                        && !ent->client->pers.admin)) {
             continue;
+        }
 
         // find quadder
-        if (ent->client->resp.spec_mode == SPEC_QUAD)
-        {
-            if (target->client->quad_framenum > level.framenum)
-            {
-                SetChase (ent, target);
+        if (ent->client->resp.spec_mode == SPEC_QUAD) {
+            if (target->client->quad_framenum > level.framenum) {
+                SetChase(ent, target);
                 break;
             }
         }
         // find invul guy
-        else if (ent->client->resp.spec_mode == SPEC_INVUL)
-        {
-            if (target->client->invincible_framenum > level.framenum)
-            {
-                SetChase (ent, target);
+        else if (ent->client->resp.spec_mode == SPEC_INVUL) {
+            if (target->client->invincible_framenum > level.framenum) {
+                SetChase(ent, target);
                 break;
             }
         }
         // count frags and find top fragger
-        else if (ent->client->resp.spec_mode == SPEC_LEADER)
-        {
-            if (target->client->resp.score > score)
-            {
+        else if (ent->client->resp.spec_mode == SPEC_LEADER) {
+            if (target->client->resp.score > score) {
                 score = target->client->resp.score;
                 tmp = target;
             }
         }
     }
 
-    if (ent->client->resp.spec_mode == SPEC_LEADER && tmp)
-            SetChase (ent, tmp);
+    if (ent->client->resp.spec_mode == SPEC_LEADER && tmp) {
+        SetChase(ent, tmp);
+    }
 }
 
-/*
-==============
-TDM_UpdateSpectatorsOnEvent
-==============
-Updates all spectators when something happens.
-*/
-void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *killer)
-{
+/**
+ * Updates all spectators when something happens.
+ */
+void TDM_UpdateSpectatorsOnEvent(int spec_mode, edict_t *target,
+        edict_t *killer) {
     int score_a = -999, score_b = -999;
-    edict_t *e, *top_fragger_a = NULL, *top_fragger_b = NULL, *new_target = NULL;
+    edict_t *e, *top_fragger_a = NULL, *top_fragger_b = NULL,
+            *new_target = NULL;
 
     // calculate the top fragger
-    if (spec_mode == SPEC_KILLER)
-    {
-        for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++)
-        {
-            if (!e->inuse || !e->client->pers.team)
+    if (spec_mode == SPEC_KILLER) {
+        for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++) {
+            if (!e->inuse || !e->client->pers.team) {
                 continue;
+            }
 
-            if (e->client->pers.team == TEAM_A)
-            {
-                if (e->client->resp.score > score_a)
-                {
+            if (e->client->pers.team == TEAM_A) {
+                if (e->client->resp.score > score_a) {
                     score_a = e->client->resp.score;
                     top_fragger_a = e;
                 }
-            }
-            else if (e->client->pers.team == TEAM_B)
-            {
-                if (e->client->resp.score > score_b)
-                {
+            } else if (e->client->pers.team == TEAM_B) {
+                if (e->client->resp.score > score_b) {
                     score_b = e->client->resp.score;
                     top_fragger_b = e;
                 }
@@ -3438,76 +3154,85 @@ void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *kille
         }
     }
 
-    for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++)
-    {
+    for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++) {
         // we are looking for a spectator who wants an auto-followed POV
-        if (!e->inuse || e->client->pers.team || e->client->resp.spec_mode == SPEC_NONE)
+        if (!e->inuse || e->client->pers.team
+                || e->client->resp.spec_mode == SPEC_NONE) {
             continue;
+        }
 
         // don't bother with spectators who are not allowed to watch anything
-        if (teaminfo[TEAM_A].speclocked && teaminfo[TEAM_B].speclocked &&
-                e->client->pers.specinvite[TEAM_A] && e->client->pers.specinvite[TEAM_B])
+        if (teaminfo[TEAM_A].speclocked && teaminfo[TEAM_B].speclocked
+                && e->client->pers.specinvite[TEAM_A]
+                && e->client->pers.specinvite[TEAM_B]) {
             continue;
+        }
 
         new_target = NULL;
 
-        if (spec_mode == SPEC_KILLER)
-        {
+        if (spec_mode == SPEC_KILLER) {
             // update spectators who use SPEC_KILLER and spectating the victim
-            if (e->client->resp.spec_mode == SPEC_KILLER && e->client->chase_target == target &&
-                (!teaminfo[target->client->pers.team].speclocked || e->client->pers.specinvite[target->client->pers.team]))
-            {
-                //could be worldspawn!
-                if (killer->client)
+            if (e->client->resp.spec_mode == SPEC_KILLER
+                    && e->client->chase_target == target
+                    && (!teaminfo[target->client->pers.team].speclocked
+                            || e->client->pers.specinvite[target->client->pers.team])) {
+                // could be worldspawn!
+                if (killer->client) {
                     new_target = killer;
+                }
             }
             // check if the killer is not top fragger now and update spectators who us SPEC_LEADER
-            else if (e->client->resp.spec_mode == SPEC_LEADER)
-            {
-                if (score_a > score_b)
-                {
-                    if (!teaminfo[TEAM_A].speclocked || e->client->pers.specinvite[TEAM_A])
+            else if (e->client->resp.spec_mode == SPEC_LEADER) {
+                if (score_a > score_b) {
+                    if (!teaminfo[TEAM_A].speclocked
+                            || e->client->pers.specinvite[TEAM_A]) {
                         new_target = top_fragger_a;
-                    else if (e->client->chase_target != top_fragger_b)
+                    } else if (e->client->chase_target != top_fragger_b) {
                         new_target = top_fragger_b;
-                }
-                else if (score_b > score_a)
-                {
-                    if (!teaminfo[TEAM_B].speclocked || e->client->pers.specinvite[TEAM_B])
+                    }
+                } else if (score_b > score_a) {
+                    if (!teaminfo[TEAM_B].speclocked
+                            || e->client->pers.specinvite[TEAM_B]) {
                         new_target = top_fragger_b;
-                    else if (e->client->chase_target != top_fragger_a)
+                    } else if (e->client->chase_target != top_fragger_a) {
                         new_target = top_fragger_a;
+                    }
                 }
             }
         }
         // some player took quad or invul, update all spectators with SPEC_QUAD on
-        else if ((spec_mode == SPEC_QUAD || spec_mode == SPEC_INVUL) && e->client->resp.spec_mode == spec_mode &&
-                (!teaminfo[target->client->pers.team].speclocked || e->client->pers.specinvite[target->client->pers.team]))
-        {
+        else if ((spec_mode == SPEC_QUAD || spec_mode == SPEC_INVUL)
+                && e->client->resp.spec_mode == spec_mode
+                && (!teaminfo[target->client->pers.team].speclocked
+                        || e->client->pers.specinvite[target->client->pers.team])) {
             new_target = target;
         }
 
-        if (new_target)
-            SetChase (e, new_target);
+        if (new_target) {
+            SetChase(e, new_target);
+        }
     }
 }
 
-
 /**
- * Just display the mod's best guess at whether server is recording a multi-view demo.
- *
+ * Just display the mod's best guess at whether server is recording a
+ * multi-view demo.
  */
-void TDM_ServerDemoStatus(edict_t *ent)
-{
+void TDM_ServerDemoStatus(edict_t *ent) {
     if (!MVD_CAPABLE) {
-        gi.cprintf(ent, PRINT_HIGH, "Multi-view demos not supported or enabled by this Q2 server\n");
+        gi.cprintf(ent, PRINT_HIGH,
+                "Multi-view demos not supported or enabled by this Q2 server\n");
         return;
     }
 
     if (game.mvd.recording) {
-        gi.cprintf(ent, PRINT_HIGH, "Currently recording %s.mvd2 (match %d/%d)\n", game.mvd.filename, game.mvd.matches + 1, (int) g_record_mvd->value);
+        gi.cprintf(ent, PRINT_HIGH,
+                "Currently recording %s.mvd2 (match %d/%d)\n",
+                game.mvd.filename, game.mvd.matches + 1,
+                (int) g_record_mvd->value);
         if (game.mvd.matches + 1 >= (int) g_record_mvd->value) {
-            gi.cprintf(ent, PRINT_HIGH, "MVD will stop after the current match\n");
+            gi.cprintf(ent, PRINT_HIGH,
+                    "MVD will stop after the current match\n");
         }
         return;
     }
@@ -3518,8 +3243,7 @@ void TDM_ServerDemoStatus(edict_t *ent)
 /**
  * Shuffle all team players randomly. Doesn't touch spectators
  */
-void TDM_RandomizeTeams(void)
-{
+void TDM_RandomizeTeams(void) {
     int i, count;
     edict_t *players[MAX_CLIENTS];
     edict_t *e;
@@ -3527,25 +3251,28 @@ void TDM_RandomizeTeams(void)
     count = 0;
 
     // build an array of just team players
-    for (i=0; i < game.maxclients; i++) {
+    for (i = 0; i < game.maxclients; i++) {
         e = g_edicts + i + 1;
 
-        if (!e->inuse)
+        if (!e->inuse) {
             continue;
+        }
 
-        if (!e->client)
+        if (!e->client) {
             continue;
+        }
 
-        if (!e->client->pers.team)
+        if (!e->client->pers.team) {
             continue;
+        }
 
         players[count++] = e;
     }
 
-    RandomizeArray((void *)players, count);
+    RandomizeArray((void*) players, count);
 
     // put players on new teams
-    for (i=0; i<count; i++) {
+    for (i = 0; i < count; i++) {
         e = players[i];
 
         // unready them
@@ -3559,12 +3286,9 @@ void TDM_RandomizeTeams(void)
 
         // tell everyone their skin
         gi.configstring(
-            CS_PLAYERSKINS + (e - g_edicts) - 1,
-            va("%s\\%s",
-                e->client->pers.netname,
-                teaminfo[e->client->pers.team].skin
-            )
-        );
+        CS_PLAYERSKINS + (e - g_edicts) - 1,
+                va("%s\\%s", e->client->pers.netname,
+                        teaminfo[e->client->pers.team].skin));
 
         // set everyone else's skin for this player
         TDM_SetAllTeamSkins(e);
@@ -3582,14 +3306,14 @@ void TDM_RandomizeTeams(void)
 
 /**
  * This is not a real handicap, it's for display only.
+ *
  * Servers sometimes are refused in league matches because
  * they are too good for certain players. This will
  * replace the player's ping with the handicap value +-
  * some fake jitter
  */
-int TDM_PingHandicap(int ping)
-{
-    int handi = (int)g_ping_handicap->value;
+int TDM_PingHandicap(int ping) {
+    int handi = (int) g_ping_handicap->value;
 
     if (handi < 1) {
         return ping;
@@ -3597,7 +3321,7 @@ int TDM_PingHandicap(int ping)
 
     // add some fake jitter
     if (level.framenum % 4 == 0) {
-        if(level.framenum % 8 == 0) {
+        if (level.framenum % 8 == 0) {
             handi += 3;
         } else {
             handi -= 2;
@@ -3616,8 +3340,7 @@ int TDM_PingHandicap(int ping)
  *
  * Called at game startup and if a reshuffle is required.
  */
-void TDM_LoadRandomMapLists(void)
-{
+void TDM_LoadRandomMapLists(void) {
     FILE *fp;
     cvar_t *gamedir;
     char entry[MAX_QPATH + 1];
@@ -3638,7 +3361,7 @@ void TDM_LoadRandomMapLists(void)
         return;
     }
 
-    for (int i=0;;i++) {
+    for (int i = 0;; i++) {
         ret = fgets(entry, sizeof(entry), fp);
         if (ret == NULL) {
             break;
@@ -3657,13 +3380,13 @@ void TDM_LoadRandomMapLists(void)
             rm = &game.random_maps[idx];
             if (rm->total == MAX_RANDOM_MAPS) {
                 gi.cprintf(
-                    NULL, PRINT_HIGH, "[Rand map] skipping %s (%d), limited to %d maps per group\n",
-                    map, idx, MAX_RANDOM_MAPS
-                );
+                NULL, PRINT_HIGH,
+                        "[Rand map] skipping %s (%d), limited to %d maps per group\n",
+                        map, idx, MAX_RANDOM_MAPS);
                 tok = strtok(NULL, " ");
                 continue;
             }
-            rm->maps[rm->total] = gi.TagMalloc(strlen(map)+1, TAG_GAME);
+            rm->maps[rm->total] = gi.TagMalloc(strlen(map) + 1, TAG_GAME);
             strcpy(rm->maps[rm->total], map);
             rm->total++;
 
@@ -3673,8 +3396,9 @@ void TDM_LoadRandomMapLists(void)
     fclose(fp);
 
     // randomize the lists
-    for (int i=0; i<RM_MAX; i++) {
-        RandomizeArray((void *)game.random_maps[i].maps, game.random_maps[i].total);
+    for (int i = 0; i < RM_MAX; i++) {
+        RandomizeArray((void*) game.random_maps[i].maps,
+                game.random_maps[i].total);
     }
 }
 
@@ -3682,8 +3406,7 @@ void TDM_LoadRandomMapLists(void)
  * Get the map name of the next random map in the list.
  * If we hit the end of the list, reshuffle and go back to 0
  */
-char *TDM_GetRandomMap(int playercount)
-{
+char* TDM_GetRandomMap(int playercount) {
     randmap_t *rm;
     int idx;
 
@@ -3693,8 +3416,8 @@ char *TDM_GetRandomMap(int playercount)
     }
 
     // we're at the end...shuffle and start over
-    if (rm->index == rm->total-1) {
-        RandomizeArray((void *)rm->maps, rm->total);
+    if (rm->index == rm->total - 1) {
+        RandomizeArray((void*) rm->maps, rm->total);
         rm->index = 0;
     }
 
@@ -3706,8 +3429,7 @@ char *TDM_GetRandomMap(int playercount)
 /**
  * convert normal ascii string to console characters
  */
-void TDM_AsciiToConsole(char *out, char *in)
-{
+void TDM_AsciiToConsole(char *out, char *in) {
     uint32_t i;
 
     if (!in) {
@@ -3715,8 +3437,8 @@ void TDM_AsciiToConsole(char *out, char *in)
         return;
     }
 
-    for (i=0; in[i] != '\0'; i++) {
-        out[i] = (char)(in[i] | 0x80);
+    for (i = 0; in[i] != '\0'; i++) {
+        out[i] = (char) (in[i] | 0x80);
     }
 
     out[i] = '\0';
