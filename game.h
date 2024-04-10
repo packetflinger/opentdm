@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define GAME_API_VERSION    3
 #endif
 
+#define BIT(n)  (1U << (n))
+
 // edict->svflags
 #define SVF_NOCLIENT            0x00000001  // don't send entity to clients, even if it has effects
 #define SVF_DEADMONSTER         0x00000002  // treat as CONTENTS_DEADMONSTER for collision
