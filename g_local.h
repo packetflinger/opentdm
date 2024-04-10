@@ -176,8 +176,6 @@ void PMenu_Next(edict_t *ent);
 void PMenu_Prev(edict_t *ent);
 void PMenu_Select(edict_t *ent);
 
-//==================================================================
-
 // view pitching times
 #define	DAMAGE_FRAMES               SECS_TO_FRAMES(0.5f)
 #define	FALL_FRAMES                 SECS_TO_FRAMES(0.3f)
@@ -235,7 +233,6 @@ typedef enum {
     WEAPON_FIRING
 } weaponstate_t;
 
-//r1: this is kind of ugly.. but meh
 #define AMMO_SHELLS    (1<<11)
 #define AMMO_BULLETS   (1<<12)
 #define AMMO_GRENADES  (1<<13)
@@ -407,8 +404,7 @@ typedef struct {
 typedef struct matchinfo_s matchinfo_t;
 typedef struct teamplayer_s teamplayer_t;
 
-typedef struct gitem_s
-{
+typedef struct gitem_s {
     const char  *classname;	// spawning name
     qboolean    (*pickup)(struct edict_s *ent, struct edict_s *other);
     void        (*use)(struct edict_s *ent, const struct gitem_s *item);
@@ -423,19 +419,15 @@ typedef struct gitem_s
     const char  *icon;
     const char  *pickup_name;	// for printing on pickup
     int         count_width;		// number of digits to display by icon
-
     int         quantity;       // for ammo: how much
                                 // for weapons: how much is used per shot
                                 // for powerups: respawn time in seconds
     int         ammoindex;
-    int         flags;			// IT_* flags
-
-    int         weapmodel;		// weapon model index (for weapons)
-
+    int         flags;          // IT_* flags
+    int         weapmodel;      // weapon model index (for weapons)
     void        *info;
     int         tag;
-
-    const char  *precaches;		// string of all models, sounds, and images this item will use
+    const char  *precaches;     // string of all models, sounds, and images this item will use
     const char  *shortname;
 } gitem_t;
 
@@ -484,130 +476,98 @@ typedef struct {
 
 #define MVD_CAPABLE ((game.server_features & GMF_MVDSPEC) > 0)
 
-//
-// this structure is left intact through an entire game
-// it should be initialized at dll load time, and read/written to
-// the server.ssv file for savegames
-//
-typedef struct {
-    gclient_t     *clients;  // [maxclients]
 
-    // store latched cvars here that we want to get at often
+/**
+ * This structure is left intact through an entire game it should be
+ * initialized at dll load time, and read/written to the server.ssv file for
+ * savegames
+ */
+typedef struct {
+    gclient_t     *clients;         // [maxclients]
     int           maxclients;
     int           maxentities;
-
-    // cross level triggers
-    int           serverflags;
-
-    // items
+    int           serverflags;      // cross level triggers
     int           num_items;
-
     char          gamedir[MAX_QPATH];
-
-    // greater than zero indicates we're running q2pro
-    int           server_features;
-
-    // the number of matches played since mod was loaded
-    int           match_count;
-
-    // auto server demo stuff
-    server_demo_t mvd;
-
-    // sets of random "known good" maps for various team sizes
-    randmap_t random_maps[RM_MAX];
+    int           server_features;  // more than 0 == running q2pro
+    int           match_count;      // matches played since mod was loaded
+    server_demo_t mvd;              // auto server demo stuff
+    randmap_t random_maps[RM_MAX];  // random known-good maps for team sizes
 } game_locals_t;
 
-
-//
-// this structure is cleared as each map is entered
-// it is read/written to the level.sav file for savegames
-//
-typedef struct
-{
-	int           framenum;
-
-	char          level_name[MAX_QPATH];	// the descriptive name (Outer Base, etc)
-	char          mapname[MAX_QPATH];		// the server name (base1, etc)
-	char          nextmap[MAX_QPATH];		// go here when fraglimit is hit
-
-	// intermission state
-	int           intermissionframe;		// time the intermission was started
-	char          *changemap;
-	int           exitintermission;
-	vec3_t        intermission_origin;
-	vec3_t        intermission_angle;
-
-	int           pic_health;
-
-	edict_t       *current_entity;	// entity running from G_RunFrame
-	int           body_que;			// dead bodies
-
-	//tdm stuff
-	int           match_start_framenum;
-	int           match_end_framenum;
-	int           match_score_end_framenum;
-	int           next_ready_nag_framenum;
-	int           match_resume_framenum;
-	const char    *entity_string;
-	teamplayer_t  *tdm_timeout_caller;
-	int           realframenum;
-	int           last_tdm_match_status;
-	qboolean      tdm_pseudo_1v1mode;
-	int           timeout_end_framenum;
-	int           warmup_start_framenum;
-
-	int           numspawns;
-	edict_t       *spawns[TDM_MAX_MAP_SPAWNPOINTS];
-	time_t        spawntime;
+/**
+ * this structure is cleared as each map is entered it is read/written to the
+ * level.sav file for savegames
+ */
+typedef struct {
+    int             framenum;
+    char            level_name[MAX_QPATH];  // the descriptive name (Outer Base, etc)
+    char            mapname[MAX_QPATH];     // the server name (base1, etc)
+    char            nextmap[MAX_QPATH];     // go here when fraglimit is hit
+    int             intermissionframe;      // time the intermission was started
+    char            *changemap;
+    int             exitintermission;
+    vec3_t          intermission_origin;
+    vec3_t          intermission_angle;
+    int             pic_health;
+    edict_t         *current_entity;        // entity running from G_RunFrame
+    int             body_que;               // dead bodies
+    int             match_start_framenum;
+    int             match_end_framenum;
+    int             match_score_end_framenum;
+    int             next_ready_nag_framenum;
+    int             match_resume_framenum;
+    const char      *entity_string;
+    teamplayer_t    *tdm_timeout_caller;
+    int             realframenum;
+    int             last_tdm_match_status;
+    qboolean        tdm_pseudo_1v1mode;
+    int             timeout_end_framenum;
+    int             warmup_start_framenum;
+    int             numspawns;
+    edict_t         *spawns[TDM_MAX_MAP_SPAWNPOINTS];
+    time_t          spawntime;
 } level_locals_t;
 
 
-// spawn_temp_t is only used to hold entity field values that
-// can be set from the editor, but aren't actualy present
-// in edict_t during gameplay
-typedef struct
-{
-	// world vars
-	char       *sky;
-	float      skyrotate;
-	vec3_t     skyaxis;
-	char       *nextmap;
-
-	int        lip;
-	int        distance;
-	int        height;
-	char       *noise;
-	float      pausetime;
-	char       *item;
-	char       *gravity;
-
-	float      minyaw;
-	float      maxyaw;
-	float      minpitch;
-	float      maxpitch;
+/**
+ * spawn_temp_t is only used to hold entity field values that can be set from
+ * the editor, but aren't actualy present in edict_t during gameplay
+ */
+typedef struct {
+    char       *sky;
+    float      skyrotate;
+    vec3_t     skyaxis;
+    char       *nextmap;
+    int        lip;
+    int        distance;
+    int        height;
+    char       *noise;
+    float      pausetime;
+    char       *item;
+    char       *gravity;
+    float      minyaw;
+    float      maxyaw;
+    float      minpitch;
+    float      maxpitch;
 } spawn_temp_t;
 
-
-typedef struct
-{
-    // fixed data
-    vec3_t      start_origin;
+/**
+ *
+ */
+typedef struct {
+    vec3_t     start_origin;
     vec3_t     start_angles;
     vec3_t     end_origin;
     vec3_t     end_angles;
-
     int        sound_start;
     int        sound_middle;
     int        sound_end;
-
     float      accel;
     float      speed;
     float      decel;
     float      distance;
-
     float      wait;
-
-    // state data
     int        state;
     vec3_t     dir;
     float      current_speed;
@@ -618,24 +578,29 @@ typedef struct
     void       (*endfunc)(edict_t *);
 } moveinfo_t;
 
-
-typedef struct
-{
+/**
+ *
+ */
+typedef struct {
     void       (*aifunc)(edict_t *self, float dist);
     float      dist;
     void       (*thinkfunc)(edict_t *self);
 } mframe_t;
 
-typedef struct
-{
+/**
+ *
+ */
+typedef struct {
     int        firstframe;
     int        lastframe;
     mframe_t   *frame;
     void       (*endfunc)(edict_t *self);
 } mmove_t;
 
-typedef struct
-{
+/**
+ *
+ */
+typedef struct {
     mmove_t    *currentmove;
     int        aiflags;
     int        nextframe;
@@ -664,6 +629,9 @@ typedef struct
     int        power_armor_power;
 } monsterinfo_t;
 
+/**
+ *
+ */
 typedef struct {
     edict_t     *ent;
     int16       distance[3];
@@ -726,137 +694,107 @@ extern  edict_t *g_edicts;
 #define LLOFS(x) (size_t)&(((level_locals_t *)0)->x)
 #define CLOFS(x) (size_t)&(((gclient_t *)0)->x)
 
-extern cvar_t   *maxentities;
-extern cvar_t   *dmflags;
-extern cvar_t   *fraglimit;
-extern cvar_t   *timelimit;
-extern cvar_t   *password;
-extern cvar_t   *spectator_password;
-extern cvar_t   *g_select_empty;
-extern cvar_t   *dedicated;
-
-extern cvar_t   *filterban;
-
-extern cvar_t   *sv_gravity;
-extern cvar_t   *sv_maxvelocity;
-
-extern cvar_t   *gun_x, *gun_y, *gun_z;
-extern cvar_t   *sv_rollspeed;
-extern cvar_t   *sv_rollangle;
-
-extern cvar_t   *run_pitch;
-extern cvar_t   *run_roll;
-extern cvar_t   *bob_up;
-extern cvar_t   *bob_pitch;
-extern cvar_t   *bob_roll;
-
-extern cvar_t   *sv_cheats;
-extern cvar_t   *maxclients;
-
-extern cvar_t   *flood_msgs;
-extern cvar_t   *flood_persecond;
-extern cvar_t   *flood_waitdelay;
-
-extern cvar_t   *flood_waves;
-extern cvar_t   *flood_waves_perminute;
-extern cvar_t   *flood_waves_waitdelay;
-
-extern cvar_t   *sv_maplist;
-
-extern cvar_t   *g_team_a_name;
-extern cvar_t   *g_team_b_name;
-extern cvar_t   *g_locked_names;
-
-extern cvar_t   *g_team_a_skin;
-extern cvar_t   *g_team_b_skin;
-extern cvar_t   *g_locked_skins;
-
-extern cvar_t   *g_admin_password;
-extern cvar_t   *g_admin_vote_decide;
-extern cvar_t   *g_match_time;
-extern cvar_t   *g_match_countdown;
-extern cvar_t   *g_vote_time;
-extern cvar_t   *g_vote_mask;
-extern cvar_t   *g_vote_attention;
-extern cvar_t   *g_vote_attention_sound;
-extern cvar_t   *g_ready_attention;
-extern cvar_t   *g_intermission_time;
-extern cvar_t   *g_force_screenshot;
-extern cvar_t   *g_force_record;
-extern cvar_t   *g_record_mvd;
-extern cvar_t   *g_weapon_hud;
-extern cvar_t   *g_armor_timer;
-extern cvar_t   *g_weapon_timer;
-extern cvar_t   *g_timeout_limit;
-extern cvar_t   *g_timeout_captain;
-extern cvar_t   *g_highlight_captain;
-extern cvar_t   *g_ping_handicap;
-
-extern cvar_t   *g_tdmflags;
-extern cvar_t   *g_itdmflags;
-extern cvar_t   *g_1v1flags;
-
-extern cvar_t   *g_itemflags;
-extern cvar_t   *g_powerupflags;
-
-extern cvar_t   *g_tdm_allow_pick;
-
-extern cvar_t   *g_fast_weap_switch;
-extern cvar_t   *g_teleporter_nofreeze;
-
-extern cvar_t   *g_overtime;
-extern cvar_t   *g_tie_mode;
-extern cvar_t   *g_gamemode;
-extern cvar_t   *g_respawn_time;
-extern cvar_t   *g_max_timeout;
-extern cvar_t   *g_1v1_timeout;
-extern cvar_t   *g_chat_mode;
-extern cvar_t   *g_idle_time;
-
-extern cvar_t   *g_http_enabled;
-extern cvar_t   *g_http_bind;
-extern cvar_t   *g_http_proxy;
-extern cvar_t   *g_http_debug;
-
-extern cvar_t   *g_http_path;
-extern cvar_t   *g_http_domain;
-
-extern cvar_t   *g_playerconfig_enabled;
-
-extern cvar_t   *g_debug_spawns;
-
-extern cvar_t   *g_maplistfile;
-extern cvar_t   *g_randommapfile;
-extern cvar_t   *g_motd_message;
-
-extern cvar_t  *g_max_players_per_team;
-
-extern cvar_t   *g_bugs;
-
-extern cvar_t   *g_allow_name_change_during_match;
-
-extern cvar_t   *g_allow_vote_config;
-
-extern cvar_t   *g_command_mask;
-
-extern cvar_t   *g_auto_rejoin_match;
-extern cvar_t   *g_auto_rejoin_map;
-
-extern cvar_t   *g_1v1_spawn_mode;
-extern cvar_t   *g_tdm_spawn_mode;
-
-extern cvar_t   *sv_mvd_enable;
-
-extern cvar_t   *g_respawn_weapon;
-extern cvar_t   *g_respawn_ammo;
-extern cvar_t   *g_respawn_armor;
-extern cvar_t   *g_respawn_health;
-extern cvar_t   *g_respawn_quad;
-extern cvar_t   *g_respawn_invuln;
-extern cvar_t   *g_respawn_backpack;
-extern cvar_t   *g_respawn_adren;
-extern cvar_t   *g_respawn_ps;
-extern cvar_t   *g_respawn_mega;
+extern cvar_t *maxentities;
+extern cvar_t *dmflags;
+extern cvar_t *fraglimit;
+extern cvar_t *timelimit;
+extern cvar_t *password;
+extern cvar_t *spectator_password;
+extern cvar_t *g_select_empty;
+extern cvar_t *dedicated;
+extern cvar_t *filterban;
+extern cvar_t *sv_gravity;
+extern cvar_t *sv_maxvelocity;
+extern cvar_t *gun_x, *gun_y, *gun_z;
+extern cvar_t *sv_rollspeed;
+extern cvar_t *sv_rollangle;
+extern cvar_t *run_pitch;
+extern cvar_t *run_roll;
+extern cvar_t *bob_up;
+extern cvar_t *bob_pitch;
+extern cvar_t *bob_roll;
+extern cvar_t *sv_cheats;
+extern cvar_t *maxclients;
+extern cvar_t *flood_msgs;
+extern cvar_t *flood_persecond;
+extern cvar_t *flood_waitdelay;
+extern cvar_t *flood_waves;
+extern cvar_t *flood_waves_perminute;
+extern cvar_t *flood_waves_waitdelay;
+extern cvar_t *sv_maplist;
+extern cvar_t *g_team_a_name;
+extern cvar_t *g_team_b_name;
+extern cvar_t *g_locked_names;
+extern cvar_t *g_team_a_skin;
+extern cvar_t *g_team_b_skin;
+extern cvar_t *g_locked_skins;
+extern cvar_t *g_admin_password;
+extern cvar_t *g_admin_vote_decide;
+extern cvar_t *g_match_time;
+extern cvar_t *g_match_countdown;
+extern cvar_t *g_vote_time;
+extern cvar_t *g_vote_mask;
+extern cvar_t *g_vote_attention;
+extern cvar_t *g_vote_attention_sound;
+extern cvar_t *g_ready_attention;
+extern cvar_t *g_intermission_time;
+extern cvar_t *g_force_screenshot;
+extern cvar_t *g_force_record;
+extern cvar_t *g_record_mvd;
+extern cvar_t *g_weapon_hud;
+extern cvar_t *g_armor_timer;
+extern cvar_t *g_weapon_timer;
+extern cvar_t *g_timeout_limit;
+extern cvar_t *g_timeout_captain;
+extern cvar_t *g_highlight_captain;
+extern cvar_t *g_ping_handicap;
+extern cvar_t *g_tdmflags;
+extern cvar_t *g_itdmflags;
+extern cvar_t *g_1v1flags;
+extern cvar_t *g_itemflags;
+extern cvar_t *g_powerupflags;
+extern cvar_t *g_tdm_allow_pick;
+extern cvar_t *g_fast_weap_switch;
+extern cvar_t *g_teleporter_nofreeze;
+extern cvar_t *g_overtime;
+extern cvar_t *g_tie_mode;
+extern cvar_t *g_gamemode;
+extern cvar_t *g_respawn_time;
+extern cvar_t *g_max_timeout;
+extern cvar_t *g_1v1_timeout;
+extern cvar_t *g_chat_mode;
+extern cvar_t *g_idle_time;
+extern cvar_t *g_http_enabled;
+extern cvar_t *g_http_bind;
+extern cvar_t *g_http_proxy;
+extern cvar_t *g_http_debug;
+extern cvar_t *g_http_path;
+extern cvar_t *g_http_domain;
+extern cvar_t *g_playerconfig_enabled;
+extern cvar_t *g_debug_spawns;
+extern cvar_t *g_maplistfile;
+extern cvar_t *g_randommapfile;
+extern cvar_t *g_motd_message;
+extern cvar_t *g_max_players_per_team;
+extern cvar_t *g_bugs;
+extern cvar_t *g_allow_name_change_during_match;
+extern cvar_t *g_allow_vote_config;
+extern cvar_t *g_command_mask;
+extern cvar_t *g_auto_rejoin_match;
+extern cvar_t *g_auto_rejoin_map;
+extern cvar_t *g_1v1_spawn_mode;
+extern cvar_t *g_tdm_spawn_mode;
+extern cvar_t *sv_mvd_enable;
+extern cvar_t *g_respawn_weapon;
+extern cvar_t *g_respawn_ammo;
+extern cvar_t *g_respawn_armor;
+extern cvar_t *g_respawn_health;
+extern cvar_t *g_respawn_quad;
+extern cvar_t *g_respawn_invuln;
+extern cvar_t *g_respawn_backpack;
+extern cvar_t *g_respawn_adren;
+extern cvar_t *g_respawn_ps;
+extern cvar_t *g_respawn_mega;
 
 #define world   (&g_edicts[0])
 
@@ -869,13 +807,14 @@ extern cvar_t   *g_respawn_mega;
 #define	DROPPED_PLAYER_ITEM     0x00020000
 #define ITEM_TARGETS_USED       0x00040000
 
-//
-// fields are needed for spawning from the entity string
+// Fields are needed for spawning from the entity string
 // and saving / loading games
-//
 #define FFL_SPAWNTEMP       1
 #define FFL_NOSPAWN         2
 
+/**
+ *
+ */
 typedef enum {
     F_INT,
     F_FLOAT,
@@ -891,17 +830,18 @@ typedef enum {
     F_IGNORE
 } fieldtype_t;
 
-typedef struct
-{
+/**
+ *
+ */
+typedef struct {
     char        *name;
     size_t      ofs;
     fieldtype_t type;
     int         flags;
 } field_t;
 
-
-extern field_t          fields[];
-extern gitem_t    itemlist[];
+extern field_t  fields[];
+extern gitem_t  itemlist[];
 
 // a sound without an ent or pos will be a local only sound
 #define SND_VOLUME      (1<<0)  // a byte
@@ -913,23 +853,19 @@ extern gitem_t    itemlist[];
 #define DEFAULT_SOUND_PACKET_VOLUME         1.0f
 #define DEFAULT_SOUND_PACKET_ATTENUATION    1.0f
 
-//
+#define ITEM_INDEX(x) ((x)-itemlist)
+
 // g_cmds.c
-//
 void Cmd_Help_f (edict_t *ent);
 void Cmd_Score_f (edict_t *ent);
 void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0);
 void Cmd_DropNearestAmmo_f(edict_t *ent);
 
-//
 // g_items.c
-//
 void PrecacheItem (const gitem_t *it);
 void InitItems (void);
 void SetItemNames (void);
-const gitem_t   *FindItem (const char *pickup_name);
-//const gitem_t	*FindItemByClassname (const char *classname);
-#define	ITEM_INDEX(x) ((x)-itemlist)
+const gitem_t *FindItem (const char *pickup_name);
 edict_t *Drop_Item (edict_t *ent, const gitem_t *item);
 void SetRespawn (edict_t *ent, float delay);
 void ChangeWeapon (edict_t *ent);
@@ -938,52 +874,45 @@ void SpawnItem (edict_t *ent, const gitem_t *item);
 void Think_Weapon (edict_t *ent);
 int ArmorIndex (edict_t *ent);
 int PowerArmorType (edict_t *ent);
-const gitem_t   *GetItemByIndex (int index);
+const gitem_t *GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, const gitem_t *item, int count);
 void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 void SetPowerupRespawnDelay(void);
 
-//
 // g_utils.c
-//
-qboolean    KillBox (edict_t *ent);
-void        G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
-edict_t     *G_Find (edict_t *from, size_t fieldofs, char *match);
-edict_t     *findradius (edict_t *from, vec3_t org, float rad);
-edict_t     *G_PickTarget (char *targetname);
-void        G_UseTargets (edict_t *ent, edict_t *activator);
-void        G_SetMovedir (vec3_t angles, vec3_t movedir);
+qboolean KillBox(edict_t *ent);
+void G_ProjectSource(vec3_t point, vec3_t distance, vec3_t forward,
+        vec3_t right, vec3_t result);
+edict_t *G_Find(edict_t *from, size_t fieldofs, char *match);
+edict_t *findradius(edict_t *from, vec3_t org, float rad);
+edict_t *G_PickTarget(char *targetname);
+void G_UseTargets(edict_t *ent, edict_t *activator);
+void G_SetMovedir(vec3_t angles, vec3_t movedir);
+void G_InitEdict(edict_t *e);
+edict_t *G_Spawn(void);
+void G_FreeEdict(edict_t *e);
+void G_StuffCmd(edict_t *e, const char *fmt, ...)
+        __attribute__ ((format (printf, 2, 3)));
+void G_UnicastSound(edict_t *ent, int index, qboolean reliable);
+void G_TouchTriggers(edict_t *ent);
+void G_TouchSolids(edict_t *ent);
+char *G_StripQuotes(char *string);
+char *G_CopyString(const char *in);
+float *tv(float x, float y, float z);
+char *vtos(vec3_t v);
+float vectoyaw(vec3_t vec);
+void vectoangles(vec3_t vec, vec3_t angles);
 
-void        G_InitEdict (edict_t *e);
-edict_t     *G_Spawn (void);
-void        G_FreeEdict (edict_t *e);
-
-void        G_StuffCmd (edict_t *e, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
-void        G_UnicastSound (edict_t *ent, int index, qboolean reliable);
-void        G_TouchTriggers (edict_t *ent);
-void        G_TouchSolids (edict_t *ent);
-char        *G_StripQuotes (char *string);
-
-char        *G_CopyString (const char *in);
-
-float       *tv (float x, float y, float z);
-char        *vtos (vec3_t v);
-
-float       vectoyaw (vec3_t vec);
-void        vectoangles (vec3_t vec, vec3_t angles);
-
-//
 // g_combat.c
-//
-qboolean    OnSameTeam (edict_t *ent1, edict_t *ent2);
-qboolean    CanDamage (edict_t *targ, edict_t *inflictor);
-void        T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod);
-void        T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
+qboolean OnSameTeam(edict_t *ent1, edict_t *ent2);
+qboolean CanDamage(edict_t *targ, edict_t *inflictor);
+void T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
+        vec3_t point, vec3_t normal, int damage, int knockback, int dflags,
+        int mod);
+void T_RadiusDamage(edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
 
-//
 // g_main.c
-//
-void        EndDMLevel (void);
+void EndDMLevel(void);
 
 // damage flags
 #define DAMAGE_RADIUS              0x00000001  // damage was indirect
@@ -1001,287 +930,265 @@ void        EndDMLevel (void);
 #define DEFAULT_SHOTGUN_COUNT      12
 #define DEFAULT_SSHOTGUN_COUNT     20
 
-
-//
 // g_misc.c
-//
-void        ThrowHead (edict_t *self, char *gibname, int damage, int type);
-void        ThrowClientHead (edict_t *self, int damage);
-void        ThrowGib (edict_t *self, char *gibname, int damage, int type);
-void        BecomeExplosion1(edict_t *self);
+void ThrowHead(edict_t *self, char *gibname, int damage, int type);
+void ThrowClientHead(edict_t *self, int damage);
+void ThrowGib(edict_t *self, char *gibname, int damage, int type);
+void BecomeExplosion1(edict_t *self);
+qboolean infront(edict_t *self, edict_t *other);
+qboolean visible(edict_t *self, edict_t *other, int mask);
 
-qboolean    infront (edict_t *self, edict_t *other);
-qboolean    visible (edict_t *self, edict_t *other, int mask);
-
-//
 // g_weapon.c
-//
-void ThrowDebris (edict_t *self, char *modelname, float speed, vec3_t origin);
-qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick);
-void fire_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick, int hspread, int vspread, int mod);
-void fire_shotgun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick, int hspread, int vspread, int count, int mod);
-void fire_blaster (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, int effect, qboolean hyper);
-void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius);
-void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius, qboolean held);
-void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);
-void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick);
-void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius);
+void ThrowDebris(edict_t *self, char *modelname, float speed, vec3_t origin);
+qboolean fire_hit(edict_t *self, vec3_t aim, int damage, int kick);
+void fire_bullet(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
+        int kick, int hspread, int vspread, int mod);
+void fire_shotgun(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
+        int kick, int hspread, int vspread, int count, int mod);
+void fire_blaster(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
+        int speed, int effect, qboolean hyper);
+void fire_grenade(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
+        int speed, float timer, float damage_radius);
+void fire_grenade2(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
+        int speed, float timer, float damage_radius, qboolean held);
+void fire_rocket(edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
+        float damage_radius, int radius_damage);
+void fire_rail(edict_t *self, vec3_t start, vec3_t aimdir, int damage,
+        int kick);
+void fire_bfg(edict_t *self, vec3_t start, vec3_t dir, int damage, int speed,
+        float damage_radius);
 
-
-//
 // g_client.c
-//
-void respawn (edict_t *ent);
-void BeginIntermission (edict_t *targ);
-void PutClientInServer (edict_t *ent);
-void InitClientPersistant (gclient_t *client);
-void InitBodyQue (void);
-void ClientBeginServerFrame (edict_t *ent);
+void respawn(edict_t *ent);
+void BeginIntermission(edict_t *targ);
+void PutClientInServer(edict_t *ent);
+void InitClientPersistant(gclient_t *client);
+void InitBodyQue(void);
+void ClientBeginServerFrame(edict_t *ent);
 
-//
 // g_player.c
-//
-void player_pain (edict_t *self, edict_t *other, float kick, int damage);
-void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
+void player_pain(edict_t *self, edict_t *other, float kick, int damage);
+void player_die(edict_t *self, edict_t *inflictor, edict_t *attacker,
+        int damage, vec3_t point);
 
-//
 // g_svcmds.c
-//
-void	ServerCommand (void);
-qboolean SV_FilterPacket (netadr_t *addr);
+void ServerCommand(void);
+qboolean SV_FilterPacket(netadr_t *addr);
 
-//
 // p_view.c
-//
-void ClientEndServerFrame (edict_t *ent);
+void ClientEndServerFrame(edict_t *ent);
 
-//
 // p_hud.c
-//
-void MoveClientToIntermission (edict_t *client);
-void G_SetStats (edict_t *ent);
-void G_SetSpectatorStats (edict_t *ent);
-void ValidateSelectedItem (edict_t *ent);
-//void DeathmatchScoreboardMessage (edict_t *client, edict_t *killer);
-void DeathmatchScoreboard (edict_t *ent);
+void MoveClientToIntermission(edict_t *client);
+void G_SetStats(edict_t *ent);
+void G_SetSpectatorStats(edict_t *ent);
+void ValidateSelectedItem(edict_t *ent);
+void DeathmatchScoreboard(edict_t *ent);
 
-//
 // g_pweapon.c
-//
 void PlayerNoise(edict_t *who, vec3_t where, int type);
 
-//
 // m_move.c
-//
-qboolean M_CheckBottom (edict_t *ent);
-qboolean M_walkmove (edict_t *ent, float yaw, float dist);
-void M_MoveToGoal (edict_t *ent, float dist);
-void M_ChangeYaw (edict_t *ent);
+qboolean M_CheckBottom(edict_t *ent);
+qboolean M_walkmove(edict_t *ent, float yaw, float dist);
+void M_MoveToGoal(edict_t *ent, float dist);
+void M_ChangeYaw(edict_t *ent);
 
-//
 // g_phys.c
-//
-void G_RunEntity (edict_t *ent);
+void G_RunEntity(edict_t *ent);
 
-
-//
 // g_chase.c
-//
 void UpdateLockCam(edict_t *ent);
 void UpdateChaseCam(edict_t *ent);
 void ChaseNext(edict_t *ent);
 void ChasePrev(edict_t *ent);
 void GetChaseTarget(edict_t *ent);
-void DisableChaseCam (edict_t *ent);
-void NextChaseMode (edict_t *ent);
-void SetChase (edict_t *ent, edict_t *target);
+void DisableChaseCam(edict_t *ent);
+void NextChaseMode(edict_t *ent);
+void SetChase(edict_t *ent, edict_t *target);
 
-//opentdm
-
-typedef enum
-{
-	MM_INVALID,
-	MM_WARMUP,
-	MM_COUNTDOWN,
-	MM_PLAYING,
-	MM_TIMEOUT,
-	MM_OVERTIME,
-	MM_SUDDEN_DEATH,
-	MM_SCOREBOARD,
+/**
+ *
+ */
+typedef enum {
+    MM_INVALID,
+    MM_WARMUP,
+    MM_COUNTDOWN,
+    MM_PLAYING,
+    MM_TIMEOUT,
+    MM_OVERTIME,
+    MM_SUDDEN_DEATH,
+    MM_SCOREBOARD,
 } matchmode_t;
 
-void ParseEntityString (qboolean respawn);
-
-void TDM_Init (void);
-qboolean TDM_SetupClient (edict_t *ent);
-void TDM_TeamsChanged (void);
-void TDM_ShowTeamMenu (edict_t *ent);
-void TDM_UpdateConfigStrings (qboolean forceUpdate);
-void TDM_SetInitialItems (edict_t *ent);
-void TDM_SetCaptain (int team, edict_t *ent);
-qboolean TDM_Command (const char *cmd, edict_t *ent);
-void TDM_CheckMatchStart (void);
-void TDM_CheckTimes (void);
-void TDM_ResetGameState (void);
-char *TDM_ScoreBoardString (edict_t *ent);
-void TDM_MapChanged (void);
-void TDM_LeftTeam (edict_t *ent, qboolean notify);
-void TDM_Disconnected (edict_t *ent);
-qboolean TDM_ServerCommand (const char *cmd);
-void TDM_UpdateTeamNames (void);
-void TDM_SetupSounds (void);
-char *TDM_SetColorText (char *buffer);
-void TDM_PlayerNameChanged (edict_t *ent);
-void TDM_WeaponFired (edict_t *ent);
-void TDM_Error (const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
-
-void TDM_BeginDamage (void);
-void TDM_Damage (edict_t *ent, edict_t *victim, edict_t *inflictor, int damage);
-void TDM_EndDamage (void);
-
-void TDM_ItemSpawned (edict_t *ent);
-void TDM_ItemGrabbed (edict_t *ent, edict_t *player);
-
-void TDM_MacroExpand (edict_t *ent, char *text, int maxlength);
-void ToggleChaseCam (edict_t *ent);
-void TDM_UpdateSpectatorsOnEvent (int spec_mode, edict_t *target, edict_t *killer);
-qboolean TDM_Is1V1 (void);
-edict_t *TDM_ClosestTeammate(edict_t *ent);
+void ParseEntityString(qboolean respawn);
+void TDM_Init(void);
+qboolean TDM_SetupClient(edict_t *ent);
+void TDM_TeamsChanged(void);
+void TDM_ShowTeamMenu(edict_t *ent);
+void TDM_UpdateConfigStrings(qboolean forceUpdate);
+void TDM_SetInitialItems(edict_t *ent);
+void TDM_SetCaptain(int team, edict_t *ent);
+qboolean TDM_Command(const char *cmd, edict_t *ent);
+void TDM_CheckMatchStart(void);
+void TDM_CheckTimes(void);
+void TDM_ResetGameState(void);
+char* TDM_ScoreBoardString(edict_t *ent);
+void TDM_MapChanged(void);
+void TDM_LeftTeam(edict_t *ent, qboolean notify);
+void TDM_Disconnected(edict_t *ent);
+qboolean TDM_ServerCommand(const char *cmd);
+void TDM_UpdateTeamNames(void);
+void TDM_SetupSounds(void);
+char* TDM_SetColorText(char *buffer);
+void TDM_PlayerNameChanged(edict_t *ent);
+void TDM_WeaponFired(edict_t *ent);
+void TDM_Error(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
+void TDM_BeginDamage(void);
+void TDM_Damage(edict_t *ent, edict_t *victim, edict_t *inflictor, int damage);
+void TDM_EndDamage(void);
+void TDM_ItemSpawned(edict_t *ent);
+void TDM_ItemGrabbed(edict_t *ent, edict_t *player);
+void TDM_MacroExpand(edict_t *ent, char *text, int maxlength);
+void ToggleChaseCam(edict_t *ent);
+void TDM_UpdateSpectatorsOnEvent(int spec_mode, edict_t *target,
+        edict_t *killer);
+qboolean TDM_Is1V1(void);
+edict_t* TDM_ClosestTeammate(edict_t *ent);
 void TDM_LoadRandomMapLists(void);
-char *TDM_GetRandomMap(int playercount);
+char* TDM_GetRandomMap(int playercount);
 qboolean TDM_VoteRandomMap(edict_t *ent);
 void TDM_AsciiToConsole(char *out, char *in);
+void CountPlayers(void);
+void UpdatePlayerTeamMenu(edict_t *ent);
+void UpdateTeamMenu(void);
+void RandomizeArray(void **base, size_t n);
 
-void CountPlayers (void);
-void UpdatePlayerTeamMenu (edict_t *ent);
-void UpdateTeamMenu (void);
+extern matchmode_t tdm_match_status;
+extern qboolean tdm_settings_not_default;
 
-void RandomizeArray (void **base, size_t n);
-
-extern matchmode_t	tdm_match_status;
-extern qboolean		tdm_settings_not_default;
-//extern pmenu_t joinmenu[];
 #define MENUSIZE_JOINMENU 18
 
-void HTTP_RunDownloads (void);
+void HTTP_RunDownloads(void);
 
-//============================================================================
 
-#define	TEAM_SPEC	0
-#define TEAM_A		1
-#define TEAM_B		2
-#define	MAX_TEAMS	3
+#define	TEAM_SPEC   0
+#define TEAM_A      1
+#define TEAM_B      2
+#define	MAX_TEAMS   3
 
-//combined, these must be < 64 plus some slop for other configstring text
-#define	MAX_TEAMNAME_LENGTH 16
-#define	MAX_TEAMSKIN_LENGTH	24
+// combined, these must be < 64 plus some slop for other configstring text
+#define MAX_TEAMNAME_LENGTH 16
+#define MAX_TEAMSKIN_LENGTH 24
 
-//this structure is used to hold information about match
-//participants until the match is over, when it is copied
-//to oldmatch. this allows us to track stats/scores even
-//for disconnected players and such.
-enum
-{
-	TDMG_INVALID,
-	TDMG_WORLD,
-	TDMG_BLASTER,
-	TDMG_SHOTGUN,
-	TDMG_SSHOTGUN,
-	TDMG_MACHINEGUN,
-	TDMG_CHAINGUN,
-	TDMG_HANDGRENADE,
-	TDMG_GRENADELAUNCHER,
-	TDMG_ROCKETLAUNCHER,
-	TDMG_HYPERBLASTER,
-	TDMG_RAILGUN,
-	TDMG_BFG10K,
-	TDMG_MAX,
+/**
+ * this structure is used to hold information about match participants until
+ * the match is over, when it is copied to oldmatch. this allows us to track
+ * stats/scores even for disconnected players and such.
+ */
+enum {
+    TDMG_INVALID,
+    TDMG_WORLD,
+    TDMG_BLASTER,
+    TDMG_SHOTGUN,
+    TDMG_SSHOTGUN,
+    TDMG_MACHINEGUN,
+    TDMG_CHAINGUN,
+    TDMG_HANDGRENADE,
+    TDMG_GRENADELAUNCHER,
+    TDMG_ROCKETLAUNCHER,
+    TDMG_HYPERBLASTER,
+    TDMG_RAILGUN,
+    TDMG_BFG10K,
+    TDMG_MAX,
 };
 
-struct teamplayer_s
-{
-	char           name[16];
-	unsigned       team;
-	unsigned       ping;
-	unsigned       joincode;
+struct teamplayer_s {
+    char           name[16];
+    unsigned       team;
+    unsigned       ping;
+    unsigned       joincode;
 
-	//actual players killed
-	unsigned       enemy_kills;
-	unsigned       team_kills;
-	unsigned       suicides;
-	unsigned       deaths;
-	unsigned       telefrags;
+    // actual players killed
+    unsigned       enemy_kills;
+    unsigned       team_kills;
+    unsigned       suicides;
+    unsigned       deaths;
+    unsigned       telefrags;
 
-	//individual weapons
-	unsigned       shots_fired[TDMG_MAX];
-	unsigned       shots_hit[TDMG_MAX];
+    // individual weapons
+    unsigned       shots_fired[TDMG_MAX];
+    unsigned       shots_hit[TDMG_MAX];
 
-	//incremented each time a kill is made with a weapon or a death is incurred by one
-	unsigned       killweapons[TDMG_MAX];
-	unsigned       deathweapons[TDMG_MAX];
+    // incremented each time a kill is made with a weapon or a death is incurred by one
+    unsigned       killweapons[TDMG_MAX];
+    unsigned       deathweapons[TDMG_MAX];
+    unsigned       quad_kills;
+    unsigned       quad_deaths;
+    unsigned       pent_kills;
+    unsigned       pent_deaths;
 
-	unsigned       quad_kills;
-	unsigned       quad_deaths;
-	unsigned       pent_kills;
-	unsigned       pent_deaths;
+    // total damage per weapon dealt/received
+    unsigned       damage_dealt[TDMG_MAX];
+    unsigned       damage_received[TDMG_MAX];
+    unsigned       quad_dealt;
+    unsigned       quad_recvd;
+    unsigned       pent_dealt;
+    unsigned       pent_recvd;
 
-	//total damage per weapon dealt/received
-	unsigned       damage_dealt[TDMG_MAX];
-	unsigned       damage_received[TDMG_MAX];
+    // count damage dealt/received on teammates
+    unsigned       team_dealt;
+    unsigned       team_recvd;
+    unsigned       items_collected[MAX_ITEMS];
 
-	unsigned       quad_dealt;
-	unsigned       quad_recvd;
-	unsigned       pent_dealt;
-	unsigned       pent_recvd;
+    // pointer to the entity - NULL if they disconnected
+    edict_t        *client;
 
-	//count damage dealt/received on teammates
-	unsigned       team_dealt;
-	unsigned       team_recvd;
+    //preserved for joincode
+    edict_t        *saved_entity;
+    gclient_t      *saved_client;
 
-	unsigned       items_collected[MAX_ITEMS];
-
-	//pointer to the entity - NULL if they disconnected
-	edict_t        *client;
-
-	//preserved for joincode
-	edict_t        *saved_entity;
-	gclient_t      *saved_client;
-
-	//link to matchinfo
-	matchinfo_t    *matchinfo;
+    //link to matchinfo
+    matchinfo_t    *matchinfo;
 };
 
-struct matchinfo_s
-{
-	int             game_mode;
-	int             timelimit;
-	int             winning_team;
-	int             scores[MAX_TEAMS];
-	char            mapname[MAX_QPATH];
-	char            scoreboard_string[1400];
-	unsigned        item_spawn_count[MAX_ITEMS];
-	char            teamnames[MAX_TEAMS][MAX_TEAMNAME_LENGTH];
+/**
+ *
+ */
+struct matchinfo_s {
+    int             game_mode;
+    int             timelimit;
+    int             winning_team;
+    int             scores[MAX_TEAMS];
+    char            mapname[MAX_QPATH];
+    char            scoreboard_string[1400];
+    unsigned        item_spawn_count[MAX_ITEMS];
+    char            teamnames[MAX_TEAMS][MAX_TEAMNAME_LENGTH];
 
-	//base of teamplayers array
-	teamplayer_t    *teamplayers;
-	teamplayer_t    *captains[MAX_TEAMS];
-	int             num_teamplayers;
-	qboolean        is1v1;
-	int             max_players_per_team;
+    //base of teamplayers array
+    teamplayer_t    *teamplayers;
+    teamplayer_t    *captains[MAX_TEAMS];
+    int             num_teamplayers;
+    qboolean        is1v1;
+    int             max_players_per_team;
 };
 
 extern matchinfo_t	current_matchinfo;
 extern matchinfo_t	old_matchinfo;
 
-typedef enum
-{
-	VOTE_NOT_ENOUGH_VOTES,
-	VOTE_NOT_SUCCESS,
-	VOTE_SUCCESS,
+/**
+ *
+ */
+typedef enum {
+    VOTE_NOT_ENOUGH_VOTES,
+    VOTE_NOT_SUCCESS,
+    VOTE_SUCCESS,
 } vote_success_t;
 
-typedef struct vote_s
-{
+/**
+ *
+ */
+typedef struct vote_s {
     qboolean        active;
     qboolean        applying;
     unsigned        flags;
@@ -1311,135 +1218,149 @@ typedef struct vote_s
     int             timeoutcaptain;
 } vote_t;
 
-typedef struct vote_menu_s
-{
-	unsigned        timelimit;
-	unsigned        bfg;
-	unsigned        powerups;
-	unsigned        gamemode;
-	unsigned        chat;
-	unsigned        bugs;
-	int             overtime;
-	int             map_index;      // index in array
-	int             cfg_index;      // index in array
-	char            map[MAX_QPATH];
-	char            config[MAX_QPATH];
-	edict_t         *kick;
-
-	char            string_gamemode[32];
-	char            string_map[32];
-	char            string_config[32];
-
-	char            string_timelimit[32];
-	char            string_overtime[32];
-	char            string_powerups[32];
-	char            string_bfg[32];
-
-	char            string_kick[32];
-	char            string_chat[32];
-	char            string_bugs[32];
-
-	qboolean        decrease;
-	qboolean        show;
+/**
+ *
+ */
+typedef struct vote_menu_s {
+    unsigned        timelimit;
+    unsigned        bfg;
+    unsigned        powerups;
+    unsigned        gamemode;
+    unsigned        chat;
+    unsigned        bugs;
+    int             overtime;
+    int             map_index;      // index in array
+    int             cfg_index;      // index in array
+    char            map[MAX_QPATH];
+    char            config[MAX_QPATH];
+    edict_t         *kick;
+    char            string_gamemode[32];
+    char            string_map[32];
+    char            string_config[32];
+    char            string_timelimit[32];
+    char            string_overtime[32];
+    char            string_powerups[32];
+    char            string_bfg[32];
+    char            string_kick[32];
+    char            string_chat[32];
+    char            string_bugs[32];
+    qboolean        decrease;
+    qboolean        show;
 } vote_menu_t;
 
-typedef struct join_menu_s
-{
-	char			string_teamJoinText[MAX_TEAMS][32];
+/**
+ *
+ */
+typedef struct join_menu_s {
+    char    string_teamJoinText[MAX_TEAMS][32];
 } join_menu_t;
 
-enum
-{
-	SND_DEATH1,
-	SND_DEATH2,
-	SND_DEATH3,
-	SND_DEATH4,
-	SND_FALL1,
-	SND_FALL2,
-	SND_GURP1,
-	SND_GURP2,
-	SND_JUMP1,
-	SND_PAIN25_1,
-	SND_PAIN25_2,
-	SND_PAIN50_1,
-	SND_PAIN50_2,
-	SND_PAIN75_1,
-	SND_PAIN75_2,
-	SND_PAIN100_1,
-	SND_PAIN100_2,
-	SND_MAX,
+/**
+ *
+ */
+enum {
+    SND_DEATH1,
+    SND_DEATH2,
+    SND_DEATH3,
+    SND_DEATH4,
+    SND_FALL1,
+    SND_FALL2,
+    SND_GURP1,
+    SND_GURP2,
+    SND_JUMP1,
+    SND_PAIN25_1,
+    SND_PAIN25_2,
+    SND_PAIN50_1,
+    SND_PAIN50_2,
+    SND_PAIN75_1,
+    SND_PAIN75_2,
+    SND_PAIN100_1,
+    SND_PAIN100_2,
+    SND_MAX,
 };
 
-typedef struct
-{
-	int         players;
-	int         score;
-	char        name[MAX_TEAMNAME_LENGTH];
-	char        skin[MAX_TEAMSKIN_LENGTH];
-	char        statname[32];
-	char        statstatus[16];
-	qboolean    locked;
-	qboolean    speclocked;
-	qboolean    ready;
-	edict_t     *captain;
-	qboolean    safety;
+/**
+ *
+ */
+typedef struct {
+    int         players;
+    int         score;
+    char        name[MAX_TEAMNAME_LENGTH];
+    char        skin[MAX_TEAMSKIN_LENGTH];
+    char        statname[32];
+    char        statstatus[16];
+    qboolean    locked;
+    qboolean    speclocked;
+    qboolean    ready;
+    edict_t     *captain;
+    qboolean    safety;
 } teaminfo_t;
 
 extern int soundcache[MAX_SOUNDS];
 
-typedef enum
-{
-	JS_FIRST_JOIN,
-	JS_JOINED,
+/**
+ *
+ */
+typedef enum {
+    JS_FIRST_JOIN,
+    JS_JOINED,
 } joinstate_t;
 
-typedef enum
-{
-	VOTE_HOLD,
-	VOTE_YES,
-	VOTE_NO
+/**
+ *
+ */
+typedef enum {
+    VOTE_HOLD,
+    VOTE_YES,
+    VOTE_NO
 } player_vote_t;
 
-typedef enum
-{
-	DL_NONE,
-	DL_CONFIG,
-	DL_PLAYER_CONFIG,
-	DL_POST_STATS,
+/**
+ *
+ */
+typedef enum {
+    DL_NONE,
+    DL_CONFIG,
+    DL_PLAYER_CONFIG,
+    DL_POST_STATS,
 } dltype_t;
 
-typedef struct tdm_download_s
-{
-	edict_t     *initiator;
-	unsigned    unique_id;
-	dltype_t    type;
-	char        name[32];
-	char        path[1024];
-	void        (*onFinish)(struct tdm_download_s *, int, byte *, int);
-	qboolean    inuse;
+/**
+ *
+ */
+typedef struct tdm_download_s {
+    edict_t     *initiator;
+    unsigned    unique_id;
+    dltype_t    type;
+    char        name[32];
+    char        path[1024];
+    void        (*onFinish)(struct tdm_download_s *, int, byte *, int);
+    qboolean    inuse;
 } tdm_download_t;
 
-typedef struct
-{
-	int         auto_record;         // record demo for each match
-	int         auto_screenshot;     // screenshot intermission
-	char        teamskin[64];
-	char        enemyskin[64];
-	int         id_highlight;
-	int         id_x;
-	int         id_y;
-	int         weapon_hud;          // show weapon/ammo hud?
-	int         weapon_hud_x;        // offset from right
-	int         weapon_hud_y;        // offset from center
-	int         armor_timer;         // auto time armor pickups
-	int         armor_mask;          // which armor to time
-	int         weapon_timer;        // auto time weapon pickups
-	int         weapon_mask;         // which weapons to time
-	qboolean    loaded;
+/**
+ *
+ */
+typedef struct {
+    int         auto_record;         // record demo for each match
+    int         auto_screenshot;     // screenshot intermission
+    char        teamskin[64];
+    char        enemyskin[64];
+    int         id_highlight;
+    int         id_x;
+    int         id_y;
+    int         weapon_hud;          // show weapon/ammo hud?
+    int         weapon_hud_x;        // offset from right
+    int         weapon_hud_y;        // offset from center
+    int         armor_timer;         // auto time armor pickups
+    int         armor_mask;          // which armor to time
+    int         weapon_timer;        // auto time weapon pickups
+    int         weapon_mask;         // which weapons to time
+    qboolean    loaded;
 } playerconfig_t;
 
-extern matchmode_t	tdm_match_status;
-extern teaminfo_t	teaminfo[MAX_TEAMS];
+extern matchmode_t  tdm_match_status;
+extern teaminfo_t   teaminfo[MAX_TEAMS];
 
 // client_t->anim_priority
 #define	ANIM_BASIC      0           // stand / run
@@ -1450,410 +1371,396 @@ extern teaminfo_t	teaminfo[MAX_TEAMS];
 #define	ANIM_DEATH      5
 #define	ANIM_REVERSE    6
 
-enum
-{
-	CHASE_EYES,
-	CHASE_THIRDPERSON,
-	CHASE_FREE,
-	CHASE_MAX,
-	CHASE_LOCK,
+enum {
+    CHASE_EYES,
+    CHASE_THIRDPERSON,
+    CHASE_FREE,
+    CHASE_MAX,
+    CHASE_LOCK,
 };
 
-enum
-{
-	SPEC_NONE,
-	SPEC_INVUL,
-	SPEC_QUAD,
-	SPEC_KILLER,
-	SPEC_LEADER,
+enum {
+    SPEC_NONE,
+    SPEC_INVUL,
+    SPEC_QUAD,
+    SPEC_KILLER,
+    SPEC_LEADER,
 };
 
-typedef enum
-{
-	GRENADE_NONE,
-	GRENADE_BLEW_UP,
-	GRENADE_THROWN,
+typedef enum {
+    GRENADE_NONE,
+    GRENADE_BLEW_UP,
+    GRENADE_THROWN,
 } grenade_state_t;
 
-typedef enum
-{
-	TIMER_NONE,
-	TIMER_QUAD,
-	TIMER_INVULN,
-	TIMER_ARMOR,
-	TIMER_WEAPON,
-	TIMER_ENVIROSUIT,
-	TIMER_REBREATHER,
-	TIMER_MAX,	// make sure is always last
+typedef enum {
+    TIMER_NONE,
+    TIMER_QUAD,
+    TIMER_INVULN,
+    TIMER_ARMOR,
+    TIMER_WEAPON,
+    TIMER_ENVIROSUIT,
+    TIMER_REBREATHER,
+    TIMER_MAX,	// make sure is always last
 } item_timer_t;
 
 typedef struct {
-	item_timer_t   current;    // which is current displayed? (quad, inv, armor, etc)
-	int            expires;    // frame to switch from current
-	int            stat_index; // ps stat for the timer value
-	int            stat_icon;  // ps stat for the icon
+    item_timer_t   current;    // which is current displayed? (quad, inv, armor, etc)
+    int            expires;    // frame to switch from current
+    int            stat_index; // ps stat for the timer value
+    int            stat_icon;  // ps stat for the icon
 } timer_state_t;
 
 // client data that stays across multiple level loads
-typedef struct
-{
-	char           userinfo[MAX_INFO_STRING];
-	char           netname[16];
-	char           ip[INET6_ADDRSTRLEN + 8]; // plus port and surrounding brackets
-	netadr_t       address; // the player's ip, port, etc
-	int            hand;
-	qboolean       connected;       // a loadgame will leave valid entities that
+typedef struct {
+    char           userinfo[MAX_INFO_STRING];
+    char           netname[16];
+    char           ip[INET6_ADDRSTRLEN + 8]; // plus port and surrounding brackets
+    netadr_t       address; // the player's ip, port, etc
+    int            hand;
+    qboolean       connected;       // a loadgame will leave valid entities that
                                     // just don't have a connection yet
-	qboolean       admin;
-	unsigned       team;
-	joinstate_t    joinstate;
-	const gitem_t  *last_weapon;
-	qboolean       shown_motd;
-	qboolean       disable_id_view;
-	qboolean       specinvite[MAX_TEAMS];
-	unsigned       mute_frame;      // mute player while game framenum < this
-	qboolean       mvdclient;
-	pmenuhnd_t     menu;            // persist across death
+    qboolean       admin;
+    unsigned       team;
+    joinstate_t    joinstate;
+    const gitem_t  *last_weapon;
+    qboolean       shown_motd;
+    qboolean       disable_id_view;
+    qboolean       specinvite[MAX_TEAMS];
+    unsigned       mute_frame;      // mute player while game framenum < this
+    qboolean       mvdclient;
+    pmenuhnd_t     menu;            // persist across death
 
-	// stored values displayed in the menu
-	vote_menu_t    votemenu_values;
-	join_menu_t    joinmenu_values;
+    // stored values displayed in the menu
+    vote_menu_t    votemenu_values;
+    join_menu_t    joinmenu_values;
 
-	// we need separate menus for all players
-	pmenu_t        votemenu[19];
-	pmenu_t        joinmenu[19];
+    // we need separate menus for all players
+    pmenu_t        votemenu[19];
+    pmenu_t        joinmenu[19];
 
-	// per-client download handle (configs)
-	tdm_download_t download;
-	playerconfig_t config;
-	unsigned       uniqueid;
-	int            userflags;
-	qboolean       weaponhud;             // show weap/ammo counts on screen
-	int            weaponhud_offset_x;    // right/left offset from right side
-	int            weaponhud_offset_y;    // up/down offset from middle
-	int            ignore;                // bitmask
-	int            weapon_timer;          // auto timer for weapons
-	int            weapon_mask;           // weapons to auto timer
-	int            armor_timer;           // auto timer for armor
-	int            armor_mask;            // armor to auto timer
-	int            timeout_count;         // how many timeouts did we call?
+    // per-client download handle (configs)
+    tdm_download_t download;
+    playerconfig_t config;
+    unsigned       uniqueid;
+    int            userflags;
+    qboolean       weaponhud;             // show weap/ammo counts on screen
+    int            weaponhud_offset_x;    // right/left offset from right side
+    int            weaponhud_offset_y;    // up/down offset from middle
+    int            ignore;                // bitmask
+    int            weapon_timer;          // auto timer for weapons
+    int            weapon_mask;           // weapons to auto timer
+    int            armor_timer;           // auto timer for armor
+    int            armor_mask;            // armor to auto timer
+    int            timeout_count;         // how many timeouts did we call?
 
-	// armor/weapon timers
-	int            item_timer[TIMER_MAX];
-	int            item_timer_icon[TIMER_MAX];
-	int            next_timer_update;
+    // armor/weapon timers
+    int            item_timer[TIMER_MAX];
+    int            item_timer_icon[TIMER_MAX];
+    int            next_timer_update;
 
-	// the timers in the hud
-	timer_state_t  timer1;
-	timer_state_t  timer2;
-
+    // the timers in the hud
+    timer_state_t  timer1;
+    timer_state_t  timer2;
 } client_persistent_t;
 
-typedef struct
-{
-	int            enterframe;            // level.framenum the client entered the game
-	int            score;                 // frags, etc
-	vec3_t         cmd_angles;            // angles sent over in the last command
-	unsigned       flood_locktill;        // locked from talking
-	unsigned       flood_when[10];        // when messages were said
-	int            flood_whenhead;        // head pointer for when said
-	unsigned       flood_waves_locktill;  // locked from using waves
-	unsigned       flood_waves_when[10];  // when wave were made
-	int            flood_waves_whenhead;  // head pointer for when made
-	qboolean       ready;
-	unsigned       last_command_frame;
-	edict_t        *last_invited_by;
-	player_vote_t  vote;
-	teamplayer_t   *teamplayerinfo;
-	edict_t        *last_id_client;
-	int            last_id_health;
-	int            last_id_armor;
-	int            last_id_powerarmor;
-	int            spec_mode;             // bitmask
+typedef struct {
+    int            enterframe;            // level.framenum the client entered the game
+    int            score;                 // frags, etc
+    vec3_t         cmd_angles;            // angles sent over in the last command
+    unsigned       flood_locktill;        // locked from talking
+    unsigned       flood_when[10];        // when messages were said
+    int            flood_whenhead;        // head pointer for when said
+    unsigned       flood_waves_locktill;  // locked from using waves
+    unsigned       flood_waves_when[10];  // when wave were made
+    int            flood_waves_whenhead;  // head pointer for when made
+    qboolean       ready;
+    unsigned       last_command_frame;
+    edict_t        *last_invited_by;
+    player_vote_t  vote;
+    teamplayer_t   *teamplayerinfo;
+    edict_t        *last_id_client;
+    int            last_id_health;
+    int            last_id_armor;
+    int            last_id_powerarmor;
+    int            spec_mode;             // bitmask
 } client_respawn_t;
 
 
 // this structure is cleared on each PutClientInServer(),
 // except for 'client->pers'
-struct gclient_s
-{
-	// known to server
-	player_state_t ps;              // communicated by server to clients
-	int            ping;
-	int            clientNum;
+struct gclient_s {
+    // known to server
+    player_state_t ps;              // communicated by server to clients
+    int            ping;
+    int            clientNum;
 
-	// private to game
-	client_persistent_t pers;
-	client_respawn_t    resp;
+    // private to game
+    client_persistent_t pers;
+    client_respawn_t    resp;
 
-	pmove_state_t  old_pmove;       // for detecting out-of-pmove changes
+    pmove_state_t  old_pmove;       // for detecting out-of-pmove changes
 
-	qboolean       showscores;      // set layout stat
-	qboolean       showoldscores;   // set layout stat
-	qboolean       showmotd;        // set layout stat
+    qboolean       showscores;      // set layout stat
+    qboolean       showoldscores;   // set layout stat
+    qboolean       showmotd;        // set layout stat
 
-	int            ammo_index;
-	int            buttons;
-	int            oldbuttons;
-	int            latched_buttons;
+    int            ammo_index;
+    int            buttons;
+    int            oldbuttons;
+    int            latched_buttons;
 
-	qboolean       weapon_thunk;
+    qboolean       weapon_thunk;
 
-	const gitem_t  *newweapon;
+    const gitem_t  *newweapon;
 
-	// sum up damage over an entire frame, so
-	// shotgun blasts give a single big kick
-	int            damage_armor;    // damage absorbed by armor
-	int            damage_parmor;   // damage absorbed by power armor
-	int            damage_blood;    // damage taken out of health
-	int            damage_knockback; // impact damage
-	vec3_t         damage_from;     // origin for vector calculation
+    // sum up damage over an entire frame, so
+    // shotgun blasts give a single big kick
+    int            damage_armor;    // damage absorbed by armor
+    int            damage_parmor;   // damage absorbed by power armor
+    int            damage_blood;    // damage taken out of health
+    int            damage_knockback; // impact damage
+    vec3_t         damage_from;     // origin for vector calculation
 
-	float          killer_yaw;      // when dead, look at killer
+    float          killer_yaw;      // when dead, look at killer
 
-	weaponstate_t  weaponstate;
-	vec3_t         kick_angles;     // weapon kicks
-	vec3_t         kick_angles_final;  // weapon kicks
-	vec3_t         kick_origin;
-	vec3_t         kick_origin_final;
-	unsigned       kick_origin_start;
-	unsigned       kick_origin_end;
-	float          v_dmg_roll, v_dmg_pitch;  // damage kicks
-	int            v_dmg_framenum;
-	float          fall_value;      // for view drop on fall
-	int            fall_framenum;
-	float          damage_alpha;
-	float          bonus_alpha;
-	vec3_t         damage_blend;
-	vec3_t         v_angle;         // aiming direction
-	float          bobtime;         // so off-ground doesn't change it
-	vec3_t         oldviewangles;
-	vec3_t         oldvelocity;
+    weaponstate_t  weaponstate;
+    vec3_t         kick_angles;     // weapon kicks
+    vec3_t         kick_angles_final;  // weapon kicks
+    vec3_t         kick_origin;
+    vec3_t         kick_origin_final;
+    unsigned       kick_origin_start;
+    unsigned       kick_origin_end;
+    float          v_dmg_roll, v_dmg_pitch;  // damage kicks
+    int            v_dmg_framenum;
+    float          fall_value;      // for view drop on fall
+    int            fall_framenum;
+    float          damage_alpha;
+    float          bonus_alpha;
+    vec3_t         damage_blend;
+    vec3_t         v_angle;         // aiming direction
+    float          bobtime;         // so off-ground doesn't change it
+    vec3_t         oldviewangles;
+    vec3_t         oldvelocity;
 
-	unsigned       next_drown_framenum;
-	int            old_waterlevel;
-	int            breather_sound;
+    unsigned       next_drown_framenum;
+    int            old_waterlevel;
+    int            breather_sound;
 
-	int            machinegun_shots;  // for weapon raising
+    int            machinegun_shots;  // for weapon raising
 
-	// animation vars
-	int            anim_end;
-	int            anim_priority;
-	qboolean       anim_duck;
-	qboolean       anim_run;
+    // animation vars
+    int            anim_end;
+    int            anim_priority;
+    qboolean       anim_duck;
+    qboolean       anim_run;
 
-	// powerup timers
-	unsigned       quad_framenum;
-	unsigned       invincible_framenum;
-	unsigned       breather_framenum;
-	unsigned       enviro_framenum;
+    // powerup timers
+    unsigned       quad_framenum;
+    unsigned       invincible_framenum;
+    unsigned       breather_framenum;
+    unsigned       enviro_framenum;
 
-	grenade_state_t  grenade_state;
-	unsigned       grenade_framenum;
-	int            silencer_shots;
-	int            weapon_sound;
-	unsigned       pickup_msg_framenum;
-	unsigned       respawn_framenum;  // can respawn when time > this
+    grenade_state_t  grenade_state;
+    unsigned       grenade_framenum;
+    int            silencer_shots;
+    int            weapon_sound;
+    unsigned       pickup_msg_framenum;
+    unsigned       respawn_framenum;  // can respawn when time > this
 
-	edict_t        *chase_target;   // player we are chasing
-	qboolean       update_chase;    // need to update chase info?
-	int            chase_mode;
+    edict_t        *chase_target;   // player we are chasing
+    qboolean       update_chase;    // need to update chase info?
+    int            chase_mode;
 
-	// values saved and restored from edicts when changing levels
-	int            savedFlags;
+    // values saved and restored from edicts when changing levels
+    int            savedFlags;
 
-	int            selected_item;
-	int            inventory[MAX_ITEMS];
+    int            selected_item;
+    int            inventory[MAX_ITEMS];
 
-	// ammo capacities
-	int            max_bullets;
-	int            max_shells;
-	int            max_rockets;
-	int            max_grenades;
-	int            max_cells;
-	int            max_slugs;
+    // ammo capacities
+    int            max_bullets;
+    int            max_shells;
+    int            max_rockets;
+    int            max_grenades;
+    int            max_cells;
+    int            max_slugs;
 
-	const gitem_t  *weapon;
-	const gitem_t  *lastweapon;
+    const gitem_t  *weapon;
+    const gitem_t  *lastweapon;
 
-	unsigned       last_command_frame;
-	unsigned       last_activity_frame;
+    unsigned       last_command_frame;
+    unsigned       last_activity_frame;
 
-	int32          last_model_frame;
-	int            next_animation_frame;
-	unsigned       next_weapon_think;
-	vec3_t         saved_angles;
+    int32          last_model_frame;
+    int            next_animation_frame;
+    unsigned       next_weapon_think;
+    vec3_t         saved_angles;
 
-	int            last_hud_update;
-	int            next_hud_update;
+    int            last_hud_update;
+    int            next_hud_update;
 };
 
-typedef enum
-{
-	ENT_INVALID,
-	ENT_FUNC_DOOR,
-	ENT_FUNC_DOOR_ROTATING,
-	ENT_FUNC_AREAPORTAL,
-	ENT_GRENADE,
-	ENT_FUNC_TRAIN,
-	ENT_DOOR_TRIGGER,
-	ENT_PLAT_TRIGGER,
-	ENT_BODYQUE,
-	ENT_GHOST,
-	ENT_GIB,
+typedef enum {
+    ENT_INVALID,
+    ENT_FUNC_DOOR,
+    ENT_FUNC_DOOR_ROTATING,
+    ENT_FUNC_AREAPORTAL,
+    ENT_GRENADE,
+    ENT_FUNC_TRAIN,
+    ENT_DOOR_TRIGGER,
+    ENT_PLAT_TRIGGER,
+    ENT_BODYQUE,
+    ENT_GHOST,
+    ENT_GIB,
 } enttype_t;
 
-struct edict_s
-{
-	entity_state_t      s;
-	struct gclient_s    *client;    // NULL if not a player
+struct edict_s {
+    entity_state_t      s;
+    struct gclient_s    *client;    // NULL if not a player
                                     // the server expects the first part
                                     // of gclient_s to be a player_state_t
                                     // but the rest of it is opaque
-	qboolean    inuse;
-	int         linkcount;
+    qboolean    inuse;
+    int         linkcount;
 
-	// FIXME: move these fields to a server private sv_entity_t
-	link_t      area;               // linked to a division node or leaf
-	int         num_clusters;       // if -1, use headnode instead
-	int         clusternums[MAX_ENT_CLUSTERS];
-	int         headnode;           // unused if num_clusters != -1
-	int         areanum, areanum2;
-	//================================
+    // FIXME: move these fields to a server private sv_entity_t
+    link_t      area;               // linked to a division node or leaf
+    int         num_clusters;       // if -1, use headnode instead
+    int         clusternums[MAX_ENT_CLUSTERS];
+    int         headnode;           // unused if num_clusters != -1
+    int         areanum, areanum2;
+    //================================
 
-	int         svflags;
-	vec3_t      mins, maxs;
-	vec3_t      absmin, absmax, size;
-	solid_t     solid;
-	int         clipmask;
-	edict_t     *owner;
+    int         svflags;
+    vec3_t      mins, maxs;
+    vec3_t      absmin, absmax, size;
+    solid_t     solid;
+    int         clipmask;
+    edict_t     *owner;
 
-	// DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER
-	// EXPECTS THE FIELDS IN THAT ORDER!
-	//================================
-	
-	int         movetype;
-	int         flags;
-	const char  *model;
-	unsigned    freed_framenum;     // level.framenum when the object was freed
+    // DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER
+    // EXPECTS THE FIELDS IN THAT ORDER!
+    //================================
 
-	//
-	// only used locally in game, not by server
-	//
+    int         movetype;
+    int         flags;
+    const char  *model;
+    unsigned    freed_framenum;     // level.framenum when the object was freed
 
-	char        *message;
-	const char  *classname;
-	int         spawnflags;
-	float		timestamp;
-	float       angle;              // set in qe3, -1 = up, -2 = down
-	char        *target;
-	char        *targetname;
-	char        *killtarget;
-	char        *team;
-	char        *pathtarget;
-	char        *deathtarget;
-	char        *combattarget;
-	edict_t     *target_ent;
+    //
+    // only used locally in game, not by server
+    //
 
-	float       speed, accel, decel;
-	vec3_t      movedir;
-	vec3_t      pos1, pos2;
-	vec3_t      velocity;
-	vec3_t      avelocity;
-	int         mass;
-	unsigned    air_finished_framenum;
-	float       gravity;            // per entity gravity multiplier (1.0 is normal)
+    char        *message;
+    const char  *classname;
+    int         spawnflags;
+    float       timestamp;
+    float       angle;              // set in qe3, -1 = up, -2 = down
+    char        *target;
+    char        *targetname;
+    char        *killtarget;
+    char        *team;
+    char        *pathtarget;
+    char        *deathtarget;
+    char        *combattarget;
+    edict_t     *target_ent;
+
+    float       speed, accel, decel;
+    vec3_t      movedir;
+    vec3_t      pos1, pos2;
+    vec3_t      velocity;
+    vec3_t      avelocity;
+    int         mass;
+    unsigned    air_finished_framenum;
+    float       gravity;            // per entity gravity multiplier (1.0 is normal)
                                     // use for lowgrav artifact, flares
-	edict_t     *goalentity;
-	edict_t     *movetarget;
-	float       yaw_speed;
-	float       ideal_yaw;
-	unsigned    nextthink;
-	void        (*prethink) (edict_t *ent);
-	void        (*think)(edict_t *self);
-	void        (*blocked)(edict_t *self, edict_t *other);	//move to moveinfo?
-	void        (*touch)(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf);
-	void        (*use)(edict_t *self, edict_t *other, edict_t *activator);
-	void        (*pain)(edict_t *self, edict_t *other, float kick, int damage);
-	void        (*die)(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
+    edict_t     *goalentity;
+    edict_t     *movetarget;
+    float       yaw_speed;
+    float       ideal_yaw;
+    unsigned    nextthink;
+    void        (*prethink) (edict_t *ent);
+    void        (*think)(edict_t *self);
+    void        (*blocked)(edict_t *self, edict_t *other);  //move to moveinfo?
+    void        (*touch)(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf);
+    void        (*use)(edict_t *self, edict_t *other, edict_t *activator);
+    void        (*pain)(edict_t *self, edict_t *other, float kick, int damage);
+    void        (*die)(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
 
-	unsigned    touch_debounce_framenum;      // are all these legit?  do we need more/less of them?
-	unsigned    pain_debounce_framenum;
-	unsigned    damage_debounce_framenum;
-	unsigned    fly_sound_debounce_framenum;  //move to clientinfo
+    unsigned    touch_debounce_framenum;      // are all these legit?  do we need more/less of them?
+    unsigned    pain_debounce_framenum;
+    unsigned    damage_debounce_framenum;
+    unsigned    fly_sound_debounce_framenum;  //move to clientinfo
 
-	int         health;
-	int         max_health;
-	int         gib_health;
-	int         deadflag;
-	qboolean    show_hostile;
-	unsigned    powerarmor_framenum;
-	char        *map;               // target_changelevel
-	int         viewheight;         // height above origin where eyesight is determined
-	int         takedamage;
-	int         dmg;
-	int         radius_dmg;
-	float       dmg_radius;
-	int         sounds;             // make this a spawntemp var?
-	int         count;
+    int         health;
+    int         max_health;
+    int         gib_health;
+    int         deadflag;
+    qboolean    show_hostile;
+    unsigned    powerarmor_framenum;
+    char        *map;               // target_changelevel
+    int         viewheight;         // height above origin where eyesight is determined
+    int         takedamage;
+    int         dmg;
+    int         radius_dmg;
+    float       dmg_radius;
+    int         sounds;             // make this a spawntemp var?
+    int         count;
 
-	edict_t     *chain;
-	edict_t     *enemy;
-	edict_t     *oldenemy;
-	edict_t     *activator;
-	edict_t     *groundentity;
-	int         groundentity_linkcount;
-	edict_t     *teamchain;
-	edict_t     *teammaster;
+    edict_t     *chain;
+    edict_t     *enemy;
+    edict_t     *oldenemy;
+    edict_t     *activator;
+    edict_t     *groundentity;
+    int         groundentity_linkcount;
+    edict_t     *teamchain;
+    edict_t     *teammaster;
 
-	edict_t     *mynoise;           // can go in client only
-	edict_t     *mynoise2;
+    edict_t     *mynoise;           // can go in client only
+    edict_t     *mynoise2;
 
-	int         noise_index;
-	int         noise_index2;
-	float       volume;
-	float       attenuation;
+    int         noise_index;
+    int         noise_index2;
+    float       volume;
+    float       attenuation;
 
-	// timing variables
-	float       wait;
-	float       delay;              // before firing targets
-	float       random;
+    // timing variables
+    float       wait;
+    float       delay;              // before firing targets
+    float       random;
 
-	int         watertype;
-	int         waterlevel;
+    int         watertype;
+    int         waterlevel;
 
-	vec3_t      move_origin;
-	vec3_t      move_angles;
+    vec3_t      move_origin;
+    vec3_t      move_angles;
 
-	int         light_level;
-	int         style;              // also used as areaportal number
+    int         light_level;
+    int         style;              // also used as areaportal number
 
-	const gitem_t *item;            // for bonus items
+    const gitem_t *item;            // for bonus items
 
-	// common data blocks
-	moveinfo_t  moveinfo;
-	//monsterinfo_t	monsterinfo;
+    // common data blocks
+    moveinfo_t  moveinfo;
+    //monsterinfo_t monsterinfo;
 
-	enttype_t   enttype;
+    enttype_t   enttype;
 
-	// hack for proper s.old_origin updates
-	vec3_t      old_origin;
+    // hack for proper s.old_origin updates
+    vec3_t      old_origin;
 };
 
-//server features
-// server is able to read clientNum field from gclient_s struct and hide appropriate entity from client
-// game DLL fills clientNum with useful information (current POV index)
-#define GMF_CLIENTNUM   1
+// R1Q2 and Q2PRO specific
+#define GMF_CLIENTNUM               BIT(0)      // game sets clientNum gclient_s field
+#define GMF_PROPERINUSE             BIT(1)      // game maintains edict_s inuse field properly
+#define GMF_MVDSPEC                 BIT(2)      // game is dummy MVD client aware
+#define GMF_WANT_ALL_DISCONNECTS    BIT(3)      // game wants ClientDisconnect() for non-spawned clients
 
-// game DLL always sets 'inuse' flag properly allowing the server to reject entities quickly
-#define GMF_PROPERINUSE 2
-
-// server will set '\mvdspec\<version>' key/value pair in userinfo string if (and only if) client is dummy MVD client (this client represents all MVD spectators and is needed for scoreboard support, etc)
-#define GMF_MVDSPEC     4
-
-// inform game DLL of disconnects between level changes
-#define GMF_WANT_ALL_DISCONNECTS 8
-
-#define GMF_VARIABLE_FPS	0x800
-
-#define GMF_IPV6_ADDRESS_AWARE 1<<13
+// Q2PRO specific
+#define GMF_ENHANCED_SAVEGAMES      BIT(10)     // game supports safe/portable savegames
+#define GMF_VARIABLE_FPS            BIT(11)     // game supports variable server FPS
+#define GMF_EXTRA_USERINFO          BIT(12)     // game wants extra userinfo after normal userinfo
+#define GMF_IPV6_ADDRESS_AWARE      BIT(13)     // game supports IPv6 addresses
+#define GMF_ALLOW_INDEX_OVERFLOW    BIT(14)     // game wants PF_FindIndex() to return 0 on overflow
+#define GMF_PROTOCOL_EXTENSIONS     BIT(15)     // game supports protocol extensions
