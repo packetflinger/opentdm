@@ -2566,8 +2566,8 @@ void TDM_Maplist_f(edict_t *ent) {
  * Players issue this command to see the randomized list of maps and
  * which one is next.
  */
-void TDM_RandomMap_f(edict_t *ent) {
-    randmap_t *list;
+void TDM_SmartMap_f(edict_t *ent) {
+    smartmap_t *list;
     int index;
     int i;
     char buf[150];
@@ -2581,25 +2581,25 @@ void TDM_RandomMap_f(edict_t *ent) {
         } else {
             gi.cprintf(ent, PRINT_HIGH,
                     "Specs must specify a list. Usage: %s [1-%d]\n", gi.argv(0),
-                    RM_MAX - 1);
+                    SM_MAX - 1);
             return;
         }
     } else {
         if (!isdigit(arg[0])) {
             gi.cprintf(ent, PRINT_HIGH, "Usage: %s [1-%d]\n", gi.argv(0),
-                    RM_MAX - 1);
+                    SM_MAX - 1);
             return;
         }
         index = atoi(arg);
     }
 
-    if (index >= RM_MAX) {
+    if (index >= SM_MAX) {
         gi.cprintf(ent, PRINT_HIGH, "Usage: %s [1-%d]\n", gi.argv(0),
-                RM_MAX - 1);
+                SM_MAX - 1);
         return;
     }
 
-    list = &game.random_maps[index];
+    list = &game.smartmaps[index];
     if (list->total == 0) {
         gi.cprintf(ent, PRINT_HIGH, "No maps listed for teams of %d\n", index);
         return;
@@ -2629,12 +2629,12 @@ void TDM_RandomMap_f(edict_t *ent) {
 /**
  * Admin command, re-randomize the random map lists
  */
-void TDM_ShuffleMaps_f(edict_t *ent) {
+void TDM_ShuffleSmartMaps_f(edict_t *ent) {
     int i;
-    randmap_t *rm;
+    smartmap_t *rm;
 
-    for (i = 1; i < RM_MAX; i++) {
-        rm = &game.random_maps[i];
+    for (i = 1; i < SM_MAX; i++) {
+        rm = &game.smartmaps[i];
         RandomizeArray((void*) rm->maps, rm->total);
         rm->index = 0;
     }
@@ -2695,8 +2695,8 @@ qboolean TDM_Command(const char *cmd, edict_t *ent) {
         } else if (!Q_stricmp(cmd, "serverdemostop")) {
             //TDM_ServerDemoStop_f(ent);
             return true;
-        } else if (!Q_stricmp(cmd, "shufflemaps")) {
-            TDM_ShuffleMaps_f(ent);
+        } else if (!Q_stricmp(cmd, "shufflesmartmaps")) {
+            TDM_ShuffleSmartMaps_f(ent);
             return true;
         }
     }
@@ -2925,8 +2925,8 @@ qboolean TDM_Command(const char *cmd, edict_t *ent) {
             TDM_Maplist_f(ent);
         } else if (!Q_stricmp(cmd, "stopsound")) {
             return true;//prevent chat from our stuffcmds on people who have no sound
-        } else if (!Q_stricmp(cmd, "randommap")) {
-            TDM_RandomMap_f(ent);
+        } else if (!Q_stricmp(cmd, "smartmap")) {
+            TDM_SmartMap_f(ent);
         } else {
             return false;
         }

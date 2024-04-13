@@ -431,20 +431,20 @@ typedef struct gitem_s {
     const char  *shortname;
 } gitem_t;
 
-#define RANDMAPFILE "randommaps.cfg"
-#define MAX_RANDOM_MAPS     75
+#define SMARTMAPFILE    "smartmap.cfg"
+#define MAX_SMARTMAPS   75
 
 /**
- * Indexes for random map lists
+ * Indexes for smartmap lists
  */
 typedef enum {
-    RM_NONE,
-    RM_DUEL,
-    RM_TWOS,
-    RM_THREES,
-    RM_FOURS,
-    RM_MAX
-} randmap_type_t;
+    SM_NONE,
+    SM_DUEL,
+    SM_TWOS,
+    SM_THREES,
+    SM_FOURS,
+    SM_MAX
+} smartmap_type_t;
 
 /**
  * A grouping of random maps for a particular team size (duel, 3s, etc). These are
@@ -454,12 +454,12 @@ typedef enum {
  * re-shuffled once they're all used.
  */
 typedef struct {
-    randmap_type_t  type;   // backwards lookup, maybe not needed
+    smartmap_type_t type;   // backwards lookup, maybe not needed
     unsigned long   time;   // when was this list last shuffled?
     int             index;  // where in the list we are
     int             total;  // how many
     char            **maps; // the array of map names
-} randmap_t;
+} smartmap_t;
 
 /**
  * this structure keeps track of the status of server-side multi-view demos.
@@ -492,7 +492,7 @@ typedef struct {
     int           server_features;  // more than 0 == running q2pro
     int           match_count;      // matches played since mod was loaded
     server_demo_t mvd;              // auto server demo stuff
-    randmap_t random_maps[RM_MAX];  // random known-good maps for team sizes
+    smartmap_t    smartmaps[SM_MAX];// random known-good maps for team sizes
 } game_locals_t;
 
 /**
@@ -773,7 +773,7 @@ extern cvar_t *g_http_domain;
 extern cvar_t *g_playerconfig_enabled;
 extern cvar_t *g_debug_spawns;
 extern cvar_t *g_maplistfile;
-extern cvar_t *g_randommapfile;
+extern cvar_t *g_smartmapfile;
 extern cvar_t *g_motd_message;
 extern cvar_t *g_max_players_per_team;
 extern cvar_t *g_bugs;
@@ -1055,9 +1055,9 @@ void TDM_UpdateSpectatorsOnEvent(int spec_mode, edict_t *target,
         edict_t *killer);
 qboolean TDM_Is1V1(void);
 edict_t* TDM_ClosestTeammate(edict_t *ent);
-void TDM_LoadRandomMapLists(void);
-char* TDM_GetRandomMap(int playercount);
-qboolean TDM_VoteRandomMap(edict_t *ent);
+void TDM_LoadSmartMapLists(void);
+char* TDM_GetSmartMap(int playercount);
+qboolean TDM_VoteSmartMap(edict_t *ent);
 void TDM_AsciiToConsole(char *out, char *in);
 void CountPlayers(void);
 void UpdatePlayerTeamMenu(edict_t *ent);

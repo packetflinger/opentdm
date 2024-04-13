@@ -273,8 +273,8 @@ void InitGame(void) {
     // powerups removed (bitmask)
     g_powerupflags = gi.cvar("g_powerupflags", "0", 0);
 
-    // File where random maps are defined
-    g_randommapfile = gi.cvar("g_randommapfile", RANDMAPFILE, CVAR_LATCH);
+    // File where smartmaps are defined
+    g_smartmapfile = gi.cvar("g_smartmapfile", SMARTMAPFILE, CVAR_LATCH);
 
     // whether server should record multi-view demo of matches
     g_record_mvd = gi.cvar("g_record_mvd", "0", 0);
@@ -385,13 +385,13 @@ void InitGame(void) {
     }
 
     // allocate memory for the random map lists
-    memset(&game.random_maps, 0, sizeof(randmap_t) * RM_MAX);
-    for (int i = 0; i < RM_MAX; i++) {
-        game.random_maps[i].maps = gi.TagMalloc(sizeof(char*) * MAX_RANDOM_MAPS,
+    memset(&game.smartmaps, 0, sizeof(smartmap_t) * SM_MAX);
+    for (int i = 0; i < SM_MAX; i++) {
+        game.smartmaps[i].maps = gi.TagMalloc(sizeof(char*) * MAX_SMARTMAPS,
                 TAG_GAME);
-        game.random_maps[i].type = i;
+        game.smartmaps[i].type = i;
     }
-    TDM_LoadRandomMapLists();
+    TDM_LoadSmartMapLists();
     TDM_Init();
 }
 

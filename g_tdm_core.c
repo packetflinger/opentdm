@@ -3336,11 +3336,11 @@ int TDM_PingHandicap(int ping) {
 }
 
 /**
- * Read the random map list config file, load the maps, and randomize them.
+ * Read the smartmap list config file, load the maps, and randomize them.
  *
  * Called at game startup and if a reshuffle is required.
  */
-void TDM_LoadRandomMapLists(void) {
+void TDM_LoadSmartMapLists(void) {
     FILE *fp;
     cvar_t *gamedir;
     char entry[MAX_QPATH + 1];
@@ -3348,11 +3348,11 @@ void TDM_LoadRandomMapLists(void) {
     char *tok;
     char *map;
     int idx;
-    randmap_t *rm;
+    smartmap_t *sm;
     char *path;
 
     gamedir = gi.cvar("gamedir", "baseq2", 0);
-    path = va("%s/%s", gamedir->string, g_randommapfile->string);
+    path = va("%s/%s", gamedir->string, g_smartmapfile->string);
 
     memset(entry, 0, sizeof(entry));
     fp = fopen(path, "r");
@@ -3377,18 +3377,18 @@ void TDM_LoadRandomMapLists(void) {
 
         while (tok != NULL) {
             idx = atoi(tok);
-            rm = &game.random_maps[idx];
-            if (rm->total == MAX_RANDOM_MAPS) {
+            sm = &game.smartmaps[idx];
+            if (sm->total == MAX_SMARTMAPS) {
                 gi.cprintf(
                 NULL, PRINT_HIGH,
-                        "[Rand map] skipping %s (%d), limited to %d maps per group\n",
-                        map, idx, MAX_RANDOM_MAPS);
+                        "[smartmap] skipping %s (%d), limited to %d maps per group\n",
+                        map, idx, MAX_SMARTMAPS);
                 tok = strtok(NULL, " ");
                 continue;
             }
-            rm->maps[rm->total] = gi.TagMalloc(strlen(map) + 1, TAG_GAME);
-            strcpy(rm->maps[rm->total], map);
-            rm->total++;
+            sm->maps[sm->total] = gi.TagMalloc(strlen(map) + 1, TAG_GAME);
+            strcpy(sm->maps[sm->total], map);
+            sm->total++;
 
             tok = strtok(NULL, " ");
         }
@@ -3396,34 +3396,34 @@ void TDM_LoadRandomMapLists(void) {
     fclose(fp);
 
     // randomize the lists
-    for (int i = 0; i < RM_MAX; i++) {
-        RandomizeArray((void*) game.random_maps[i].maps,
-                game.random_maps[i].total);
+    for (int i = 0; i < SM_MAX; i++) {
+        RandomizeArray((void*) game.smartmaps[i].maps,
+                game.smartmaps[i].total);
     }
 }
 
 /**
- * Get the map name of the next random map in the list.
+ * Get the map name of the next smartmap in the list.
  * If we hit the end of the list, reshuffle and go back to 0
  */
-char* TDM_GetRandomMap(int playercount) {
-    randmap_t *rm;
+char* TDM_GetSmartMap(int playercount) {
+    smartmap_t *sm;
     int idx;
 
-    rm = &game.random_maps[playercount];
-    if (rm == NULL) {
+    sm = &game.smartmaps[playercount];
+    if (sm == NULL) {
         return NULL;
     }
 
     // we're at the end...shuffle and start over
-    if (rm->index == rm->total - 1) {
-        RandomizeArray((void*) rm->maps, rm->total);
-        rm->index = 0;
+    if (sm->index == sm->total - 1) {
+        RandomizeArray((void*) sm->maps, sm->total);
+        sm->index = 0;
     }
 
-    idx = rm->index;
-    rm->index++;
-    return rm->maps[idx];
+    idx = sm->index;
+    sm->index++;
+    return sm->maps[idx];
 }
 
 /**

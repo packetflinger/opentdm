@@ -2103,7 +2103,7 @@ void TDM_Vote_f(edict_t *ent) {
                     "  weapontimer <0/1>\n"
                     "  timeoutlimit <integer> (per player; 0 == unlimited)\n"
                     "  timeoutcaptain <0/1>\n"
-                    "  randommap [#] (# is players per team, optional)\n");
+                    "  smartmap [#] (# is players per team, optional)\n");
             return;
         }
 
@@ -2216,8 +2216,8 @@ void TDM_Vote_f(edict_t *ent) {
         started_new_vote = TDM_VoteTimeoutLimit(ent);
     } else if (!Q_stricmp(cmd, "timeoutcaptain")) {
         started_new_vote = TDM_VoteTimeoutCaptain(ent);
-    } else if (!Q_stricmp(cmd, "randommap")) {
-        started_new_vote = TDM_VoteRandomMap(ent);
+    } else if (!Q_stricmp(cmd, "smartmap")) {
+        started_new_vote = TDM_VoteSmartMap(ent);
     } else if (!Q_stricmp(cmd, "yes")) {
         TDM_Vote_X(ent, VOTE_YES, "YES");
     } else if (!Q_stricmp(cmd, "no")) {
@@ -2672,7 +2672,7 @@ int TDM_ArmorStringToBitmask(const char *str) {
     return mask;
 }
 
-qboolean TDM_VoteRandomMap(edict_t *ent) {
+qboolean TDM_VoteSmartMap(edict_t *ent) {
     const char *value;
     int arg;
 
@@ -2685,18 +2685,18 @@ qboolean TDM_VoteRandomMap(edict_t *ent) {
     arg = atoi(gi.argv(2));
 
     // assuming no arg was given rather than specifying a "0"
-    if (arg == RM_NONE) {
+    if (arg == SM_NONE) {
         arg = teaminfo[ent->client->pers.team].players;
     }
 
-    if (arg >= RM_MAX || arg <= RM_NONE) {
-        gi.cprintf(ent, PRINT_HIGH, "Invalid random map list\n");
+    if (arg >= SM_MAX || arg <= SM_NONE) {
+        gi.cprintf(ent, PRINT_HIGH, "Invalid smartmap list\n");
         return false;
     }
 
-    value = TDM_GetRandomMap(arg);
+    value = TDM_GetSmartMap(arg);
     while (!strcmp(level.mapname, value)) {
-        value = TDM_GetRandomMap(arg);
+        value = TDM_GetSmartMap(arg);
     }
 
     if (!value[0]) {

@@ -136,7 +136,7 @@ cvar_t *g_debug_spawns;
 cvar_t *g_max_players_per_team;
 
 cvar_t *g_maplistfile;
-cvar_t *g_randommapfile;
+cvar_t *g_smartmapfile;
 cvar_t *g_motd_message;
 
 cvar_t *g_bugs;
