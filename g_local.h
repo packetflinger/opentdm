@@ -36,6 +36,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #define NAME(e) ((e)->client->pers.netname)
+#define ENTITY(id) (edict_t *)((char *)globals.edicts + (globals.edict_size * id))
+#define ENTITY_OFFSET(e) (((char *)e - (char *)globals.edicts) / globals.edict_size)
+#define TEAM(e) (e->client->pers.team)
+#define TEAMMATES(e1, e2) (TEAM(e1) == TEAM(e2))
 
 // protocol bytes that can be directly added to messages
 #define SVC_MUZZLEFLASH    1
@@ -1216,6 +1220,8 @@ typedef struct vote_s {
     int             weapon_timer;
     int             timeoutlimit;
     int             timeoutcaptain;
+    edict_t         *swap1;
+    edict_t         *swap2;
 } vote_t;
 
 /**

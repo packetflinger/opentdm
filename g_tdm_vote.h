@@ -14,10 +14,13 @@ void TDM_CreateConfiglist (void);
 void TDM_VoteMenuApply (edict_t *ent);
 void TDM_UpdateVoteConfigString (void);
 void TDM_ApplyVote (void);
+void TDM_SwapPlayers(edict_t *id1, edict_t *id2);
+qboolean TDM_VoteSwapPlayers(edict_t *ent);
 
 int LookupPlayer (const char *match, edict_t **out, edict_t *ent);
 int TDM_WeaponStringToBitmask(const char *str);
 int TDM_ArmorStringToBitmask(const char *str);
+edict_t *argToPlayer(char *arg);
 
 //votemenu.c
 void OpenVoteMenu (edict_t *ent);
@@ -127,3 +130,4 @@ extern char     **tdm_configlist;
 #define VOTE_WEAPON_TIMER       0x200000
 #define VOTE_TIMEOUT_LIMIT      0x400000
 #define VOTE_TIMEOUT_CAPTAIN    0x800000
+#define VOTE_SWAPPLAYERS        0x1000000

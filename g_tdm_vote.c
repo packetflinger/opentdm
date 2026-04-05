@@ -305,6 +305,11 @@ void TDM_ApplyVote(void) {
         g_1v1_spawn_mode = gi.cvar_set("g_1v1_spawn_mode", value);
     }
 
+    if (vote.flags & VOTE_SWAPPLAYERS) {
+        gi.bprintf(PRINT_HIGH, "Swapping players\n");
+        TDM_SwapPlayers(vote.swap1, vote.swap2);
+    }
+
     vote.applying = false;
 }
 
@@ -2103,7 +2108,8 @@ void TDM_Vote_f(edict_t *ent) {
                     "  weapontimer <0/1>\n"
                     "  timeoutlimit <integer> (per player; 0 == unlimited)\n"
                     "  timeoutcaptain <0/1>\n"
-                    "  smartmap [#] (# is players per team, optional)\n");
+                    "  smartmap [#] (# is players per team, optional)\n"
+                    "  swap <player1> <player2>\n");
             return;
         }
 
@@ -2218,6 +2224,8 @@ void TDM_Vote_f(edict_t *ent) {
         started_new_vote = TDM_VoteTimeoutCaptain(ent);
     } else if (!Q_stricmp(cmd, "smartmap")) {
         started_new_vote = TDM_VoteSmartMap(ent);
+    } else if (!Q_stricmp(cmd, "swap")) {
+        started_new_vote = TDM_VoteSwapPlayers(ent);
     } else if (!Q_stricmp(cmd, "yes")) {
         TDM_Vote_X(ent, VOTE_YES, "YES");
     } else if (!Q_stricmp(cmd, "no")) {
@@ -2727,4 +2735,149 @@ qboolean TDM_VoteSmartMap(edict_t *ent) {
     vote.flags |= VOTE_MAP;
 
     return true;
+}
+
+/**
+ * Exchange team memberships for two players for balancing teams.
+ */
+qboolean TDM_VoteSwapPlayers(edict_t *ent) {
+    if (!((int) g_vote_mask->value & VOTE_SWAPPLAYERS)
+            && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH,
+                "Voting for player swapping is not allowed on this server.\n");
+        return false;
+    }
+
+    if (tdm_match_status != MM_WARMUP) {
+        gi.cprintf(ent, PRINT_HIGH,
+                "You can't swap players while a match is in progress\n");
+        return false;
+    }
+
+    if (!ent->client->pers.team && !ent->client->pers.admin) {
+        gi.cprintf(ent, PRINT_HIGH,
+                "Only team players can vote for a player swap.\n");
+        return false;
+    }
+    if (gi.argc() < 4) {
+        gi.cprintf(ent, PRINT_HIGH, "too few arguments\n");
+        return false;
+    }
+
+    vote.flags |= VOTE_SWAPPLAYERS;
+    vote.swap1 = argToPlayer(gi.argv(2));
+    vote.swap2 = argToPlayer(gi.argv(3));
+
+    if (!vote.swap1 || !vote.swap2) {
+        gi.cprintf(ent, PRINT_HIGH, "Invalid players\n");
+        return false;
+    }
+    if (!vote.swap1->client || !vote.swap2->client) {
+        gi.cprintf(ent, PRINT_HIGH, "Not a player\n");
+        gi.dprintf("%s\n", vote.swap1->classname);
+        gi.dprintf("%s\n", vote.swap2->classname);
+        return false;
+    }
+    if (TEAM(vote.swap1) == TEAM_SPEC) {
+        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator\n", NAME(vote.swap1));
+        return false;
+    }
+    if (TEAM(vote.swap2) == TEAM_SPEC) {
+        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator\n", NAME(vote.swap2));
+        return false;
+    }
+    if (TEAMMATES(vote.swap1, vote.swap2)) {
+        gi.cprintf(ent, PRINT_HIGH, "%s and %s are team mates\n", NAME(vote.swap1), NAME(vote.swap2));
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Resolve either a player name or ID supplied by a client into a verified
+ * clientID. Returns -1 if the input can't be resolved.
+ *
+ * Note: If a player's name is a number between 0 and maxclients, the name will
+ * be treated as a client id
+ */
+edict_t *argToPlayer(char *arg) {
+    int id, i;
+
+    gi.dprintf("arg: %s\n", arg);
+
+    if (arg[0] == 0) {
+        gi.dprintf("zero arg\n");
+        return NULL;
+    }
+    if (!Q_stricmp(arg, " ")) {
+        gi.dprintf("empty arg\n");
+        return NULL;
+    }
+    id = atoi(arg);
+    gi.dprintf("atoi returned %d\n", id);
+    if (id < 0 || id > game.maxclients) {
+        gi.dprintf("arg out of bounds\n");
+        return NULL;
+    }
+
+    // atoi returns 0 for invalid input, ensure zero was the input
+    if (id == 0 && !Q_stricmp(arg, "0")) {
+        gi.dprintf("returning entity(1)\n");
+        return ENTITY(1); // ent 0 is world, players start at 1
+    }
+
+    if (id > 0) {
+        gi.dprintf("returning entity(%d)", id +1);
+        return ENTITY(id+1);
+    }
+
+    // input was a name
+    if (id == 0) {
+        gi.dprintf("input was name\n");
+        for (i=0; i<game.maxclients; i++) {
+            if (!Q_stricmp(game.clients[i].pers.netname, arg)) {
+                gi.dprintf("i=%d\n", i);
+                return ENTITY(i+1);
+            }
+        }
+    }
+    gi.dprintf("returning null\n");
+    return NULL;
+}
+
+/**
+ * Do the actual changing of the teams.
+ *
+ * Do all the sanity checks again because this is run at the time the vote is
+ * applied which could be 30s+ after the initial vote proposal. In that time
+ * the target players could switch teams, go spec or just quit.
+ */
+void TDM_SwapPlayers(edict_t *p1, edict_t *p2) {
+    int temp;
+
+    if (!p1 || !p2) {
+        gi.bprintf(PRINT_HIGH, "Swap player failed, unable to resolve valid player\n");
+        return;
+    }
+    if (!p1->inuse || !p2->inuse) {
+        gi.bprintf(PRINT_HIGH, "Swap player failed, player edict not in use\n");
+        return;
+    }
+    if (p1->client->pers.team == TEAM_SPEC) {
+        gi.bprintf(PRINT_HIGH, "Swap player failed, %s is a spectator\n", NAME(p1));
+        return;
+    }
+    if (p2->client->pers.team == TEAM_SPEC) {
+        gi.bprintf(PRINT_HIGH, "Swap player failed, %s is a spectator\n", NAME(p2));
+        return;
+    }
+    if (TEAMMATES(p1, p2)) {
+        gi.bprintf(PRINT_HIGH, "Swap player failed, %s and %s are team mates\n", NAME(p1), NAME(p2));
+        return;
+    }
+
+    temp = TEAM(p1);
+    TEAM(p1) = TEAM(p2);
+    TEAM(p2) = temp;
+    gi.bprintf(PRINT_HIGH, "%s and %s have swapped teams\n", NAME(p1), NAME(p2));
 }
