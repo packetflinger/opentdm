@@ -19,6 +19,7 @@
  */
 #include "g_local.h"
 
+// Don't allow chasing or freefloating if teams are speclocked
 void DisableChaseCam(edict_t *ent) {
     //remove a gun model if we were using one for in-eyes
     ent->client->ps.gunframe = ent->client->ps.gunindex = 0;
@@ -39,6 +40,7 @@ void DisableChaseCam(edict_t *ent) {
     }
 }
 
+// Toggle between the 3 chase modes (in-eyes, third-person, freefloat)
 void NextChaseMode(edict_t *ent) {
     if (tdm_match_status == MM_TIMEOUT) {
         return;
@@ -47,10 +49,10 @@ void NextChaseMode(edict_t *ent) {
     ent->client->chase_mode = (ent->client->chase_mode + 1) % CHASE_MAX;
 
     if (ent->client->chase_mode == CHASE_EYES) {
-        //set clientnum to hide chased person on supported server
+        // set clientnum to hide chased person on supported server
         ent->client->clientNum = g_edicts - ent->client->chase_target - 1;
     } else if (ent->client->chase_mode == CHASE_THIRDPERSON) {
-        //going 3rd person, remove gun and invisible player
+        // going 3rd person, remove gun and invisible player
         ent->client->clientNum = ent - g_edicts - 1;
         ent->client->ps.gunindex = ent->client->ps.gunframe = 0;
     } else if (ent->client->chase_mode == CHASE_FREE) {
@@ -59,12 +61,12 @@ void NextChaseMode(edict_t *ent) {
 }
 
 void UpdateLockCam(edict_t *ent) {
-    /* position on the map */
+    // position on the map
     ent->s.origin[0] = 0.0f;
     ent->s.origin[1] = 0.0f;
     ent->s.origin[2] = 4000.0f;
 
-    /* view */
+    // view
     ent->client->ps.viewangles[ROLL] = 0;
     ent->client->ps.viewangles[PITCH] = 90;
     ent->client->ps.viewangles[YAW] = 0;
@@ -95,7 +97,7 @@ void UpdateChaseCam(edict_t *ent) {
         }
     }
 
-    /* update it again since it might be changed */
+    // update it again since it might be changed
     targ = ent->client->chase_target;
 
     VectorCopy(targ->client->v_angle, angles);
@@ -104,7 +106,7 @@ void UpdateChaseCam(edict_t *ent) {
         VectorCopy(targ->s.origin, goal);
         goal[2] += targ->viewheight;
 
-        //for old servers we have to spec in front of the player so they don't clip into the view
+        // for old servers we have to spec in front of the player so they don't clip into the view
         if (!(game.server_features & GMF_CLIENTNUM)) {
             vec3_t targorigin;
 
