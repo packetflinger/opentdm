@@ -21,6 +21,7 @@
 #include "g_local.h"
 #include "g_tdm.h"
 
+// menu start positions
 const int teamJoinEntries[MAX_TEAMS] = { 9, 3, 6 };
 
 /**
@@ -93,12 +94,12 @@ void JoinedTeam(edict_t *ent, qboolean reconnected, qboolean notify) {
 
     ent->client->resp.ready = false;
 
-    //joining a team with no captain by default assigns.
+    // joining a team with no captain by default assigns.
     if (!teaminfo[ent->client->pers.team].captain) {
         TDM_SetCaptain(ent->client->pers.team, ent);
     }
 
-    //nasty hack for setting team names for 1v1 mode
+    // nasty hack for setting team names for 1v1 mode
     TDM_UpdateTeamNames();
 
     // if we were invited mid-game, reallocate and insert into teamplayers
