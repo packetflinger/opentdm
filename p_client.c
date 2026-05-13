@@ -1529,16 +1529,28 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo) {
  *
  * Changing levels will NOT cause this to be called again, but loadgames will.
  */
-qboolean ClientConnect(edict_t *ent, char *userinfo) {
+qboolean ClientConnect(edict_t *ent, char *ui) {
     const char *value;
-    char *tempip;
+    char *tempip, *userinfo, *extra;
     netadr_t ip;
+
+    if (game.server_features & GMF_EXTRA_USERINFO) {
+        extra = ui + strlen(ui) + 1;
+        if (strlen(extra) == 0) {
+            Info_SetValueForKey(ui, "rejmsg", "invalid userinfo.");
+            return false;
+        }
+        userinfo = va("%s%s", ui, extra);
+    } else {
+        userinfo = ui;
+    }
 
     // find \ip variable
     tempip = Info_ValueForKey(userinfo, "ip");
+    gi.dprintf("tempip: %s\n", tempip);
     if (!tempip) {
         userinfo[0] = '\0';
-        Info_SetValueForKey(userinfo, "rejmsg",
+        Info_SetValueForKey(ui, "rejmsg",
                 "Your userinfo string is malformed, please restart Quake 2.");
         return false;
     }
@@ -1548,7 +1560,7 @@ qboolean ClientConnect(edict_t *ent, char *userinfo) {
     // check to see if they are on the banned IP list
     if (SV_FilterPacket(&ip)) {
         userinfo[0] = '\0';
-        Info_SetValueForKey(userinfo, "rejmsg",
+        Info_SetValueForKey(ui, "rejmsg",
                 "You are banned from this server.");
         return false;
     }
@@ -1558,7 +1570,7 @@ qboolean ClientConnect(edict_t *ent, char *userinfo) {
     if (*password->string && strcmp(password->string, "none")
             && strcmp(password->string, value)) {
         userinfo[0] = '\0';
-        Info_SetValueForKey(userinfo, "rejmsg",
+        Info_SetValueForKey(ui, "rejmsg",
                 "Password required or incorrect.");
         return false;
     }

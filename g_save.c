@@ -370,19 +370,13 @@ void InitGame(void) {
 
     // ensure it has NOSET if it didn't exist
     g_features = gi.cvar("g_features", "0", CVAR_NOSET);
-    gi.cvar_forceset("g_features",
-            va("%d",
-                    GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE
-                            | GMF_MVDSPEC | GMF_VARIABLE_FPS
-                            | GMF_IPV6_ADDRESS_AWARE));
+    unsigned features = GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE |
+            GMF_MVDSPEC | GMF_VARIABLE_FPS | GMF_IPV6_ADDRESS_AWARE | GMF_EXTRA_USERINFO;
+    gi.cvar_forceset("g_features", va("%d", features));
 
     // init server features
     sv_features = gi.cvar("sv_features", NULL, 0);
-    if (sv_features) {
-        game.server_features = (int) sv_features->value;
-    } else {
-        game.server_features = 0;
-    }
+    game.server_features = (sv_features) ? (int)sv_features->value : 0;
 
     // allocate memory for the random map lists
     memset(&game.smartmaps, 0, sizeof(smartmap_t) * SM_MAX);
