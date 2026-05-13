@@ -1,7 +1,6 @@
 #ifndef G_NET_H
 #define G_NET_H
 
-#include <arpa/inet.h>
 #define IP4_LEN  4
 #define IP6_LEN 16
 

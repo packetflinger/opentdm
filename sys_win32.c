@@ -1,7 +1,5 @@
 #ifdef _WIN32
 #include "g_local.h"
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 char    findbase[MAX_OSPATH];
 char    findpath[MAX_OSPATH];
@@ -61,5 +59,6 @@ void Sys_FindClose (void) {
 void Sys_DebugBreak (void) {
     DebugBreak();
 }
+
 
 #endif

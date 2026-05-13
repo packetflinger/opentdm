@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef _QSHARED_H
 
+#include "q_platform.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -1303,4 +1304,4 @@ extern int vidref_val;
 
 #endif
 
-#include "q_platform.h"
+

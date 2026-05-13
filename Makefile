@@ -24,9 +24,13 @@ LDFLAGS ?= -shared
 LIBS ?=
 
 ifdef CONFIG_WINDOWS
-	CC = i686-w64-mingw32-gcc
-	WINDRES = i686-w64-mingw32-windres
-	CFLAGS += -Duint32_t=int -Duint8_t="unsigned char"
+    CC = i686-w64-mingw32-gcc
+    WINDRES = i686-w64-mingw32-windres
+    CFLAGS += -Duint8_t="unsigned char" \
+              -Duint16_t="unsigned short int" \
+              -Duint32_t="int" \
+              -Duint64_t="unsigned long long" \
+              -Din_addr_t="uint32_t"
     LDFLAGS += -mconsole
     LDFLAGS += -Wl,--nxcompat,--dynamicbase
     CURL_CFLAGS = -static -static-libgcc -DCURL_STATIC
