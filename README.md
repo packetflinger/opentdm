@@ -53,6 +53,10 @@ OpenTDM is an open source team deathmatch and duel mod for Quake II. Origially w
 
 `oldteamstats/oldteamaccuracy` Show stats for the team for the previous match
 
+`stats-all` Show table with accuracy per weapon per player, sorted by highest kills
+
+`oldstats-all` Show table with accuracy per weapon per player, sorted by highest kills for the previous match
+
 `rejoin/ghost/restore/recover` Rejoin your team during a match
 
 `tskin [model/skin]` Sets the team skin

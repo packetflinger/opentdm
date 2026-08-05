@@ -1029,6 +1029,66 @@ void TDM_Stats_f(edict_t *ent, matchinfo_t *m_info) {
     TDM_GeneralStats_f(ent, m_info, p_info, p_info->team);
 }
 
+/*
+=================
+TDM_StatsAll_f
+=================
+*/
+void TDM_StatsAll_f(edict_t *ent, matchinfo_t *m_info) {
+    int i, j;
+    int order[256];
+
+    // Helper macros
+#define ACC(p, w) ((p)->shots_fired[w] > 0 ? (int)ceil((float)(p)->shots_hit[w] * 100.0f / (float)(p)->shots_fired[w]) : 0)
+#define CAPV(v)   ((v) > 100 ? 100 : (v))
+
+    if (tdm_match_status == MM_WARMUP && m_info == &current_matchinfo) {
+        m_info = &old_matchinfo;
+    }
+
+    if (m_info->num_teamplayers <= 0) {
+        gi.cprintf(ent, PRINT_HIGH, "No stats available.\n");
+        return;
+    }
+
+    for (i = 0; i < m_info->num_teamplayers && i < 256; i++) {
+        order[i] = i;
+    }
+
+    // Sort by enemy_kills descending
+    for (i = 0; i < m_info->num_teamplayers - 1; i++) {
+        for (j = i + 1; j < m_info->num_teamplayers; j++) {
+            if (m_info->teamplayers[order[i]].enemy_kills < m_info->teamplayers[order[j]].enemy_kills) {
+                int tmp = order[i];
+                order[i] = order[j];
+                order[j] = tmp;
+            }
+        }
+    }
+
+    gi.cprintf(ent, PRINT_HIGH, "\n%-9s %2s %3s %3s %3s %3s %3s %3s %3s %3s %3s %3s\n",
+        "Name", "ki", "RA%", "CH%", "RL%", "MG%", "SG%", "SS%", "HB%", "GR%", "GL%", "BL%");
+    gi.cprintf(ent, PRINT_HIGH, "--------------------------------------------------\n");
+
+    for (i = 0; i < m_info->num_teamplayers && i < 256; i++) {
+        teamplayer_t *p = &m_info->teamplayers[order[i]];
+        char name[10];
+
+        Q_strncpy(name, p->name, sizeof(name) - 1);
+
+        gi.cprintf(ent, PRINT_HIGH, "%-9s %2d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n",
+            name, p->enemy_kills,
+            CAPV(ACC(p, TDMG_RAILGUN)), CAPV(ACC(p, TDMG_CHAINGUN)),
+            CAPV(ACC(p, TDMG_ROCKETLAUNCHER)), CAPV(ACC(p, TDMG_MACHINEGUN)),
+            CAPV(ACC(p, TDMG_SHOTGUN)), CAPV(ACC(p, TDMG_SSHOTGUN)),
+            CAPV(ACC(p, TDMG_HYPERBLASTER)), CAPV(ACC(p, TDMG_HANDGRENADE)),
+            CAPV(ACC(p, TDMG_GRENADELAUNCHER)), CAPV(ACC(p, TDMG_BLASTER)));
+    }
+
+#undef ACC
+#undef CAPV
+}
+
 /**
  * Shows team statistics
  */

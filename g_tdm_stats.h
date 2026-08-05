@@ -41,6 +41,7 @@ void TDM_SetupMatchInfoAndTeamPlayers(void);
 void TDM_SetupTeamInfoForPlayer(edict_t *ent, teamplayer_t *info);
 qboolean TDM_StatCheatCheck(edict_t *ent, matchinfo_t *info, unsigned team);
 void TDM_Stats_f(edict_t *ent, matchinfo_t *m_info);
+void TDM_StatsAll_f(edict_t *ent, matchinfo_t *m_info);
 void TDM_TeamItemsStats_f(edict_t *ent, matchinfo_t *m_info, int team);
 void TDM_TeamStats_f(edict_t *ent, matchinfo_t *m_info);
 void TDM_TopBottomShots_f(edict_t *ent, qboolean team_stats, qboolean top_shots);

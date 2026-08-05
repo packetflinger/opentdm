@@ -2818,6 +2818,8 @@ qboolean TDM_Command(const char *cmd, edict_t *ent) {
                 || !Q_stricmp(cmd, "killstats")
                 || !Q_stricmp(cmd, "deathstats")) {
             TDM_Stats_f(ent, &current_matchinfo);
+        } else if (!Q_stricmp(cmd, "stats-all")) {
+            TDM_StatsAll_f(ent, &current_matchinfo);
         } else if (!Q_stricmp(cmd, "oldstats") || !Q_stricmp(cmd, "oldkills")
                 || !Q_stricmp(cmd, "laststats") || !Q_stricmp(cmd, "lastkills")
                 || !Q_stricmp(cmd, "oldaccuracy")
@@ -2831,6 +2833,8 @@ qboolean TDM_Command(const char *cmd, edict_t *ent) {
                 || !Q_stricmp(cmd, "lastdeathstats")
                 || !Q_stricmp(cmd, "olddeathstats")) {
             TDM_Stats_f(ent, &old_matchinfo);
+        } else if (!Q_stricmp(cmd, "oldstats-all")) {
+            TDM_StatsAll_f(ent, &old_matchinfo);
         } else if (!Q_stricmp(cmd, "teamstats") || !Q_stricmp(cmd, "teamkills")
                 || !Q_stricmp(cmd, "teamaccuracy")
                 || !Q_stricmp(cmd, "teamdamage")

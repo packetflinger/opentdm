@@ -1,0 +1,37 @@
+CONFIG_WINDOWS = 1
+
+TARGET = gamex86_64.dll
+
+CC = x86_64-w64-mingw32-gcc
+LD = x86_64-w64-mingw32-gcc
+WINDRES = x86_64-w64-mingw32-windres
+
+CFLAGS = -std=gnu99 -static -static-libgcc -DCURL_STATICLIB -DHAVE_CURL -DWIN32 -D__USE_W32_SOCKETS
+LDFLAGS = -shared -static -static-libgcc
+
+LIBS = -L/usr/x86_64-w64-mingw32/lib
+
+# curl and its deps (only ones we know exist)
+LIBS += /usr/x86_64-w64-mingw32/lib/libcurl.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libnghttp2.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libpsl.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libidn2.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libbrotlidec.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libbrotlicommon.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libzstd.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libunistring.a
+
+# ssh2 (needs zlib)
+LIBS += /usr/x86_64-w64-mingw32/lib/libssh2.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libz.a
+
+# OpenSSL (ssl first, then crypto)
+LIBS += /usr/x86_64-w64-mingw32/lib/libssl.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libcrypto.a
+
+# windows / misc helpers
+LIBS += /usr/x86_64-w64-mingw32/lib/libcrypt32.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libwldap32.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libiconv.a
+LIBS += /usr/x86_64-w64-mingw32/lib/libbcrypt.a
+
