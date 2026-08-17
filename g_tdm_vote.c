@@ -623,6 +623,14 @@ static void TDM_AnnounceVote(void) {
             strcat(what, "disable timeout limit");
         }
     }
+
+    if (vote.flags & VOTE_SWAPPLAYERS) {
+        if (what[0]) {
+            strcat(what, ", ");
+        }
+        strcat(what, va("swap teams for %s and %s", NAME(vote.swap1), NAME(vote.swap2)));
+    }
+
     vote.vote_string = what;
     gi.bprintf(PRINT_HIGH, "%s%s\n", message, what);
     if (g_vote_attention->value) {
@@ -2109,7 +2117,7 @@ void TDM_Vote_f(edict_t *ent) {
                     "  timeoutlimit <integer> (per player; 0 == unlimited)\n"
                     "  timeoutcaptain <0/1>\n"
                     "  smartmap [#] (# is players per team, optional)\n"
-                    "  swap <player1> <player2>\n");
+                    "  swap <player1_ID> <player2_ID> (use \"players\" cmd to see IDs)\n");
             return;
         }
 
@@ -2769,13 +2777,11 @@ qboolean TDM_VoteSwapPlayers(edict_t *ent) {
     vote.swap2 = argToPlayer(gi.argv(3));
 
     if (!vote.swap1 || !vote.swap2) {
-        gi.cprintf(ent, PRINT_HIGH, "Invalid players\n");
+        gi.cprintf(ent, PRINT_HIGH, "Invalid players for swapping\n");
         return false;
     }
     if (!vote.swap1->client || !vote.swap2->client) {
-        gi.cprintf(ent, PRINT_HIGH, "Not a player\n");
-        gi.dprintf("%s\n", vote.swap1->classname);
-        gi.dprintf("%s\n", vote.swap2->classname);
+        gi.cprintf(ent, PRINT_HIGH, "Invalid players for swapping\n");
         return false;
     }
     if (TEAM(vote.swap1) == TEAM_SPEC) {
@@ -2787,61 +2793,35 @@ qboolean TDM_VoteSwapPlayers(edict_t *ent) {
         return false;
     }
     if (TEAMMATES(vote.swap1, vote.swap2)) {
-        gi.cprintf(ent, PRINT_HIGH, "%s and %s are team mates\n", NAME(vote.swap1), NAME(vote.swap2));
+        gi.cprintf(ent, PRINT_HIGH, "%s and %s are teammates\n", NAME(vote.swap1), NAME(vote.swap2));
         return false;
     }
     return true;
 }
 
 /**
- * Resolve either a player name or ID supplied by a client into a verified
- * clientID. Returns -1 if the input can't be resolved.
- *
- * Note: If a player's name is a number between 0 and maxclients, the name will
- * be treated as a client id
+ * Resolve a player ID supplied by a client into that player's edict_t pointer.
  */
 edict_t *argToPlayer(char *arg) {
-    int id, i;
-
-    gi.dprintf("arg: %s\n", arg);
+    int id;
+    char *endptr;
+    edict_t *found;
 
     if (arg[0] == 0) {
-        gi.dprintf("zero arg\n");
         return NULL;
     }
-    if (!Q_stricmp(arg, " ")) {
-        gi.dprintf("empty arg\n");
+    id = strtol(arg, &endptr, 10);
+    if (id == 0 && Q_stricmp(arg, "0") != 0) {
+        // invalid input, got a 0 but input text wasn't "0"
         return NULL;
     }
-    id = atoi(arg);
-    gi.dprintf("atoi returned %d\n", id);
     if (id < 0 || id > game.maxclients) {
-        gi.dprintf("arg out of bounds\n");
         return NULL;
     }
-
-    // atoi returns 0 for invalid input, ensure zero was the input
-    if (id == 0 && !Q_stricmp(arg, "0")) {
-        gi.dprintf("returning entity(1)\n");
-        return ENTITY(1); // ent 0 is world, players start at 1
+    found = ENTITY(id + 1); // ent 0 is world, player 0 is ent 1...
+    if (found->inuse) {
+        return found;
     }
-
-    if (id > 0) {
-        gi.dprintf("returning entity(%d)", id +1);
-        return ENTITY(id+1);
-    }
-
-    // input was a name
-    if (id == 0) {
-        gi.dprintf("input was name\n");
-        for (i=0; i<game.maxclients; i++) {
-            if (!Q_stricmp(game.clients[i].pers.netname, arg)) {
-                gi.dprintf("i=%d\n", i);
-                return ENTITY(i+1);
-            }
-        }
-    }
-    gi.dprintf("returning null\n");
     return NULL;
 }
 
@@ -2853,8 +2833,6 @@ edict_t *argToPlayer(char *arg) {
  * the target players could switch teams, go spec or just quit.
  */
 void TDM_SwapPlayers(edict_t *p1, edict_t *p2) {
-    int temp;
-
     if (!p1 || !p2) {
         gi.bprintf(PRINT_HIGH, "Swap player failed, unable to resolve valid player\n");
         return;
@@ -2876,8 +2854,11 @@ void TDM_SwapPlayers(edict_t *p1, edict_t *p2) {
         return;
     }
 
-    temp = TEAM(p1);
-    TEAM(p1) = TEAM(p2);
-    TEAM(p2) = temp;
-    gi.bprintf(PRINT_HIGH, "%s and %s have swapped teams\n", NAME(p1), NAME(p2));
+    if (TEAM(p1) == TEAM_A) {
+        JoinTeam2(p1);
+        JoinTeam1(p2);
+    } else {
+        JoinTeam1(p1);
+        JoinTeam2(p2);
+    }
 }
