@@ -23,6 +23,7 @@ qboolean TDM_ParsePlayerConfigLine(char *line, int line_number, void *param);
 void TDM_PlayerConfigDownloaded(tdm_download_t *download, int code, byte *buff,
         int len);
 void TDM_PlayerNameChanged(edict_t *ent);
+edict_t *TDM_PlayerNameToEntity(const char *name);
 qboolean TDM_ProcessJoinCode(edict_t *ent, unsigned value);
 void TDM_SendPlayerStatusBar(edict_t *ent);
 void TDM_SendSpectatorStatusBar(edict_t *ent);

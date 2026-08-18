@@ -2751,24 +2751,21 @@ qboolean TDM_VoteSmartMap(edict_t *ent) {
 qboolean TDM_VoteSwapPlayers(edict_t *ent) {
     if (!((int) g_vote_mask->value & VOTE_SWAPPLAYERS)
             && !ent->client->pers.admin) {
-        gi.cprintf(ent, PRINT_HIGH,
-                "Voting for player swapping is not allowed on this server.\n");
+        gi.cprintf(ent, PRINT_HIGH, "Voting for player swapping is not allowed on this server.\n");
         return false;
     }
 
     if (tdm_match_status != MM_WARMUP) {
-        gi.cprintf(ent, PRINT_HIGH,
-                "You can't swap players while a match is in progress\n");
+        gi.cprintf(ent, PRINT_HIGH, "You can't swap players while a match is in progress.\n");
         return false;
     }
 
     if (!ent->client->pers.team && !ent->client->pers.admin) {
-        gi.cprintf(ent, PRINT_HIGH,
-                "Only team players can vote for a player swap.\n");
+        gi.cprintf(ent, PRINT_HIGH, "Only team players can vote for a player swap.\n");
         return false;
     }
     if (gi.argc() < 4) {
-        gi.cprintf(ent, PRINT_HIGH, "too few arguments\n");
+        gi.cprintf(ent, PRINT_HIGH, "Too few arguments. Usage: vote swap <p1> <p2>\n");
         return false;
     }
 
@@ -2776,24 +2773,28 @@ qboolean TDM_VoteSwapPlayers(edict_t *ent) {
     vote.swap1 = argToPlayer(gi.argv(2));
     vote.swap2 = argToPlayer(gi.argv(3));
 
+    if (vote.swap1 == vote.swap2) {
+        gi.cprintf(ent, PRINT_HIGH, "Can't swap the same player.\n");
+        return false;
+    }
     if (!vote.swap1 || !vote.swap2) {
-        gi.cprintf(ent, PRINT_HIGH, "Invalid players for swapping\n");
+        gi.cprintf(ent, PRINT_HIGH, "Unable to uniquely resolve all players for swapping.\n");
         return false;
     }
     if (!vote.swap1->client || !vote.swap2->client) {
-        gi.cprintf(ent, PRINT_HIGH, "Invalid players for swapping\n");
+        gi.cprintf(ent, PRINT_HIGH, "Unable to uniquely resolve all players for swapping.\n");
         return false;
     }
     if (TEAM(vote.swap1) == TEAM_SPEC) {
-        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator\n", NAME(vote.swap1));
+        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator and not swappable.\n", NAME(vote.swap1));
         return false;
     }
     if (TEAM(vote.swap2) == TEAM_SPEC) {
-        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator\n", NAME(vote.swap2));
+        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator and not swappable.\n", NAME(vote.swap2));
         return false;
     }
     if (TEAMMATES(vote.swap1, vote.swap2)) {
-        gi.cprintf(ent, PRINT_HIGH, "%s and %s are teammates\n", NAME(vote.swap1), NAME(vote.swap2));
+        gi.cprintf(ent, PRINT_HIGH, "%s and %s are teammates and not swappable.\n", NAME(vote.swap1), NAME(vote.swap2));
         return false;
     }
     return true;
@@ -2811,9 +2812,15 @@ edict_t *argToPlayer(char *arg) {
         return NULL;
     }
     id = strtol(arg, &endptr, 10);
+
+    // not a player id given, assume it's a name
     if (id == 0 && Q_stricmp(arg, "0") != 0) {
-        // invalid input, got a 0 but input text wasn't "0"
-        return NULL;
+        found = TDM_PlayerNameToEntity(arg);
+        if (found && found->inuse) {
+            return found;
+        } else {
+            return NULL;
+        }
     }
     if (id < 0 || id > game.maxclients) {
         return NULL;

@@ -143,6 +143,37 @@ void JoinedTeam(edict_t *ent, qboolean reconnected, qboolean notify) {
 }
 
 /**
+ * Resolve a player name to a pointer to their edict_t. If there is more than 1
+ * player with the same name currently connected, returns NULL instead of just
+ * the first one found.
+ *
+ * Case insensitive
+ */
+edict_t *TDM_PlayerNameToEntity(const char *name) {
+    int count = 0;
+    edict_t *ent, *found;
+
+    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        if (!ent->inuse) {
+            continue;
+        }
+        if (!ent->client) {
+            continue;
+        }
+        if (Q_stricmp(NAME(ent), name) == 0) {
+            count++;
+            found = ent;
+        }
+    }
+
+    if (count == 1 && found) {
+        return found;
+    }
+
+    return NULL;
+}
+
+/**
  * A player just left a team, so do things. Remember to call TeamsChanged
  * afterwards!
  */
