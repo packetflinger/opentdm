@@ -42,7 +42,7 @@ qboolean TDM_RateLimited(edict_t *ent, int penalty) {
 static void TDM_ForceReady_f(qboolean status) {
     edict_t *ent;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
@@ -1811,7 +1811,7 @@ void TDM_CheckSafety(void) {
         return;
     }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
