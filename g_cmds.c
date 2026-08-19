@@ -1053,7 +1053,7 @@ void Cmd_PlayerList_f(edict_t *ent) {
                 "----------------------------------------------\n");
     }
 
-    for (e2 = g_edicts + 1; e2 <= g_edicts + game.maxclients; e2++) {
+    FOREACH_CLIENT(e2) {
         if (!e2->inuse) {
             continue;
         }
