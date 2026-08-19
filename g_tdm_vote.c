@@ -242,7 +242,7 @@ void TDM_ApplyVote(void) {
         current_matchinfo.teamplayers = NULL;
 
         //clear stale teamplayerinfo pointers
-        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        FOREACH_CLIENT(ent) {
             if (ent->inuse) {
                 ent->client->resp.teamplayerinfo = NULL;
                 ent->client->resp.score = 0;
@@ -328,7 +328,7 @@ void TDM_UpdateVoteConfigString(void) {
     *vote_string = 0;
 
     if (vote.active) {
-        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        FOREACH_CLIENT(ent) {
             if (!ent->inuse) {
                 continue;
             }
@@ -658,7 +658,7 @@ void TDM_RemoveVote(void) {
     vote.last_initiator = initiator;
     vote.last_vote_end_frame = level.framenum;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
@@ -2269,7 +2269,7 @@ void TDM_CheckVote(void) {
         return;
     }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
