@@ -434,7 +434,7 @@ void TDM_BeginMatch(void) {
 
     //psuedo-kill everyone first to prevent the spawnspot selection from being able to be controlled
     //by positioning in warmup and also possible telefrag conditions
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse)
             continue;
 
@@ -450,10 +450,10 @@ void TDM_BeginMatch(void) {
     }
 
     //put everyone in the server and go!
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
-        if (!ent->inuse)
+    FOREACH_CLIENT(ent) {
+        if (!ent->inuse) {
             continue;
-
+        }
         if (ent->client->pers.team) {
             respawn(ent);
         }
@@ -1240,7 +1240,7 @@ void TDM_EndMatch(void) {
     tdm_match_status = MM_SCOREBOARD;
 
     //show stats
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (ent->inuse && ent->client->pers.team) {
             if (!ent->client->resp.teamplayerinfo) {
                 TDM_Error("TDM_EndMatch: Missing teamplayerinfo for client %d",
@@ -1333,7 +1333,7 @@ void TDM_NagUnreadyPlayers(void) {
 
     len = 0;
     message[0] = '\0';
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
@@ -1370,12 +1370,12 @@ void TDM_FixDeltaAngles(void) {
     int i;
     edict_t *ent;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
 
-        //set the delta angle
+        // set the delta angle
         for (i = 0; i < 3; i++) {
             ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(
                     ent->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
@@ -1557,7 +1557,7 @@ void TDM_CheckTimes(void) {
         if (level.framenum == vote.end_frame) {
             // end of vote, compare yes/no and ignore non-voters and ratio
             vote_yes = vote_no = 0;
-            for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+            FOREACH_CLIENT(ent) {
                 if (ent->client->resp.vote == VOTE_YES) {
                     vote_yes++;
                     continue;
@@ -1585,7 +1585,7 @@ void TDM_CheckTimes(void) {
             && teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0) {
         qboolean reset = true;
 
-        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        FOREACH_CLIENT(ent) {
             if (!ent->client) {
                 continue;
             }
@@ -1605,12 +1605,12 @@ void TDM_CheckTimes(void) {
         }
     }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
 
-        //r1: only show motd once per connect, not on level change
+        // only show motd once per connect, not on level change
         if (!ent->client->pers.shown_motd && !ent->client->showmotd
                 && level.framenum - ent->client->resp.enterframe
                         == SECS_TO_FRAMES(10)) {
@@ -1639,7 +1639,7 @@ void TDM_CheckMatchStart(void) {
     ready[TEAM_A] = ready[TEAM_B] = 0;
     total_ready = total_players = 0;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
@@ -1696,7 +1696,7 @@ void TDM_CheckMatchStart(void) {
             tdm_match_status = MM_WARMUP;
 
             // stop everyone from recording
-            for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+            FOREACH_CLIENT(ent) {
                 if (ent->inuse && ent->client->pers.team
                         && (g_force_record->value == 1
                                 || ent->client->pers.config.auto_record
@@ -1889,7 +1889,7 @@ void TDM_UpdateTeamNames(void) {
         return;
     }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
@@ -2014,7 +2014,7 @@ void CountPlayers(void) {
         teaminfo[i].players = 0;
     }
     total = 0;
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (ent->inuse) {
             if (!ent->client->pers.mvdclient) {
                 teaminfo[ent->client->pers.team].players++;
@@ -2119,7 +2119,7 @@ void UpdateTeamMenu(void) {
     sprintf(openTDMBanner, "*Quake II - OpenTDM (%s)",
             gameString[(int) g_gamemode->value]);
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (ent->inuse) {
             UpdatePlayerTeamMenu(ent);
         }
@@ -2486,9 +2486,9 @@ void TDM_ResetGameState(void) {
 
     TDM_UpdateTeamNames();
 
-    //note, this block of code only runs on a reset from the same map. a map change
-    //will have every client ->inuse false until they are reconnected.
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    // Note, this block of code only runs on a reset from the same map. A map
+    // change will have every client->inuse false until they are reconnected.
+    FOREACH_CLIENT(ent) {
         if (ent->inuse) {
             ent->client->resp.last_command_frame = 0;
             ent->client->resp.last_invited_by = NULL;
@@ -2515,7 +2515,7 @@ void TDM_ResetGameState(void) {
     UpdateTeamMenu();
 
     //show menu for players in spec
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (ent->inuse && !ent->client->pers.team) {
             TDM_ShowTeamMenu(ent);
         }
@@ -2684,7 +2684,7 @@ void TDM_SetSkins(void) {
 
         Q_strncpy(teaminfo[i].skin, newskin, sizeof(teaminfo[i].skin) - 1);
 
-        for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+        FOREACH_CLIENT(ent) {
             if (!ent->inuse) {
                 continue;
             }
@@ -2949,7 +2949,7 @@ void TDM_Error(const char *fmt, ...) {
             vote.initiator ? (int) (vote.initiator - g_edicts) : 0);
 
     gi.dprintf("Client dump:\n");
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
