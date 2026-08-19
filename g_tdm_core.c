@@ -1071,8 +1071,7 @@ void TDM_BeginCountdown(void) {
             + SECS_TO_FRAMES(g_match_countdown->value);
 
     // force players to record
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
-            client++) {
+    FOREACH_CLIENT(client) {
         if (client->inuse && client->client->pers.team
                 && (g_force_record->value == 1
                         || client->client->pers.config.auto_record
@@ -1096,8 +1095,7 @@ void TDM_EndIntermission(void) {
             "Please report issues at https://github.com/packetflinger/opentdm\n");
 
     // stop demo recording if we enforce it
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
-            client++) {
+    FOREACH_CLIENT(client) {
         if (!client->inuse) {
             continue;
         }
@@ -1196,8 +1194,7 @@ void TDM_BeginIntermission(void) {
     strcpy(current_matchinfo.scoreboard_string, TDM_ScoreBoardString(NULL));
 
     // move all clients to the intermission point
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
-            client++) {
+    FOREACH_CLIENT(client) {
         if (!client->inuse) {
             continue;
         }
@@ -1207,8 +1204,7 @@ void TDM_BeginIntermission(void) {
 
     // disable chasecams after moving clients to intermission, that way the scoreboard
     // will remember who was chasing who.
-    for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
-            client++) {
+    FOREACH_CLIENT(client) {
         if (!client->inuse) {
             continue;
         }
@@ -1530,8 +1526,7 @@ void TDM_CheckTimes(void) {
         if (remaining == SECS_TO_FRAMES (g_intermission_time->value) - 5) {
             edict_t *client;
 
-            for (client = g_edicts + 1; client <= g_edicts + game.maxclients;
-                    client++) {
+            FOREACH_CLIENT(client) {
                 if (!client->inuse) {
                     continue;
                 }
@@ -1755,7 +1750,7 @@ int LookupPlayer(const char *match, edict_t **out, edict_t *ent) {
         Q_strncpy(lowermatch, match, sizeof(lowermatch) - 1);
         Q_strlwr(lowermatch);
 
-        for (p = g_edicts + 1; p <= g_edicts + game.maxclients; p++) {
+        FOREACH_CLIENT(p) {
             if (!p->inuse) {
                 continue;
             }
@@ -3086,8 +3081,7 @@ void TDM_UpdateSpectator(edict_t *ent) {
     int score = -999;
     edict_t *target = NULL, *tmp = NULL;
 
-    for (target = g_edicts + 1; target <= g_edicts + game.maxclients;
-            target++) {
+    FOREACH_CLIENT(target) {
         // skip if client is not a player or we are not allowed to spectate his team and we are not an admin
         if (!target->inuse || !target->client->pers.team
                 || (teaminfo[target->client->pers.team].speclocked
@@ -3135,7 +3129,7 @@ void TDM_UpdateSpectatorsOnEvent(int spec_mode, edict_t *target,
 
     // calculate the top fragger
     if (spec_mode == SPEC_KILLER) {
-        for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++) {
+        FOREACH_CLIENT(e) {
             if (!e->inuse || !e->client->pers.team) {
                 continue;
             }
@@ -3154,7 +3148,7 @@ void TDM_UpdateSpectatorsOnEvent(int spec_mode, edict_t *target,
         }
     }
 
-    for (e = g_edicts + 1; e <= g_edicts + game.maxclients; e++) {
+    FOREACH_CLIENT(e) {
         // we are looking for a spectator who wants an auto-followed POV
         if (!e->inuse || e->client->pers.team
                 || e->client->resp.spec_mode == SPEC_NONE) {
