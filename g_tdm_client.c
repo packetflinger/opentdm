@@ -374,11 +374,10 @@ qboolean TDM_ProcessJoinCode(edict_t *ent, unsigned value) {
     ent->client->pers.team = t->team;
     JoinedTeam(ent, true, true);
 
-    //we only preserve the whole client state in 1v1 mode, in TDM we simply respawn the player
+    // we only preserve the whole client state in 1v1 mode, in TDM we simply respawn the player
     if (TDM_Is1V1()) {
-        //remove ghost model
-        for (ghost = g_edicts + game.maxclients + 1;
-                ghost < g_edicts + globals.num_edicts; ghost++) {
+        // remove ghost model
+        FOREACH_NONPLAYER_ENTITY(ghost) {
             if (!ghost->inuse) {
                 continue;
             }
@@ -1369,7 +1368,7 @@ int TDM_GetPlayerIdView(edict_t *ent) {
             AngleVectors(ent->client->v_angle, forward, NULL, NULL);
             best = NULL;
 
-            for (who = g_edicts + 1; who <= g_edicts + game.maxclients; who++) {
+            FOREACH_CLIENT(who) {
                 if (!who->inuse) {
                     continue;
                 }
