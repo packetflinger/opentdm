@@ -198,9 +198,8 @@ void TDM_ResetLevel(void) {
         return;
     }
 
-    //free up any stray ents
-    for (ent = g_edicts + 1 + game.maxclients;
-            ent < g_edicts + globals.num_edicts; ent++) {
+    // free up any stray ents
+    FOREACH_NONPLAYER_ENTITY(ent) {
         if (!ent->inuse) {
             continue;
         }
@@ -227,10 +226,10 @@ void TDM_ResetLevel(void) {
     ParseEntityString(true);
 
     // immediately droptofloor and setup removed items
-    for (ent = g_edicts + 1 + game.maxclients;
-            ent < g_edicts + globals.num_edicts; ent++) {
-        if (!ent->inuse)
+    FOREACH_NONPLAYER_ENTITY(ent) {
+        if (!ent->inuse) {
             continue;
+        }
 
         // add/remove items
         if (ent->item) {
@@ -1164,8 +1163,7 @@ void TDM_BeginIntermission(void) {
             + SECS_TO_FRAMES(g_intermission_time->value);
 
     // remove any weapons or similar stuff still in flight
-    for (ent = g_edicts + game.maxclients + 1;
-            ent < g_edicts + globals.num_edicts; ent++) {
+    FOREACH_NONPLAYER_ENTITY(ent) {
         if ((ent->owner && ent->owner->client) || ent->enttype == ENT_GHOST) {
             G_FreeEdict(ent);
         }

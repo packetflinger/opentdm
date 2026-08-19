@@ -41,7 +41,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define TEAM(e) (e->client->pers.team)
 #define TEAMMATES(e1, e2) (TEAM(e1) == TEAM(e2))
 
+// loop macros for readability
 #define FOREACH_CLIENT(ent) for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++)
+#define FOREACH_NONPLAYER_ENTITY(ent) for (ent = g_edicts + 1 + game.maxclients; ent < g_edicts + globals.num_edicts; ent++)
 
 // protocol bytes that can be directly added to messages
 #define SVC_MUZZLEFLASH    1
