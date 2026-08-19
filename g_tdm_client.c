@@ -153,7 +153,7 @@ edict_t *TDM_PlayerNameToEntity(const char *name) {
     int count = 0;
     edict_t *ent, *found;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
@@ -1190,7 +1190,7 @@ qboolean TDM_SetupClient(edict_t *ent) {
 edict_t* TDM_FindPlayerForTeam(unsigned team) {
     edict_t *ent;
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
