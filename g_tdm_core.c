@@ -2583,30 +2583,32 @@ void TDM_Init(void) {
 }
 
 /**
- * Setup teamskin/enemyskin configstrings.
+ * Setup teamskin/enemyskin configstrings. Send subject's skin to recip. If
+ * subject is null, send all players skins to recip.
+ *
+ * Player skins are already sent to everyone as they join the server, or as
+ * part of a userinfo update, this is for players who specify team and/or enemy
+ * skins explicitly. This is called as players join and part teams.
  */
-void TDM_SetTeamSkins(edict_t *cl, edict_t *target_to_set_skins_for) {
+void TDM_SetTeamSkins(edict_t *recip, edict_t *subject) {
     edict_t *ent;
     const char *teamskin, *enemyskin;
 
-    //not using teamskins
-    if (!cl->client->pers.config.teamskin[0]
-            && !cl->client->pers.config.enemyskin[0]) {
+    // not using teamskins
+    if (!recip->client->pers.config.teamskin[0] && !recip->client->pers.config.enemyskin[0]) {
         return;
     }
 
-    teamskin = cl->client->pers.config.teamskin;
-    enemyskin = cl->client->pers.config.enemyskin;
+    teamskin = recip->client->pers.config.teamskin;
+    enemyskin = recip->client->pers.config.enemyskin;
 
     if (!enemyskin[0]) {
-        //don't care about enemyskin
         if (!strcmp(teamskin, g_team_a_skin->string)) {
             enemyskin = g_team_b_skin->string;
         } else {
             enemyskin = g_team_a_skin->string;
         }
     } else if (!teamskin[0]) {
-        //don't care about teamskin
         if (!strcmp(enemyskin, g_team_a_skin->string)) {
             teamskin = g_team_b_skin->string;
         } else {
@@ -2614,8 +2616,9 @@ void TDM_SetTeamSkins(edict_t *cl, edict_t *target_to_set_skins_for) {
         }
     }
 
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
-        if (target_to_set_skins_for && ent != target_to_set_skins_for) {
+    FOREACH_CLIENT(ent) {
+        // subject isn't null, so skip over everyone else
+        if (subject && ent != subject) {
             continue;
         }
 
@@ -2627,33 +2630,32 @@ void TDM_SetTeamSkins(edict_t *cl, edict_t *target_to_set_skins_for) {
             gi.WriteByte(SVC_CONFIGSTRING);
             gi.WriteShort(CS_PLAYERSKINS + (ent - g_edicts) - 1);
 
-            //spectators get team A as teamskin, team B as enemyskin
-            if (ent->client->pers.team == cl->client->pers.team
-                    || (cl->client->pers.team == TEAM_SPEC
-                            && ent->client->pers.team == TEAM_A)) {
-                gi.WriteString(
-                        va("%s\\%s", ent->client->pers.netname, teamskin));
+            // spectators get team A as teamskin, team B as enemyskin
+            if (ent->client->pers.team == recip->client->pers.team || (recip->client->pers.team == TEAM_SPEC && ent->client->pers.team == TEAM_A)) {
+                gi.WriteString(va("%s\\%s", ent->client->pers.netname, teamskin));
             } else {
-                gi.WriteString(
-                        va("%s\\%s", ent->client->pers.netname, enemyskin));
+                gi.WriteString(va("%s\\%s", ent->client->pers.netname, enemyskin));
             }
-            gi.unicast(cl, true);
+            gi.unicast(recip, true);
         }
     }
 }
 
 /**
+ * Tell all players what subject's skin is based on their team membership. If
+ * subject is null, tell everyone what everyone else's skin is based on teams.
  *
+ * If subject is on a team and has teamskin/enemyskin set in their config, the
+ * appropriate skins are sent regardless of the team defaults.
  */
-void TDM_SetAllTeamSkins(edict_t *target_to_set_skins_for) {
+void TDM_SetAllTeamSkins(edict_t *subject) {
     edict_t *ent;
 
-    //now reset anyone who had teamskin/enemyskin set. ew.
-    for (ent = g_edicts + 1; ent <= g_edicts + game.maxclients; ent++) {
+    FOREACH_CLIENT(ent) {
         if (!ent->inuse) {
             continue;
         }
-        TDM_SetTeamSkins(ent, target_to_set_skins_for);
+        TDM_SetTeamSkins(ent, subject);
     }
 }
 
