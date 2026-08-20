@@ -284,9 +284,10 @@ void ToggleChaseCam(edict_t *ent) {
     if (ent->client->pers.team) {
         TDM_LeftTeam(ent, true);
         TDM_TeamsChanged();
-        if (tdm_match_status == MM_TIMEOUT && teaminfo[TEAM_A].players == 0
-                && teaminfo[TEAM_B].players == 0)
+        TDM_ResetTeamSkinsForSpecs(ent);
+        if (tdm_match_status == MM_TIMEOUT && teaminfo[TEAM_A].players == 0 && teaminfo[TEAM_B].players == 0) {
             TDM_ResumeGame();
+        }
         respawn(ent);
     }
     if (ent->client->chase_target) {

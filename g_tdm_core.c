@@ -3437,3 +3437,37 @@ void TDM_AsciiToConsole(char *out, char *in) {
 
     out[i] = '\0';
 }
+
+/**
+ * Send all team member skins to a new spectator if they have teamskin or
+ * enemyskin enabled. Send the default skins since neither team is an
+ * enemy or friendly
+ */
+void TDM_ResetTeamSkinsForSpecs(edict_t *spec) {
+    edict_t *ent;
+    char *skin;
+
+    if (TEAM(spec) != TEAM_SPEC) {
+        return;
+    }
+    if (!spec->client->pers.config.teamskin[0] && !spec->client->pers.config.enemyskin[0]) {
+        return;
+    }
+
+    FOREACH_CLIENT(ent) {
+        if (TEAM(ent) == TEAM_SPEC) {
+            continue;
+        }
+        gi.WriteByte(SVC_CONFIGSTRING);
+        gi.WriteShort(CS_PLAYERSKINS + (ent - g_edicts) - 1);
+
+        if (TEAM(ent) == TEAM_A) {
+            skin = g_team_a_skin->string;
+        } else {
+            skin = g_team_b_skin->string;
+        }
+
+        gi.WriteString(va("%s\\%s", NAME(ent), skin));
+        gi.unicast(spec, true);
+    }
+}

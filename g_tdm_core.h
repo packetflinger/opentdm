@@ -48,6 +48,7 @@ void TDM_RandomizeTeams(void);
 void TDM_RecordMVD(void);
 void TDM_ResetGameState(void);
 void TDM_ResetLevel(void);
+void TDM_ResetTeamSkinsForSpecs(edict_t *spec);
 void TDM_ResetVotableVariables(void);
 void TDM_ResumeGame(void);
 void TDM_SaveDefaultCvars(void);
