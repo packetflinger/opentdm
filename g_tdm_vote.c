@@ -2711,6 +2711,10 @@ qboolean TDM_VoteSmartMap(edict_t *ent) {
     }
 
     value = TDM_GetSmartMap(arg);
+    if (value == NULL) {
+        gi.cprintf(ent, PRINT_HIGH, "Smartmap isn't setup properly on this server\n");
+        return false;
+    }
     while (!strcmp(level.mapname, value)) {
         value = TDM_GetSmartMap(arg);
     }
