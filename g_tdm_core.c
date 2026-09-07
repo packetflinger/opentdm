@@ -142,23 +142,29 @@ char* TDM_SetColorText(char *buffer) {
 }
 
 /**
- *
+ * For variable server frames per second. The default FPS is 10 for backwards
+ * compatibility and the max value is 60. The limit is hard coded into q2pro,
+ * unsure about r1q2. To avoid funkyness with lower protocol clients at the
+ * same time as higher protocol clients with variable FPS, the rate must be
+ * a multiple of 10.
  */
 void TDM_SetFrameTime(void) {
     cvar_t *sv_fps;
 
-    sv_fps = gi.cvar("sv_fps", NULL, 0);
-    if (!sv_fps) {
-        FRAMETIME = 0.1f;
+    if ((game.server_features & GMF_VARIABLE_FPS) == 0) {
         SERVER_FPS = 10;
     } else {
-        FRAMETIME = 1.0f / sv_fps->value;
+        sv_fps = gi.cvar("sv_fps", "10", CVAR_LATCH);
         SERVER_FPS = (int) sv_fps->value;
     }
 
-    if ((int) (0.1f / FRAMETIME) == 0) {
+    gi.dprintf("SERVER_FPS: %d\n", SERVER_FPS);
+    if (SERVER_FPS % 10 != 0 || SERVER_FPS > 60) {
         gi.error("Invalid server FPS");
     }
+
+    FRAMETIME = 1.0f / SERVER_FPS;
+    gi.dprintf("FRAMETIME: %f\n", FRAMETIME);
 }
 
 /**
