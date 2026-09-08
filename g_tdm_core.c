@@ -158,13 +158,11 @@ void TDM_SetFrameTime(void) {
         SERVER_FPS = (int) sv_fps->value;
     }
 
-    gi.dprintf("SERVER_FPS: %d\n", SERVER_FPS);
     if (SERVER_FPS % 10 != 0 || SERVER_FPS > 60) {
         gi.error("Invalid server FPS");
     }
 
     FRAMETIME = 1.0f / SERVER_FPS;
-    gi.dprintf("FRAMETIME: %f\n", FRAMETIME);
 }
 
 /**
