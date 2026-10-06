@@ -333,11 +333,12 @@ void hurt_touch(edict_t *self, edict_t *other, cplane_t *plane,
     if (self->spawnflags & 16) {
         self->touch_debounce_framenum = level.framenum + SECS_TO_FRAMES(1);
     } else {
-        self->touch_debounce_framenum = level.framenum + 1;
+        // one 10Hz frame regardless of sv_fps
+        self->touch_debounce_framenum = level.framenum + SECS_TO_FRAMES(0.1f);
     }
 
     if (!(self->spawnflags & 4)) {
-        if ((level.framenum % 10) == 0) {
+        if ((level.framenum % SECS_TO_FRAMES(1)) == 0) {
             gi.sound(other, CHAN_AUTO, self->noise_index, 1, ATTN_NORM, 0);
         }
     }
