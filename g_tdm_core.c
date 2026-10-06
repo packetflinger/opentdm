@@ -342,20 +342,17 @@ void TDM_ResetLevel(void) {
  * behind a wall, in the water, etc.
  */
 edict_t* TDM_ClosestTeammate(edict_t *ent) {
-    uint8_t i;
-    int16 pos[3];
-    edict_t *player;
-    nearest_player_t closest, next;
-
-    memset(&closest, 0, sizeof(nearest_player_t));
-    memset(&next, 0, sizeof(nearest_player_t));
+    int i;
+    float dist, bestdist;
+    vec3_t diff;
+    edict_t *player, *best;
 
     if (TDM_Is1V1()) {
         return NULL;
     }
 
-    // make a local copy of our location
-    VectorCopy(ent->client->ps.pmove.origin, pos);
+    best = NULL;
+    bestdist = 0;
 
     for (i = 0; i < game.maxclients; i++) {
         player = g_edicts + 1 + i;
@@ -373,44 +370,21 @@ edict_t* TDM_ClosestTeammate(edict_t *ent) {
         }
 
         // only look at our team mates
-        if (OnSameTeam(player, ent)) {
-            if (closest.ent == NULL) {
-                closest.ent = player;
+        if (!OnSameTeam(player, ent)) {
+            continue;
+        }
 
-                closest.distance[0] = pos[0]
-                        - player->client->ps.pmove.origin[0];
-                closest.distance[1] = pos[1]
-                        - player->client->ps.pmove.origin[1];
-                closest.distance[2] = pos[2]
-                        - player->client->ps.pmove.origin[2];
+        // squared distance is fine for comparing
+        VectorSubtract(ent->s.origin, player->s.origin, diff);
+        dist = DotProduct(diff, diff);
 
-                // a single number representing our distance
-                closest.overall = closest.distance[0] + closest.distance[1]
-                        + closest.distance[2];
-
-                continue;
-            }
-
-            next.ent = player;
-
-            next.distance[0] = pos[0] - player->client->ps.pmove.origin[0];
-            next.distance[1] = pos[1] - player->client->ps.pmove.origin[1];
-            next.distance[2] = pos[2] - player->client->ps.pmove.origin[2];
-
-            next.overall = next.distance[0] + next.distance[1]
-                    + next.distance[2];
-
-            if (next.overall < closest.overall) {
-                closest = next;
-            }
+        if (!best || dist < bestdist) {
+            best = player;
+            bestdist = dist;
         }
     }
 
-    if (closest.ent) {
-        return closest.ent;
-    }
-
-    return NULL;
+    return best;
 }
 
 /**

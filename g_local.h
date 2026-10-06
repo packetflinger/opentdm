@@ -637,15 +637,6 @@ typedef struct {
     int        power_armor_power;
 } monsterinfo_t;
 
-/**
- *
- */
-typedef struct {
-    edict_t     *ent;
-    int16       distance[3];
-    uint32_t    overall;
-} nearest_player_t;
-
 extern  game_locals_t   game;
 extern  level_locals_t  level;
 extern  game_import_t   gi;
