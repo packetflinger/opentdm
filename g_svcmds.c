@@ -261,7 +261,7 @@ void SVCmd_WriteIP_f(void) {
 
     for (i = 0; i < numipfilters; i++) {
         // only write permanent bans to disk
-        if (ipfilters[i].expire) {
+        if (ipfilters[i].expire != -1) {
             continue;
         }
         fprintf(f, "sv addip %s\n", IPMASK(&ipfilters[i].addr));
