@@ -704,7 +704,7 @@ qboolean TDM_VoteTimeLimit(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (limit == vote.newtimelimit) {
+        if ((vote.flags & VOTE_TIMELIMIT) && limit == vote.newtimelimit) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that timelimit.\n");
             return false;
@@ -757,7 +757,7 @@ qboolean TDM_VoteMap(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (!strcmp(vote.newmap, value)) {
+        if ((vote.flags & VOTE_MAP) && !strcmp(vote.newmap, value)) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for %s.\n", value);
             return false;
@@ -894,7 +894,7 @@ qboolean TDM_VoteWeapons(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (flags == vote.newweaponflags) {
+        if ((vote.flags & VOTE_WEAPONS) && flags == vote.newweaponflags) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that weapon config.\n");
             return false;
@@ -947,7 +947,7 @@ qboolean TDM_VoteKick(edict_t *ent) {
         }
 
         if (vote.active) {
-            if (victim == vote.victim) {
+            if ((vote.flags & VOTE_KICK) && victim == vote.victim) {
                 gi.cprintf(ent, PRINT_HIGH,
                         "You've already started a vote to kick %s.\n",
                         vote.victim->client->pers.netname);
@@ -1057,7 +1057,7 @@ qboolean TDM_VotePowerups(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (flags == vote.newpowerupflags) {
+        if ((vote.flags & VOTE_POWERUPS) && flags == vote.newpowerupflags) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that powerup config.\n");
             return false;
@@ -1118,7 +1118,7 @@ qboolean TDM_VoteGameMode(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (vote.gamemode == gamemode) {
+        if ((vote.flags & VOTE_GAMEMODE) && vote.gamemode == gamemode) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that game mode.\n");
             return false;
@@ -1178,7 +1178,7 @@ qboolean TDM_VoteTieMode(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (tiemode == vote.tiemode) {
+        if ((vote.flags & VOTE_TIEMODE) && tiemode == vote.tiemode) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that tie mode.\n");
             return false;
@@ -1236,7 +1236,7 @@ qboolean TDM_VoteTeleMode(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (telemode == vote.telemode) {
+        if ((vote.flags & VOTE_TELEMODE) && telemode == vote.telemode) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that teleporter mode.\n");
             return false;
@@ -1301,7 +1301,7 @@ qboolean TDM_VoteSwitchMode(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (switchmode == vote.switchmode) {
+        if ((vote.flags & VOTE_SWITCHMODE) && switchmode == vote.switchmode) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that weapon switch mode.\n");
             return false;
@@ -1355,7 +1355,7 @@ qboolean TDM_VoteOverTimeLimit(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (limit == vote.overtimemins) {
+        if ((vote.flags & VOTE_OVERTIME) && limit == vote.overtimemins) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that overtime limit.\n");
             return false;
@@ -1748,7 +1748,7 @@ qboolean TDM_VoteChat(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (chatmode == vote.newchatmode) {
+        if ((vote.flags & VOTE_CHAT) && chatmode == vote.newchatmode) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that chat mode.\n");
             return false;
@@ -1866,7 +1866,7 @@ qboolean TDM_VoteBugs(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (vote.bugs == bugs) {
+        if ((vote.flags & VOTE_BUGS) && vote.bugs == bugs) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for that gameplay bugs settings.\n");
             return false;
@@ -2734,7 +2734,7 @@ qboolean TDM_VoteSmartMap(edict_t *ent) {
     }
 
     if (vote.active) {
-        if (!strcmp(vote.newmap, value)) {
+        if ((vote.flags & VOTE_MAP) && !strcmp(vote.newmap, value)) {
             gi.cprintf(ent, PRINT_HIGH,
                     "You've already started a vote for %s.\n", value);
             return false;
