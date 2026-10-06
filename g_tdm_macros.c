@@ -131,7 +131,7 @@ int TDM_GetPowerArmorCount(edict_t *ent) {
  * health
  */
 const char* TDM_Macro_Health(edict_t *ent, size_t *length) {
-    static char buff[8];
+    static char buff[16];
 
     *length = sprintf(buff, "H:%d", ent->health);
     return buff;
@@ -141,7 +141,7 @@ const char* TDM_Macro_Health(edict_t *ent, size_t *length) {
  * health
  */
 const char* TDM_Macro_RawHealth(edict_t *ent, size_t *length) {
-    static char buff[8];
+    static char buff[16];
 
     *length = sprintf(buff, "%d", ent->health);
     return buff;
@@ -151,7 +151,7 @@ const char* TDM_Macro_RawHealth(edict_t *ent, size_t *length) {
  * armor
  */
 const char* TDM_Macro_ShortArmor(edict_t *ent, size_t *length) {
-    static char buff[16];
+    static char buff[32];
     int index;
     int power;
     int count;
@@ -197,7 +197,7 @@ const char* TDM_Macro_RawArmor(edict_t *ent, size_t *length) {
  * armor
  */
 const char* TDM_Macro_LongArmor(edict_t *ent, size_t *length) {
-    static char buff[32];
+    static char buff[64];
     int index;
     int power;
     int count;
@@ -249,7 +249,7 @@ const char* TDM_Macro_LongWeapon(edict_t *ent, size_t *length) {
  * weapon
  */
 const char* TDM_Macro_ShortWeapon(edict_t *ent, size_t *length) {
-    static char buff[16];
+    static char buff[32];
 
     if (!ent->client->weapon) {
         return NULL;
@@ -382,7 +382,7 @@ const char* TDM_Macro_Location(edict_t *ent, size_t *length) {
  * Get the player's combined health and armor value
  */
 const char* TDM_Macro_TotalStack(edict_t *ent, size_t *length) {
-    static char buff[16];
+    static char buff[32];
     int armor;
 
     armor = ArmorIndex(ent);
