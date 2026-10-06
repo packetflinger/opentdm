@@ -201,22 +201,25 @@ const char* TDM_Macro_LongArmor(edict_t *ent, size_t *length) {
     int index;
     int power;
     int count;
+    const char *name;
 
     index = ArmorIndex(ent);
 
+    // itemlist[0] is empty, its pickup_name is NULL
     if (index == 0) {
         count = 0;
+        name = "None";
     } else {
         count = ent->client->inventory[index];
+        name = GETITEM(index)->pickup_name;
     }
 
     power = TDM_GetPowerArmorCount(ent);
 
     if (power == -1) {
-        *length = sprintf(buff, "A:%d %s", count, GETITEM(index)->pickup_name);
+        *length = sprintf(buff, "A:%d %s", count, name);
     } else {
-        *length = sprintf(buff, "A:%d %s P:%d", count,
-                GETITEM(index)->pickup_name, power);
+        *length = sprintf(buff, "A:%d %s P:%d", count, name, power);
     }
 
     return buff;
