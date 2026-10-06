@@ -206,8 +206,13 @@ void UpdateChaseCam(edict_t *ent) {
 }
 
 void SetChase(edict_t *ent, edict_t *target) {
-    if (target != ent->client->chase_target
-            && ent->client->chase_mode == CHASE_EYES) {
+    // free/lock modes have no camera position, UpdateChaseCam needs one of these
+    if (ent->client->chase_mode != CHASE_EYES
+            && ent->client->chase_mode != CHASE_THIRDPERSON) {
+        ent->client->chase_mode = CHASE_EYES;
+    }
+
+    if (ent->client->chase_mode == CHASE_EYES) {
         ent->client->clientNum = target - g_edicts - 1;
     }
 
