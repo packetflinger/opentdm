@@ -37,6 +37,22 @@ qboolean TDM_RateLimited(edict_t *ent, int penalty) {
 }
 
 /**
+ * Skip past the first argument of a gi.args() string. Anything <= ' ' is
+ * whitespace, same as the command tokenizer. Stops at the end of the string.
+ */
+static char* TDM_SkipFirstArg(char *s) {
+    while (*s && (unsigned char) *s > ' ') {
+        s++;
+    }
+
+    while (*s && (unsigned char) *s <= ' ') {
+        s++;
+    }
+
+    return s;
+}
+
+/**
  * Force everyone to be ready/notready, admin command
  */
 static void TDM_ForceReady_f(qboolean status) {
@@ -1013,13 +1029,7 @@ void TDM_Teamname_f(edict_t *ent) {
 
     // skip original team name in the string
     if (gi.argc() == 3) {
-        while (*value != ' ') {
-            value++;
-        }
-
-        while (*value == ' ') {
-            value++;
-        }
+        value = TDM_SkipFirstArg(value);
     }
 
     //chop off quotes if the user specified them
@@ -1228,13 +1238,7 @@ void TDM_PickPlayer_f(edict_t *ent) {
 
     // skip the name in the string
     if (gi.argc() > 2) {
-        while (*name != ' ') {
-            name++;
-        }
-
-        while (*name == ' ') {
-            name++;
-        }
+        name = TDM_SkipFirstArg(name);
     }
 
     if (LookupPlayer(name, &victim, ent)) {
@@ -1462,13 +1466,7 @@ void TDM_KickPlayer_f(edict_t *ent) {
 
     // skip the name in the string
     if (gi.argc() > 2) {
-        while (*name != ' ') {
-            name++;
-        }
-
-        while (*name == ' ') {
-            name++;
-        }
+        name = TDM_SkipFirstArg(name);
     }
 
     if (LookupPlayer(name, &victim, ent)) {
