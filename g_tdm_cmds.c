@@ -2387,6 +2387,12 @@ void TDM_TeamEnemySkin_f(edict_t *ent, qboolean team) {
  * "Randomly" assign people to teams to mix things up
  */
 void TDM_Shuffle_f(edict_t *ent) {
+    if (tdm_match_status != MM_WARMUP) {
+        gi.cprintf(ent, PRINT_HIGH,
+                "You can't shuffle players while a match is in progress\n");
+        return;
+    }
+
     TDM_RandomizeTeams();
     gi.bprintf(PRINT_HIGH, "Teams randomized...\n");
 }
