@@ -190,14 +190,17 @@ void VoteMenuUpdate(edict_t *ent, unsigned flags) {
     }
 
     if (flags & VOTE_MENU_CHAT) {
-        static const char *chatString[] = { "speak", "whisper" };
+        static const char *chatString[] = { "speak", "whisper", "shutup" };
 
         if (!((int) g_vote_mask->value & VOTE_CHAT)) {
             ent->client->pers.votemenu[12].text = "Chat: disabled";
             ent->client->pers.votemenu[12].SelectFunc = NULL;
         } else {
+            unsigned chat = ent->client->pers.votemenu_values.chat;
+
+            // g_chat_mode 2 (shutup) is only settable by admins, but can be current
             sprintf(ent->client->pers.votemenu_values.string_chat, "Chat: %s",
-                    chatString[ent->client->pers.votemenu_values.chat]);
+                    chat < 3 ? chatString[chat] : "unknown");
             ent->client->pers.votemenu[12].text =
                     ent->client->pers.votemenu_values.string_chat;
             ent->client->pers.votemenu[12].SelectFunc = VoteMenuChat;
@@ -212,8 +215,10 @@ void VoteMenuUpdate(edict_t *ent, unsigned flags) {
             ent->client->pers.votemenu[13].text = "Bugs: disabled";
             ent->client->pers.votemenu[13].SelectFunc = NULL;
         } else {
+            unsigned bugs = ent->client->pers.votemenu_values.bugs;
+
             sprintf(ent->client->pers.votemenu_values.string_bugs, "Bugs: %s",
-                    bugsString[ent->client->pers.votemenu_values.bugs]);
+                    bugs < 3 ? bugsString[bugs] : "unknown");
             ent->client->pers.votemenu[13].text =
                     ent->client->pers.votemenu_values.string_bugs;
             ent->client->pers.votemenu[13].SelectFunc = VoteMenuBugs;
