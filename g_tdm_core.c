@@ -158,7 +158,7 @@ void TDM_SetFrameTime(void) {
         SERVER_FPS = (int) sv_fps->value;
     }
 
-    if (SERVER_FPS % 10 != 0 || SERVER_FPS > 60) {
+    if (SERVER_FPS < 10 || SERVER_FPS % 10 != 0 || SERVER_FPS > 60) {
         gi.error("Invalid server FPS");
     }
 
