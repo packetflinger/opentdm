@@ -406,6 +406,7 @@ qboolean TDM_ProcessJoinCode(edict_t *ent, unsigned value) {
         ent->inuse = true;
         ent->s.number = new_entity.s.number;
         ent->client->resp.vote = VOTE_HOLD;
+        ent->client->pers.admin = new_client.pers.admin;
         VectorCopy(new_client.resp.cmd_angles, ent->client->resp.cmd_angles);
         strcpy(ent->client->pers.userinfo, new_client.pers.userinfo);
 
@@ -428,13 +429,15 @@ qboolean TDM_ProcessJoinCode(edict_t *ent, unsigned value) {
         ent->client->resp.enterframe = t->saved_client->resp.enterframe;
         ent->client->resp.ready = t->saved_client->resp.ready;
         ent->client->pers.joinstate = t->saved_client->pers.joinstate;
-        ent->client->pers.admin = t->saved_client->pers.admin;
     }
 
     gi.TagFree(t->saved_entity);
     gi.TagFree(t->saved_client);
     t->saved_entity = NULL;
     t->saved_client = NULL;
+
+    // admin status is deliberately not restored, anyone holding the join code
+    // could otherwise inherit it. Admins can log in again.
 
     // restore player's name
     G_StuffCmd(ent, "set name \"%s\"\n", t->name);

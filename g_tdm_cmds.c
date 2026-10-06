@@ -2078,7 +2078,9 @@ void TDM_Ghost_f(edict_t *ent) {
     }
 
     code = strtoul(gi.args(), NULL, 0);
-    if (TDM_RateLimited(ent, 2)) {
+
+    // codes are only 4 digits, make guessing them impractical
+    if (TDM_RateLimited(ent, SECS_TO_FRAMES(2))) {
         return;
     }
 
