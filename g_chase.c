@@ -50,7 +50,7 @@ void NextChaseMode(edict_t *ent) {
 
     if (ent->client->chase_mode == CHASE_EYES) {
         // set clientnum to hide chased person on supported server
-        ent->client->clientNum = g_edicts - ent->client->chase_target - 1;
+        ent->client->clientNum = ent->client->chase_target - g_edicts - 1;
     } else if (ent->client->chase_mode == CHASE_THIRDPERSON) {
         // going 3rd person, remove gun and invisible player
         ent->client->clientNum = ent - g_edicts - 1;
