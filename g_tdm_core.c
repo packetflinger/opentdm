@@ -3178,8 +3178,9 @@ void TDM_UpdateSpectatorsOnEvent(int spec_mode, edict_t *target,
 
         // don't bother with spectators who are not allowed to watch anything
         if (teaminfo[TEAM_A].speclocked && teaminfo[TEAM_B].speclocked
-                && e->client->pers.specinvite[TEAM_A]
-                && e->client->pers.specinvite[TEAM_B]) {
+                && !e->client->pers.specinvite[TEAM_A]
+                && !e->client->pers.specinvite[TEAM_B]
+                && !e->client->pers.admin) {
             continue;
         }
 
