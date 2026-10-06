@@ -1425,7 +1425,6 @@ typedef struct {
 typedef struct {
     char           userinfo[MAX_INFO_STRING];
     char           netname[16];
-    char           ip[INET6_ADDRSTRLEN + 8]; // plus port and surrounding brackets
     netadr_t       address; // the player's ip, port, etc
     int            hand;
     qboolean       connected;       // a loadgame will leave valid entities that

@@ -507,7 +507,7 @@ void TDM_Kickban_f(edict_t *ent) {
         if ((vote.flags & VOTE_KICK) && vote.victim == victim) {
             TDM_RemoveVote();
         }
-        SVCmd_AddIP_f(ent, victim->client->pers.ip, 60);
+        SVCmd_AddIP_f(ent, IP(&victim->client->pers.address), 60);
         gi.AddCommandString(va("kick %d\n", (int) (victim - g_edicts - 1)));
     }
 }
@@ -1529,7 +1529,7 @@ void TDM_Admin_f(edict_t *ent) {
     } else {
         gi.cprintf(ent, PRINT_HIGH, "Invalid password.\n");
         gi.dprintf("%s[%s] failed to login as admin.\n",
-                ent->client->pers.netname, ent->client->pers.ip);
+                ent->client->pers.netname, IP(&ent->client->pers.address));
     }
 }
 
