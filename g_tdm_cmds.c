@@ -2502,7 +2502,7 @@ void TDM_ArmorTimer_f(edict_t *ent) {
                 ent->client->pers.armor_mask = TDM_ArmorStringToBitmask(mask);
             }
 
-            G_StuffCmd(ent, "set amask \"%d\" u", ent->client->pers.armor_mask);
+            G_StuffCmd(ent, "set amask \"%d\" u\n", ent->client->pers.armor_mask);
             gi.cprintf(ent, PRINT_HIGH, "Armor timer mask set\n");
         }
     } else {
@@ -2548,7 +2548,7 @@ void TDM_WeaponTimer_f(edict_t *ent) {
                 ent->client->pers.weapon_mask = TDM_WeaponStringToBitmask(mask);
             }
 
-            G_StuffCmd(ent, "set wmask \"%d\" u",
+            G_StuffCmd(ent, "set wmask \"%d\" u\n",
                     ent->client->pers.weapon_mask);
             gi.cprintf(ent, PRINT_HIGH, "Weapon timer mask set\n");
         }
