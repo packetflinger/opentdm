@@ -2753,6 +2753,8 @@ qboolean TDM_VoteSmartMap(edict_t *ent) {
  * Exchange team memberships for two players for balancing teams.
  */
 qboolean TDM_VoteSwapPlayers(edict_t *ent) {
+    edict_t *swap1, *swap2;
+
     if (!((int) g_vote_mask->value & VOTE_SWAPPLAYERS)
             && !ent->client->pers.admin) {
         gi.cprintf(ent, PRINT_HIGH, "Voting for player swapping is not allowed on this server.\n");
@@ -2773,34 +2775,38 @@ qboolean TDM_VoteSwapPlayers(edict_t *ent) {
         return false;
     }
 
-    vote.flags |= VOTE_SWAPPLAYERS;
-    vote.swap1 = argToPlayer(gi.argv(2));
-    vote.swap2 = argToPlayer(gi.argv(3));
+    // resolve into locals so a failed proposal leaves no state in the vote
+    swap1 = argToPlayer(gi.argv(2));
+    swap2 = argToPlayer(gi.argv(3));
 
-    if (vote.swap1 == vote.swap2) {
+    if (swap1 == swap2) {
         gi.cprintf(ent, PRINT_HIGH, "Can't swap the same player.\n");
         return false;
     }
-    if (!vote.swap1 || !vote.swap2) {
+    if (!swap1 || !swap2) {
         gi.cprintf(ent, PRINT_HIGH, "Unable to uniquely resolve all players for swapping.\n");
         return false;
     }
-    if (!vote.swap1->client || !vote.swap2->client) {
+    if (!swap1->client || !swap2->client) {
         gi.cprintf(ent, PRINT_HIGH, "Unable to uniquely resolve all players for swapping.\n");
         return false;
     }
-    if (TEAM(vote.swap1) == TEAM_SPEC) {
-        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator and not swappable.\n", NAME(vote.swap1));
+    if (TEAM(swap1) == TEAM_SPEC) {
+        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator and not swappable.\n", NAME(swap1));
         return false;
     }
-    if (TEAM(vote.swap2) == TEAM_SPEC) {
-        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator and not swappable.\n", NAME(vote.swap2));
+    if (TEAM(swap2) == TEAM_SPEC) {
+        gi.cprintf(ent, PRINT_HIGH, "%s is a spectator and not swappable.\n", NAME(swap2));
         return false;
     }
-    if (TEAMMATES(vote.swap1, vote.swap2)) {
-        gi.cprintf(ent, PRINT_HIGH, "%s and %s are teammates and not swappable.\n", NAME(vote.swap1), NAME(vote.swap2));
+    if (TEAMMATES(swap1, swap2)) {
+        gi.cprintf(ent, PRINT_HIGH, "%s and %s are teammates and not swappable.\n", NAME(swap1), NAME(swap2));
         return false;
     }
+
+    vote.swap1 = swap1;
+    vote.swap2 = swap2;
+    vote.flags |= VOTE_SWAPPLAYERS;
     return true;
 }
 
