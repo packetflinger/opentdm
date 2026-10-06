@@ -1555,6 +1555,15 @@ void TDM_CheckTimes(void) {
             // end of vote, compare yes/no and ignore non-voters and ratio
             vote_yes = vote_no = 0;
             FOREACH_CLIENT(ent) {
+                // same voters TDM_CheckVote counts
+                if (!ent->inuse) {
+                    continue;
+                }
+
+                if (!ent->client->pers.team && !ent->client->pers.admin) {
+                    continue;
+                }
+
                 if (ent->client->resp.vote == VOTE_YES) {
                     vote_yes++;
                     continue;
