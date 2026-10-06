@@ -964,7 +964,8 @@ const char* TDM_MakeDemoName(edict_t *ent) {
     len = strlen(string);
 
     for (i = 0; i < len; i++) {
-        if ((string[i] < '!' && string[i] > '~') || string[i] == '\\'
+        if (((unsigned char) string[i] < '!'
+                || (unsigned char) string[i] > '~') || string[i] == '\\'
                 || string[i] == '\"' || string[i] == ':' || string[i] == '*'
                 || string[i] == '/' || string[i] == '?' || string[i] == '>'
                 || string[i] == '<' || string[i] == '|' || string[i] == ' ')
@@ -999,7 +1000,8 @@ char* TDM_MakeServerDemoName(void) {
     len = strlen(string);
 
     for (i = 0; i < len; i++) {
-        if ((string[i] < '!' && string[i] > '~') || string[i] == '\\'
+        if (((unsigned char) string[i] < '!'
+                || (unsigned char) string[i] > '~') || string[i] == '\\'
                 || string[i] == '\"' || string[i] == ':' || string[i] == '*'
                 || string[i] == '/' || string[i] == '?' || string[i] == '>'
                 || string[i] == '<' || string[i] == '|' || string[i] == ' ') {
