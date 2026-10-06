@@ -62,6 +62,9 @@ unsigned numipfilters;
 qboolean StringToFilter(const char *s, ipfilter_t *f, int seconds) {
     memset(&f->addr, 0, sizeof(netadr_t));
     f->addr = net_parseIPAddressMask(s);
+    if (f->addr.type == NA_UNSPECIFIED) {
+        return false;
+    }
 
     if (seconds) {
         f->expire = time(NULL) + seconds;
@@ -152,6 +155,7 @@ void SVCmd_AddIP_f(edict_t *ent, char *ip, int expiry) {
     expiry *= 60;
 
     if (!StringToFilter(ip, &new_filter, expiry)) {
+        gi.cprintf(ent, PRINT_HIGH, "Invalid IP address '%s'\n", ip);
         return;
     }
 
@@ -175,6 +179,7 @@ void SVCmd_RemoveIP_f(edict_t *ent, char *ip) {
     }
 
     if (!StringToFilter(ip, &f, 0)) {
+        gi.cprintf(ent, PRINT_HIGH, "Invalid IP address '%s'\n", ip);
         return;
     }
 

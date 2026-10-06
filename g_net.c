@@ -248,46 +248,54 @@ netadr_t net_parseIPAddressBase(const char *ip)
 netadr_t net_parseIPAddressMask(const char *ip)
 {
     netadr_t address;
-    char *delim;
+    netadr_t empty;
+    const char *delim;
+    size_t len;
+    int bits;
     char addr[40];         // temporarily hold just the IP part
     struct in6_addr addr6; // use for both versions
 
     memset(addr, 0, 40);
     memset(&address, 0, sizeof(netadr_t));
+    memset(&empty, 0, sizeof(netadr_t));
     memset(&addr6, 0, sizeof(struct in6_addr));
 
+    // split off the optional /mask, the address part must fit in addr
+    delim = strchr(ip, '/');
+    len = (delim) ? (size_t) (delim - ip) : strlen(ip);
+    if (len >= sizeof(addr)) {
+        return empty;
+    }
+    memcpy(addr, ip, len);
+
     // Look for IPv6
-    delim = strstr(ip, ":");
-    if (delim) {
+    if (strchr(addr, ':')) {
         address.type = NA_IP6;
-        delim = strstr(ip, "/");
-        if (delim) {
-            memcpy(addr, ip, (delim-ip));
-            address.mask_bits = atoi(delim+1);
-        } else {
-            strcpy(addr, ip);
-            address.mask_bits = 128;
+        bits = (delim) ? atoi(delim + 1) : 128;
+        if (bits < 0 || bits > 128) {
+            return empty;
         }
-        inet_pton(AF_INET6, addr, &addr6);
+        address.mask_bits = bits;
+        if (inet_pton(AF_INET6, addr, &addr6) != 1) {
+            return empty;
+        }
         memcpy(address.ip.u8, addr6.s6_addr, 16);
         return address;
     }
 
     // assume it's an IPv4 address
-    delim = strstr(ip, ".");
-    if (delim) {
+    if (strchr(addr, '.')) {
         address.type = NA_IP;
-        delim = strstr(ip, "/");
-        if (delim) {
-            memcpy(addr, ip, (delim-ip));
-            address.mask_bits = atoi(delim+1);
-        } else {
-            strcpy(addr, ip);
-            address.mask_bits = 32;
+        bits = (delim) ? atoi(delim + 1) : 32;
+        if (bits < 0 || bits > 32) {
+            return empty;
         }
-        inet_pton(AF_INET, addr, &addr6);
+        address.mask_bits = bits;
+        if (inet_pton(AF_INET, addr, &addr6) != 1) {
+            return empty;
+        }
         memcpy(address.ip.u8, addr6.s6_addr, sizeof(in_addr_t));
         return address;
     }
-    return address;
+    return empty;
 }
