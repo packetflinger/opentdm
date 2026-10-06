@@ -1476,8 +1476,7 @@ void TDM_KickPlayer_f(edict_t *ent) {
             return;
         }
 
-        if (victim->client->pers.team != team && !ent->client->pers.admin
-                && gi.argc() < 3) {
+        if (victim->client->pers.team != team && !ent->client->pers.admin) {
             gi.cprintf(ent, PRINT_HIGH, "%s is not on your team.\n",
                     victim->client->pers.netname);
             return;
