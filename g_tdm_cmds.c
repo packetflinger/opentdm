@@ -2004,6 +2004,10 @@ void TDM_Changeteamstatus_f(edict_t *ent, qboolean ready) {
         return;
     }
 
+    if (tdm_match_status >= MM_PLAYING) {
+        return;
+    }
+
     for (ent2 = g_edicts + 1; ent2 <= g_edicts + game.maxclients; ent2++) {
         if (!ent2->inuse) {
             continue;
@@ -2011,10 +2015,7 @@ void TDM_Changeteamstatus_f(edict_t *ent, qboolean ready) {
         if (ent->client->pers.team != ent2->client->pers.team) {
             continue;
         }
-        if (ready && ent2->client->resp.ready) {
-            continue;
-        }
-        if (!ready && !ent2->client->resp.ready) {
+        if (ent2->client->resp.ready == ready) {
             continue;
         }
         if (ent2 != ent) {
@@ -2022,8 +2023,15 @@ void TDM_Changeteamstatus_f(edict_t *ent, qboolean ready) {
                     "You were forced %sready by team captain %s!\n",
                     ready ? "" : "not ", ent->client->pers.netname);
         }
-        TDM_Ready_f(ent2);
+
+        // set directly, TDM_Ready_f only sets ready and is rate limited per player
+        ent2->client->resp.ready = ready;
+        gi.bprintf(PRINT_HIGH, "%s is %sready!\n", ent2->client->pers.netname,
+                ready ? "" : "not ");
     }
+
+    TDM_CheckSafety();
+    TDM_CheckMatchStart();
 }
 
 /**
