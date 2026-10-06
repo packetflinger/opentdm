@@ -385,12 +385,10 @@ const char* TDM_Macro_TotalStack(edict_t *ent, size_t *length) {
     static char buff[32];
     int armor;
 
+    // no armor, the stack is just health
     armor = ArmorIndex(ent);
-    if (armor == 0) {
-        *length = 1;
-        return "0";
-    }
-    *length = sprintf(buff, "Stack:%d", ent->health + ent->client->inventory[armor]);
+    *length = sprintf(buff, "Stack:%d",
+            ent->health + (armor ? ent->client->inventory[armor] : 0));
     return buff;
 }
 
@@ -401,12 +399,10 @@ const char* TDM_Macro_RawTotalStack(edict_t *ent, size_t *length) {
     static char buff[16];
     int armor;
 
+    // no armor, the stack is just health
     armor = ArmorIndex(ent);
-    if (armor == 0) {
-        *length = 1;
-        return "0";
-    }
-    *length = sprintf(buff, "%d", ent->health + ent->client->inventory[armor]);
+    *length = sprintf(buff, "%d",
+            ent->health + (armor ? ent->client->inventory[armor] : 0));
     return buff;
 }
 
