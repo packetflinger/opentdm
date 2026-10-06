@@ -1547,8 +1547,7 @@ qboolean ClientConnect(edict_t *ent, char *ui) {
 
     // find \ip variable
     tempip = Info_ValueForKey(userinfo, "ip");
-    gi.dprintf("tempip: %s\n", tempip);
-    if (!tempip) {
+    if (!tempip[0]) {
         userinfo[0] = '\0';
         Info_SetValueForKey(ui, "rejmsg",
                 "Your userinfo string is malformed, please restart Quake 2.");
