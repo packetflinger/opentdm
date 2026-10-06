@@ -3376,25 +3376,32 @@ void TDM_LoadSmartMapLists(void) {
             continue;
         }
 
-        map = strtok(entry, " ");
-        tok = strtok(NULL, " ");
+        map = strtok(entry, " \t\r\n");
+        tok = strtok(NULL, " \t\r\n");
 
         while (tok != NULL) {
             idx = atoi(tok);
+            if (idx <= SM_NONE || idx >= SM_MAX) {
+                gi.cprintf(NULL, PRINT_HIGH,
+                        "[smartmap] skipping %s, invalid group '%s'\n", map,
+                        tok);
+                tok = strtok(NULL, " \t\r\n");
+                continue;
+            }
             sm = &game.smartmaps[idx];
             if (sm->total == MAX_SMARTMAPS) {
                 gi.cprintf(
                 NULL, PRINT_HIGH,
                         "[smartmap] skipping %s (%d), limited to %d maps per group\n",
                         map, idx, MAX_SMARTMAPS);
-                tok = strtok(NULL, " ");
+                tok = strtok(NULL, " \t\r\n");
                 continue;
             }
             sm->maps[sm->total] = gi.TagMalloc(strlen(map) + 1, TAG_GAME);
             strcpy(sm->maps[sm->total], map);
             sm->total++;
 
-            tok = strtok(NULL, " ");
+            tok = strtok(NULL, " \t\r\n");
         }
     }
     fclose(fp);
