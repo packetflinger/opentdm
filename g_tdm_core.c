@@ -2211,6 +2211,12 @@ void TDM_WriteMaplist(edict_t *ent) {
     static char maplist_string[1024];
     static qboolean short_maplist = false;
 
+    // maplist file is configured but missing or empty
+    if (!tdm_maplist) {
+        gi.cprintf(ent, PRINT_HIGH, "No maps are listed on this server.\n");
+        return;
+    }
+
     // maplist fits the string, so no need to create new maplist again
     if (short_maplist) {
         gi.cprintf(ent, PRINT_HIGH, "%s", maplist_string);
