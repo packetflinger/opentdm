@@ -2276,6 +2276,7 @@ void TDM_CreateMaplist(void) {
         }
 
         len = strlen(buffer);
+        start = true;
 
         // cut only first column from the line
         for (i = 0; i < len; i++) {
