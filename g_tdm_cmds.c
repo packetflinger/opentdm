@@ -1027,8 +1027,8 @@ void TDM_Teamname_f(edict_t *ent) {
 
     value = gi.args();
 
-    // skip original team name in the string
-    if (gi.argc() == 3) {
+    // skip the team argument, only present when an admin named a team above
+    if (ent->client->pers.admin && gi.argc() > 2) {
         value = TDM_SkipFirstArg(value);
     }
 
