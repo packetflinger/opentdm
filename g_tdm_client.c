@@ -1077,6 +1077,9 @@ void TDM_PlayerConfigDownloaded(tdm_download_t *download, int code, byte *buff,
     }
 
     if (buff) {
+        // fields missing from the response must not be stack garbage
+        memset(&config, 0, sizeof(config));
+
         if (!TDM_ProcessText((char*) buff, len, TDM_ParsePlayerConfigLine,
                 &config)) {
             gi.dprintf("TDM_PlayerConfigDownloaded: Parse failed.\n");
