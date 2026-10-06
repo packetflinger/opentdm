@@ -367,7 +367,10 @@ static void HTTP_FinishDownload(void) {
             } else if (responseCode == 200) {
                 TDM_HandleDownload(dl->tdm_handle, dl->tempBuffer, dl->position,
                         responseCode);
-                gi.TagFree(dl->tempBuffer);
+                // an empty response never allocates a buffer
+                if (dl->tempBuffer) {
+                    gi.TagFree(dl->tempBuffer);
+                }
             } else {
                 TDM_HandleDownload(dl->tdm_handle, NULL, 0, responseCode);
                 if (dl->tempBuffer) {
