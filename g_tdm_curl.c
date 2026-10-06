@@ -83,7 +83,7 @@ static void HTTP_EscapePath(const char *filePath, char *escaped) {
 
     len = strlen(filePath);
     for (i = 0; i < len; i++) {
-        if (!isalnum(filePath[i]) && filePath[i] != ';' && filePath[i] != '/'
+        if (!isalnum((unsigned char) filePath[i]) &&filePath[i] != ';' && filePath[i] != '/'
                 && filePath[i] != '?' && filePath[i] != ':'
                 && filePath[i] != '@' && filePath[i] != '&'
                 && filePath[i] != '=' && filePath[i] != '+'
@@ -94,7 +94,7 @@ static void HTTP_EscapePath(const char *filePath, char *escaped) {
                 && filePath[i] != '~' && filePath[i] != '*'
                 && filePath[i] != '\'' && filePath[i] != '('
                 && filePath[i] != ')') {
-            sprintf(p, "%%%02x", filePath[i]);
+            sprintf(p, "%%%02x", (unsigned char) filePath[i]);
             p += 3;
         } else {
             *p = filePath[i];
