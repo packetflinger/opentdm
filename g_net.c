@@ -13,7 +13,7 @@ qboolean net_addressesMatch(netadr_t *a1, netadr_t *a2)
         return false;
     }
     len = (a1->type == NA_IP6) ? IP6_LEN : IP4_LEN;
-    return memcmp(a1->ip.u8, a2->ip.u8, len);
+    return memcmp(a1->ip.u8, a2->ip.u8, len) == 0;
 }
 
 /**
