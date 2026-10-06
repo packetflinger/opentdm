@@ -1640,6 +1640,9 @@ qboolean TDM_VoteWebConfig(edict_t *ent) {
     if (HTTP_QueueDownload(&tdm_vote_download)) {
         gi.cprintf(ent, PRINT_HIGH,
                 "Fetching web config '%s', please wait...\n", value);
+    } else {
+        // not queued, onFinish will never run to release the handle
+        tdm_vote_download.inuse = false;
     }
 
     // we never legitimately start a vote yet, it's handled when the config is

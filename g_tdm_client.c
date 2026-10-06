@@ -1143,7 +1143,11 @@ void TDM_DownloadPlayerConfig(edict_t *ent) {
     ent->client->pers.download.inuse = true;
     ent->client->pers.download.unique_id = ent->client->pers.uniqueid;
 
-    HTTP_QueueDownload(&ent->client->pers.download);
+    // not queued, onFinish will never run to release the handle
+    if (!HTTP_QueueDownload(&ent->client->pers.download)) {
+        ent->client->pers.download.inuse = false;
+        TDM_UpdateHud(ent, false);
+    }
 }
 
 /**
