@@ -201,7 +201,7 @@ void ScoreboardMessage(edict_t *ent, edict_t *killer) {
         // send the layout
         Com_sprintf(entry, sizeof(entry), "client %i %i %i %i %i %i ", x, y,
                 sorted[i], cl->resp.score, cl->ping,
-                (level.framenum - cl->resp.enterframe) / 600);
+                FRAMES_TO_SECS(level.framenum - cl->resp.enterframe) / 60);
         j = strlen(entry);
         if (stringlength + j > 1024) {
             break;
