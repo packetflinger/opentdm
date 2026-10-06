@@ -217,9 +217,10 @@ void HTTP_ResolveOTDMServer(void) {
 }
 
 /**
- * Actually starts a download by adding it to the curl multihandle.
+ * Actually starts a download by adding it to the curl multihandle. Returns
+ * false if it couldn't be started, the slot is released in that case.
  */
-void HTTP_StartDownload(dlhandle_t *dl) {
+static qboolean HTTP_StartDownload(dlhandle_t *dl) {
     cvar_t *hostname;
     char escapedFilePath[1024 * 3];
 
@@ -277,10 +278,12 @@ void HTTP_StartDownload(dlhandle_t *dl) {
 
     if (curl_multi_add_handle(multi, dl->curl) != CURLM_OK) {
         gi.dprintf("HTTP_StartDownload: curl_multi_add_handle: error\n");
-        return;
+        dl->inuse = false;
+        return false;
     }
 
     handleCount++;
+    return true;
 }
 
 /**
@@ -458,9 +461,7 @@ qboolean HTTP_QueueDownload(tdm_download_t *d) {
     Q_strncpy(downloads[i].filePath, d->path,
             sizeof(downloads[i].filePath) - 1);
 #pragma GCC diagnostic pop
-    HTTP_StartDownload(&downloads[i]);
-
-    return true;
+    return HTTP_StartDownload(&downloads[i]);
 }
 
 /**
