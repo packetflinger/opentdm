@@ -2691,6 +2691,7 @@ int TDM_ArmorStringToBitmask(const char *str) {
 qboolean TDM_VoteSmartMap(edict_t *ent) {
     const char *value;
     int arg;
+    int tries;
 
     if (!((int) g_vote_mask->value & VOTE_MAP) && !ent->client->pers.admin) {
         gi.cprintf(ent, PRINT_HIGH,
@@ -2715,12 +2716,15 @@ qboolean TDM_VoteSmartMap(edict_t *ent) {
         gi.cprintf(ent, PRINT_HIGH, "Smartmap isn't setup properly on this server\n");
         return false;
     }
-    while (!strcmp(level.mapname, value)) {
+    // skip the current map, but don't spin forever if it's the only one listed
+    for (tries = 1; !strcmp(level.mapname, value)
+            && tries < game.smartmaps[arg].total; tries++) {
         value = TDM_GetSmartMap(arg);
     }
 
-    if (!value[0]) {
-        gi.cprintf(ent, PRINT_HIGH, "Problems...giving up.\n");
+    if (!strcmp(level.mapname, value)) {
+        gi.cprintf(ent, PRINT_HIGH,
+                "No other maps are in that smartmap list.\n");
         return false;
     }
 

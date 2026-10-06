@@ -3414,19 +3414,28 @@ char* TDM_GetSmartMap(int playercount) {
     smartmap_t *sm;
     int idx;
 
-    sm = &game.smartmaps[playercount];
-    if (sm == NULL) {
+    if (playercount <= SM_NONE || playercount >= SM_MAX) {
         return NULL;
     }
 
-    // we're at the end...shuffle and start over
-    if (sm->index == sm->total - 1) {
-        RandomizeArray((void*) sm->maps, sm->total);
-        sm->index = 0;
+    sm = &game.smartmaps[playercount];
+    if (sm->total == 0) {
+        return NULL;
     }
 
     idx = sm->index;
     sm->index++;
+
+    // we used the last one...shuffle and start over. Done after picking so
+    // every map gets used and index always points at a valid entry.
+    if (sm->index >= sm->total) {
+        char *picked = sm->maps[idx];
+
+        RandomizeArray((void*) sm->maps, sm->total);
+        sm->index = 0;
+        return picked;
+    }
+
     return sm->maps[idx];
 }
 
