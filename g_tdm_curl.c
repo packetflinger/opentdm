@@ -324,7 +324,7 @@ static void HTTP_FinishDownload(void) {
     CURL *curl;
     long responseCode;
     double timeTaken;
-    double fileSize;
+    curl_off_t fileSize;
     unsigned i;
 
     do {
@@ -406,7 +406,7 @@ static void HTTP_FinishDownload(void) {
         dl->inuse = false;
 
         gi.dprintf("HTTP: Finished %s: %.f bytes, %.2fkB/sec\n", dl->URL,
-                fileSize, (fileSize / 1024.0) / timeTaken);
+                (double) fileSize, ((double) fileSize / 1024.0) / timeTaken);
     } while (msgs_in_queue > 0);
 }
 
