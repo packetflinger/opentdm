@@ -772,6 +772,7 @@ extern cvar_t *g_http_domain;
 extern cvar_t *g_playerconfig_enabled;
 extern cvar_t *g_send_stats;
 extern cvar_t *g_stats_url;
+extern cvar_t *g_stats_token;
 extern cvar_t *g_debug_spawns;
 extern cvar_t *g_maplistfile;
 extern cvar_t *g_smartmapfile;

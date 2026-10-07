@@ -133,6 +133,7 @@ cvar_t *g_playerconfig_enabled;
 
 cvar_t *g_send_stats;
 cvar_t *g_stats_url;
+cvar_t *g_stats_token;
 
 cvar_t *g_debug_spawns;
 

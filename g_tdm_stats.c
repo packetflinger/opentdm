@@ -1748,5 +1748,5 @@ void TDM_SendMatchStats(void) {
         return;
     }
 
-    HTTP_PostJSON(g_stats_url->string, json, len);
+    HTTP_PostJSON(g_stats_url->string, g_stats_token->string, json, len);
 }

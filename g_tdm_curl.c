@@ -433,13 +433,15 @@ static void HTTP_FinishPost(dlhandle_t *dl, CURLcode result) {
 }
 
 /**
- * Asynchronously POST a JSON document to url. Takes ownership of json (which
- * must be malloc'd) and frees it in all cases. Returns false if the request
- * couldn't be started.
+ * Asynchronously POST a JSON document to url, sending token (if not empty) as
+ * a bearer token. Takes ownership of json (which must be malloc'd) and frees
+ * it in all cases. Returns false if the request couldn't be started.
  */
-qboolean HTTP_PostJSON(const char *url, char *json, size_t len) {
+qboolean HTTP_PostJSON(const char *url, const char *token, char *json,
+        size_t len) {
     unsigned i;
     dlhandle_t *dl;
+    char auth[MAX_STRING_CHARS];
 
     for (i = 0; i < MAX_DOWNLOADS; i++) {
         if (!downloads[i].inuse) {
@@ -471,6 +473,10 @@ qboolean HTTP_PostJSON(const char *url, char *json, size_t len) {
 
     dl->postHeaders = curl_slist_append(NULL,
             "Content-Type: application/json");
+    if (token && token[0]) {
+        Com_sprintf(auth, sizeof(auth), "Authorization: Bearer %s", token);
+        dl->postHeaders = curl_slist_append(dl->postHeaders, auth);
+    }
     curl_easy_setopt(dl->curl, CURLOPT_HTTPHEADER, dl->postHeaders);
 
     curl_easy_setopt(dl->curl, CURLOPT_URL, dl->URL);
@@ -719,7 +725,8 @@ void HTTP_ResolveStatsServer(void) {
 /**
  *
  */
-qboolean HTTP_PostJSON(const char *url, char *json, size_t len) {
+qboolean HTTP_PostJSON(const char *url, const char *token, char *json,
+        size_t len) {
     gi.dprintf("Not sending match stats, OpenTDM was built without libcurl.\n");
     free(json);
     return false;

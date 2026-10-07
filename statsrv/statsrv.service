@@ -5,6 +5,9 @@
 #
 # The database lives in /var/lib/statsrv and the log in /var/log/statsrv,
 # both created by systemd and owned by the dynamic service user.
+#
+# Set -post-token to your game servers' g_stats_token before starting it, and
+# add -get-token <token> to require a token for reading stats.
 
 [Unit]
 Description=OpenTDM match stats server
@@ -13,7 +16,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/statsrv -addr :47910 -db /var/lib/statsrv/stats.db -log /var/log/statsrv/statsrv.log
+ExecStart=/usr/local/bin/statsrv -addr :47910 -db /var/lib/statsrv/stats.db -log /var/log/statsrv/statsrv.log -post-token changeme
 Restart=always
 RestartSec=5
 

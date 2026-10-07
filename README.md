@@ -350,6 +350,12 @@ Value | Description
 
 `g_http_path <string>` URL path for websconfig/playerconfig downloads, *default: /*
 
+`g_send_stats <0/1>` POST each match's stats as JSON to `g_stats_url` when the match ends, *default: 0*
+
+`g_stats_url <string>` Full URL match stats are POSTed to, ex: `http://stats.example.com:47910/stats` (see `statsrv/`), *default: blank*
+
+`g_stats_token <string>` Token sent as `Authorization: Bearer <token>` with the match stats, must match the stats server's `-post-token`. Blank sends no token, *default: changeme*
+
 `g_1v1_spawn_mode <0/1/2>` How spawns are picked in duel mode
 
 Value | Description

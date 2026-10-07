@@ -2,10 +2,15 @@
 // match (g_send_stats 1, g_stats_url http://host:47910/stats), stores them in
 // SQLite and serves them back as JSON:
 //
-//	GET /stats?since=2026-10-01[&limit=N]
+//	GET /stats?since=2026-10-01[&limit=N][&token=T]
+//
+// POST requires "Authorization: Bearer <token>" with the game server's
+// g_stats_token. GET requires the shared -get-token in the query string when
+// one is set.
 package main
 
 import (
+	"crypto/subtle"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -16,6 +21,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -30,9 +36,11 @@ var sinceFormats = []string{
 }
 
 type server struct {
-	db       *sql.DB
-	maxLimit int
-	maxBody  int64
+	db        *sql.DB
+	maxLimit  int
+	maxBody   int64
+	postToken string
+	getToken  string
 }
 
 func main() {
@@ -41,7 +49,14 @@ func main() {
 	logPath := flag.String("log", "statsrv.log", "log file")
 	maxLimit := flag.Int("max", 100, "most matches returned by one GET")
 	maxBody := flag.Int64("maxbody", 1<<20, "largest POST body accepted, in bytes")
+	postToken := flag.String("post-token", "", "token game servers must send to POST stats (their g_stats_token), required")
+	getToken := flag.String("get-token", "", "token required to GET stats, blank allows anyone")
 	flag.Parse()
+
+	// checked before logging moves to the file so it shows on the console
+	if *postToken == "" {
+		log.Fatalf("-post-token is required")
+	}
 
 	logFile, err := os.OpenFile(*logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
@@ -59,7 +74,13 @@ func main() {
 	}
 	defer db.Close()
 
-	s := &server{db: db, maxLimit: *maxLimit, maxBody: *maxBody}
+	s := &server{
+		db:        db,
+		maxLimit:  *maxLimit,
+		maxBody:   *maxBody,
+		postToken: *postToken,
+		getToken:  *getToken,
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /stats", s.postStats)
 	mux.HandleFunc("GET /stats", s.getStats)
@@ -73,6 +94,9 @@ func main() {
 		IdleTimeout:       120 * time.Second,
 	}
 	log.Printf("listening on %s, database %s", *addr, *dbPath)
+	if *getToken == "" {
+		log.Printf("no -get-token, anyone can GET stats")
+	}
 	log.Fatal(srv.ListenAndServe())
 }
 
@@ -81,6 +105,13 @@ func (s *server) postStats(w http.ResponseWriter, r *http.Request) {
 	source, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		source = r.RemoteAddr
+	}
+
+	got, _ := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
+	if !tokenMatches(got, s.postToken) {
+		w.Header().Set("WWW-Authenticate", "Bearer")
+		s.fail(w, r, http.StatusUnauthorized, "missing or wrong token")
+		return
 	}
 
 	var m Match
@@ -122,6 +153,11 @@ func (s *server) postStats(w http.ResponseWriter, r *http.Request) {
 // time to get the rest; since is inclusive, so skip the ids already seen.
 func (s *server) getStats(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
+
+	if s.getToken != "" && !tokenMatches(q.Get("token"), s.getToken) {
+		s.fail(w, r, http.StatusUnauthorized, "missing or wrong token")
+		return
+	}
 
 	sinceParam := q.Get("since")
 	if sinceParam == "" {
@@ -175,8 +211,13 @@ func parseSince(v string) (time.Time, error) {
 		"YYYY-MM-DD HH:MM:SS (UTC) or RFC 3339")
 }
 
+// tokenMatches reports whether got is the non-empty token want.
+func tokenMatches(got, want string) bool {
+	return got != "" && subtle.ConstantTimeCompare([]byte(got), []byte(want)) == 1
+}
+
 func (s *server) fail(w http.ResponseWriter, r *http.Request, code int, msg string) {
-	log.Printf("%s: %s %s: %d %s", r.RemoteAddr, r.Method, r.URL, code, msg)
+	log.Printf("%s: %s %s: %d %s", r.RemoteAddr, r.Method, redactedURL(r), code, msg)
 	writeJSON(w, code, map[string]string{"error": msg})
 }
 
@@ -186,6 +227,18 @@ func writeJSON(w http.ResponseWriter, code int, v any) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		log.Printf("writing response: %v", err)
 	}
+}
+
+// redactedURL is r's URL with any token parameter blanked, for logging.
+func redactedURL(r *http.Request) string {
+	q := r.URL.Query()
+	if !q.Has("token") {
+		return r.URL.String()
+	}
+	q.Set("token", "REDACTED")
+	u := *r.URL
+	u.RawQuery = q.Encode()
+	return u.String()
 }
 
 func deref(s *string) string {

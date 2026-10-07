@@ -279,6 +279,9 @@ void InitGame(void) {
     // full URL match stats are POSTed to, ex: https://example.com/api/stats
     g_stats_url = gi.cvar("g_stats_url", "", 0);
 
+    // sent as "Authorization: Bearer <token>" with the stats, blank to omit
+    g_stats_token = gi.cvar("g_stats_token", "changeme", 0);
+
     // File where smartmaps are defined
     g_smartmapfile = gi.cvar("g_smartmapfile", SMARTMAPFILE, CVAR_LATCH);
 

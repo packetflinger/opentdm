@@ -7,4 +7,5 @@ void HTTP_Shutdown (void);
 qboolean HTTP_QueueDownload (tdm_download_t *d);
 void HTTP_ResolveOTDMServer (void);
 void HTTP_ResolveStatsServer (void);
-qboolean HTTP_PostJSON (const char *url, char *json, size_t len);
+qboolean HTTP_PostJSON (const char *url, const char *token, char *json,
+        size_t len);

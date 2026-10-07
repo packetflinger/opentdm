@@ -41,7 +41,7 @@ from `schema.sql` (built into the binary) every time it starts.
 ## Running
 
 ```sh
-./statsrv [flags]
+./statsrv -post-token <token> [flags]
 ```
 
 | Flag       | Default       | Description                                  |
@@ -51,28 +51,53 @@ from `schema.sql` (built into the binary) every time it starts.
 | `-log`     | `statsrv.log` | Log file, appended to                        |
 | `-max`     | `100`         | Most matches a single GET can return         |
 | `-maxbody` | `1048576`     | Largest POST body accepted, in bytes         |
+| `-post-token` | *(none)*   | Token game servers must send to POST stats; must match their `g_stats_token`. **Required**, statsrv won't start without it |
+| `-get-token`  | *(none)*   | Token needed to GET stats, passed as `?token=`. Blank lets anyone read them |
 
 Examples:
 
 ```sh
-# all defaults: port 47910 on every interface, files in the current directory
-./statsrv
+# defaults: port 47910 on every interface, files in the current directory,
+# anyone can read the stats
+./statsrv -post-token s3cret
+
+# also require a token to read the stats
+./statsrv -post-token s3cret -get-token readme
 
 # a different port
-./statsrv -addr :8080
+./statsrv -post-token s3cret -addr :8080
 
 # only listen on one interface, eg a private network shared with game servers
-./statsrv -addr 10.0.0.5:47910
+./statsrv -post-token s3cret -addr 10.0.0.5:47910
 
 # keep the database and log somewhere permanent
-./statsrv -db /var/lib/statsrv/stats.db -log /var/log/statsrv/statsrv.log
+./statsrv -post-token s3cret -db /var/lib/statsrv/stats.db \
+    -log /var/log/statsrv/statsrv.log
 
 # never return more than 25 matches per request
-./statsrv -max 25
+./statsrv -post-token s3cret -max 25
 
 # accept POST bodies up to 4 MB
-./statsrv -maxbody 4194304
+./statsrv -post-token s3cret -maxbody 4194304
 ```
+
+## Tokens
+
+A missing or wrong token gets a `401`.
+
+- **POST** needs the `-post-token` value in an `Authorization: Bearer <token>`
+  header. Every game server sends its `g_stats_token` cvar this way, so set
+  `-post-token` to the same value you give the game servers.
+- **GET** needs the `-get-token` value, if one is set, in the `token` query
+  parameter: `/stats?since=2026-10-01&token=readme`. It's one token shared by
+  everyone you want to let read the stats, such as a website or a Discord
+  bot. It controls who may read the stats, not who someone is.
+
+Because the GET token is part of the URL, it can end up in browser history
+and in the logs of any proxy in front of statsrv. statsrv blanks it out in
+its own log.
+
+statsrv only speaks plain HTTP, so tokens cross the network unencrypted.
 
 statsrv only speaks plain HTTP. If you need HTTPS, put it behind a reverse
 proxy such as nginx or Caddy.
@@ -91,7 +116,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now statsrv
 ```
 
-To change the flags, edit the `ExecStart=` line, or run
+Before starting it, change `-post-token` on the `ExecStart=` line to match
+your game servers' `g_stats_token`, and add `-get-token` if you want reads to
+need a token. To change the flags later, edit the `ExecStart=` line, or run
 `systemctl edit statsrv` to override it.
 
 ## Configuring the game server
@@ -101,7 +128,11 @@ In the OpenTDM server config:
 ```
 set g_send_stats 1
 set g_stats_url "http://stats.example.com:47910/stats"
+set g_stats_token "s3cret"
 ```
+
+`g_stats_token` defaults to `changeme`. It must match statsrv's
+`-post-token`, or statsrv rejects the stats.
 
 ## API
 
@@ -115,6 +146,7 @@ it came from (`source`).
 
 ```sh
 curl -X POST -H 'Content-Type: application/json' \
+    -H 'Authorization: Bearer s3cret' \
     --data-binary @match.json http://localhost:47910/stats
 ```
 
@@ -125,7 +157,7 @@ curl -X POST -H 'Content-Type: application/json' \
 A body that isn't valid JSON, or has a bad `time` or player `team`, gets a
 `400` with `{"error":"..."}`.
 
-### GET /stats?since=DATE[&limit=N]
+### GET /stats?since=DATE[&limit=N][&token=TOKEN]
 
 Returns the matches that ended at or after `since`, oldest first.
 
@@ -138,9 +170,14 @@ Returns the matches that ended at or after `since`, oldest first.
 
 `limit` asks for fewer matches. It can't go above `-max`.
 
+`token` is required when statsrv runs with `-get-token`, and must match it.
+
 ```sh
 curl 'http://localhost:47910/stats?since=2026-10-01'
 curl 'http://localhost:47910/stats?since=2026-10-01T18:30:00Z&limit=10'
+
+# when statsrv runs with -get-token readme
+curl 'http://localhost:47910/stats?since=2026-10-01&token=readme'
 ```
 
 ```json
@@ -202,6 +239,14 @@ sqlite3 statsrv.db "SELECT name, SUM(kills) FROM players
 
 ## Security
 
-The POST endpoint has no authentication: anyone who can reach the port can
-add matches. Firewall the port so only your game servers can reach it, or
-listen on a private address with `-addr`.
+Only clients that send the `-post-token` value can add matches. Change it
+from the game's default of `changeme`, because anyone who knows the token can
+add made-up matches.
+
+Without `-get-token`, anyone who can reach the port can read every match,
+including each player's `stats_id`.
+
+Tokens are sent over plain HTTP, so anyone who can watch the traffic between
+a client and statsrv can read them. For more protection, firewall the port so
+only your game servers and readers can reach it, listen on a private address
+with `-addr`, or put statsrv behind an HTTPS reverse proxy.
