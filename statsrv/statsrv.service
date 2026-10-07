@@ -1,0 +1,30 @@
+# Install:
+#   go build -o /usr/local/bin/statsrv .
+#   cp statsrv.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now statsrv
+#
+# The database lives in /var/lib/statsrv and the log in /var/log/statsrv,
+# both created by systemd and owned by the dynamic service user.
+
+[Unit]
+Description=OpenTDM match stats server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/statsrv -addr :47910 -db /var/lib/statsrv/stats.db -log /var/log/statsrv/statsrv.log
+Restart=always
+RestartSec=5
+
+DynamicUser=yes
+StateDirectory=statsrv
+LogsDirectory=statsrv
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+
+[Install]
+WantedBy=multi-user.target
