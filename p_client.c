@@ -1359,8 +1359,12 @@ void ClientUserinfoChanged(edict_t *ent, char *userinfo) {
 
     //new connection, server is calling us. just save userinfo for later.
     if (!ent->inuse) {
-        ent->client->pers.address = net_parseIP(
-                Info_ValueForKey(userinfo, "ip"));
+        // with GMF_EXTRA_USERINFO the ip only comes in ClientConnect's extra
+        // userinfo, which already stored it. Don't wipe it out here.
+        s = Info_ValueForKey(userinfo, "ip");
+        if (s[0]) {
+            ent->client->pers.address = net_parseIP(s);
+        }
         Q_strncpy(ent->client->pers.userinfo, userinfo,
                 sizeof(ent->client->pers.userinfo) - 1);
 
@@ -1589,6 +1593,9 @@ qboolean ClientConnect(edict_t *ent, char *ui) {
         //zero pers in preparation for new client
         memset(&ent->client->pers, 0, sizeof(ent->client->pers));
     }
+
+    // ClientUserinfoChanged never sees the ip when it's in the extra userinfo
+    ent->client->pers.address = ip;
 
     value = Info_ValueForKey(userinfo, "name");
 

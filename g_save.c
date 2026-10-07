@@ -273,6 +273,12 @@ void InitGame(void) {
     // powerups removed (bitmask)
     g_powerupflags = gi.cvar("g_powerupflags", "0", 0);
 
+    // POST match stats as JSON to g_stats_url when each match ends
+    g_send_stats = gi.cvar("g_send_stats", "0", 0);
+
+    // full URL match stats are POSTed to, ex: https://example.com/api/stats
+    g_stats_url = gi.cvar("g_stats_url", "", 0);
+
     // File where smartmaps are defined
     g_smartmapfile = gi.cvar("g_smartmapfile", SMARTMAPFILE, CVAR_LATCH);
 

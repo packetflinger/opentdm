@@ -28,6 +28,7 @@ void TDM_EndDamage(void);
 teamplayer_t* TDM_FindTeamplayerForJoinCode(unsigned code);
 void TDM_GeneralStats_f(edict_t *ent, matchinfo_t *m_info, teamplayer_t *p_info,
         unsigned team);
+void TDM_GetStatsId(edict_t *ent, char *out, size_t size);
 teamplayer_t* TDM_GetInfoForPlayer(edict_t *ent, matchinfo_t *matchinfo);
 int TDM_GetTeamFromMatchInfo(edict_t *ent, matchinfo_t *matchinfo);
 qboolean TDM_IsTrackableItem(edict_t *ent);
@@ -37,6 +38,7 @@ void TDM_ItemsStats_f(edict_t *ent, matchinfo_t *m_info, teamplayer_t *p_info);
 void TDM_Killed(edict_t *attacker, edict_t *victim, int mod);
 int TDM_PercentageSort(void const *a, void const *b);
 void TDM_RemoveStatsLink(edict_t *ent);
+void TDM_SendMatchStats(void);
 void TDM_SetupMatchInfoAndTeamPlayers(void);
 void TDM_SetupTeamInfoForPlayer(edict_t *ent, teamplayer_t *info);
 qboolean TDM_StatCheatCheck(edict_t *ent, matchinfo_t *info, unsigned team);

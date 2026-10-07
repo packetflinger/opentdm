@@ -48,6 +48,11 @@ typedef struct dlhandle_s {
     char *tempBuffer;
     qboolean inuse;
     tdm_download_t *tdm_handle;
+
+    // set for an HTTP_PostJSON request, owned by the slot until it finishes
+    char *postData;
+    struct curl_slist *postHeaders;
+    struct curl_slist *postResolve;
 } dlhandle_t;
 
 //we need this high in case a sudden server switch causes a bunch of people
@@ -68,6 +73,11 @@ static char hostHeader[64];
 static struct curl_slist *http_header_slist;
 
 static time_t last_dns_lookup;
+
+// cached DNS result for g_stats_url, handed to curl via CURLOPT_RESOLVE
+static char stats_resolve_url[1024];
+static char stats_resolve_entry[384];
+static time_t stats_last_dns_lookup;
 
 /**
  * Properly escapes a path with HTTP %encoding. libcurl's function
@@ -217,6 +227,107 @@ void HTTP_ResolveOTDMServer(void) {
 }
 
 /**
+ * Resolve the host in g_stats_url and cache it. The bundled libcurl has no
+ * asynchronous resolver, so letting curl look it up would block the server
+ * frame. Called on game state reset and again before posting, it only does
+ * a lookup when the URL changed or the cached result is a day old.
+ */
+void HTTP_ResolveStatsServer(void) {
+    CURLU *u;
+    char *host, *port;
+    struct hostent *h;
+
+    if (!g_send_stats->value || !g_stats_url->string[0]) {
+        return;
+    }
+
+    if (!strcmp(stats_resolve_url, g_stats_url->string)
+            && time(NULL) - stats_last_dns_lookup <= 86400) {
+        return;
+    }
+
+    Q_strncpy(stats_resolve_url, g_stats_url->string,
+            sizeof(stats_resolve_url) - 1);
+    stats_resolve_entry[0] = '\0';
+    stats_last_dns_lookup = 0;
+
+    u = curl_url();
+    if (!u) {
+        return;
+    }
+
+    host = port = NULL;
+    if (curl_url_set(u, CURLUPART_URL, g_stats_url->string, 0) != CURLUE_OK
+            || curl_url_get(u, CURLUPART_HOST, &host, 0) != CURLUE_OK
+            || curl_url_get(u, CURLUPART_PORT, &port, CURLU_DEFAULT_PORT)
+                    != CURLUE_OK) {
+        gi.dprintf("WARNING: g_stats_url '%s' is not a valid URL.\n",
+                g_stats_url->string);
+        goto done;
+    }
+
+    // IP literals need no lookup (IPv6 hosts come back bracketed)
+    if (strchr(host, ':') || inet_addr(host) != INADDR_NONE) {
+        goto done;
+    }
+
+    gi.cprintf(NULL, PRINT_HIGH, "Resolving stats server %s -> ", host);
+    h = gethostbyname(host);
+    if (!h) {
+        // leave the cache empty, curl will try again itself when posting
+        gi.dprintf("WARNING: Could not resolve stats server '%s'.\n", host);
+        goto done;
+    }
+
+    Com_sprintf(stats_resolve_entry, sizeof(stats_resolve_entry), "%s:%s:%s",
+            host, port, inet_ntoa(*(struct in_addr*) h->h_addr_list[0]));
+    time(&stats_last_dns_lookup);
+    gi.cprintf(NULL, PRINT_HIGH, "%s\n",
+            inet_ntoa(*(struct in_addr*) h->h_addr_list[0]));
+
+done:
+    curl_free(host);
+    curl_free(port);
+    curl_url_cleanup(u);
+}
+
+/**
+ * Prepare a slot's curl handle for a new request. Handles are reused between
+ * downloads and posts, so start from a clean set of options each time.
+ */
+static void HTTP_SetupHandle(dlhandle_t *dl) {
+    dl->tempBuffer = NULL;
+    dl->speed = 0;
+    dl->fileSize = 0;
+    dl->position = 0;
+
+    if (!dl->curl) {
+        dl->curl = curl_easy_init();
+    } else {
+        curl_easy_reset(dl->curl);
+    }
+
+    if (g_http_debug->value) {
+        curl_easy_setopt(dl->curl, CURLOPT_DEBUGFUNCTION, CURL_Debug);
+        curl_easy_setopt(dl->curl, CURLOPT_VERBOSE, 1);
+    }
+
+    if (g_http_bind->string[0]) {
+        curl_easy_setopt(dl->curl, CURLOPT_INTERFACE, g_http_bind->string);
+    }
+
+    if (g_http_proxy->string[0]) {
+        curl_easy_setopt(dl->curl, CURLOPT_PROXY, g_http_proxy->string);
+    }
+
+    curl_easy_setopt(dl->curl, CURLOPT_NOPROGRESS, 1);
+    curl_easy_setopt(dl->curl, CURLOPT_WRITEDATA, dl);
+    curl_easy_setopt(dl->curl, CURLOPT_WRITEFUNCTION, HTTP_Recv);
+    curl_easy_setopt(dl->curl, CURLOPT_USERAGENT,
+            "OpenTDM (" OPENTDM_VERSION ")");
+}
+
+/**
  * Actually starts a download by adding it to the curl multihandle. Returns
  * false if it couldn't be started, the slot is released in that case.
  */
@@ -229,14 +340,7 @@ static qboolean HTTP_StartDownload(dlhandle_t *dl) {
         TDM_Error("HTTP_StartDownload: Couldn't get hostname cvar");
     }
 
-    dl->tempBuffer = NULL;
-    dl->speed = 0;
-    dl->fileSize = 0;
-    dl->position = 0;
-
-    if (!dl->curl) {
-        dl->curl = curl_easy_init();
-    }
+    HTTP_SetupHandle(dl);
 
     HTTP_EscapePath(dl->filePath, escapedFilePath);
 
@@ -245,34 +349,8 @@ static qboolean HTTP_StartDownload(dlhandle_t *dl) {
 
     curl_easy_setopt(dl->curl, CURLOPT_HTTPHEADER, http_header_slist);
     curl_easy_setopt(dl->curl, CURLOPT_ENCODING, "");
-
-    if (g_http_debug->value) {
-        curl_easy_setopt(dl->curl, CURLOPT_DEBUGFUNCTION, CURL_Debug);
-        curl_easy_setopt(dl->curl, CURLOPT_VERBOSE, 1);
-    } else {
-        curl_easy_setopt(dl->curl, CURLOPT_DEBUGFUNCTION, NULL);
-        curl_easy_setopt(dl->curl, CURLOPT_VERBOSE, 0);
-    }
-
-    curl_easy_setopt(dl->curl, CURLOPT_NOPROGRESS, 1);
-    curl_easy_setopt(dl->curl, CURLOPT_WRITEDATA, dl);
-    if (g_http_bind->string[0]) {
-        curl_easy_setopt(dl->curl, CURLOPT_INTERFACE, g_http_bind->string);
-    } else {
-        curl_easy_setopt(dl->curl, CURLOPT_INTERFACE, NULL);
-    }
-
-    curl_easy_setopt(dl->curl, CURLOPT_WRITEFUNCTION, HTTP_Recv);
-
-    if (g_http_proxy->string[0]) {
-        curl_easy_setopt(dl->curl, CURLOPT_PROXY, g_http_proxy->string);
-    } else {
-        curl_easy_setopt(dl->curl, CURLOPT_PROXY, NULL);
-    }
     curl_easy_setopt(dl->curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(dl->curl, CURLOPT_MAXREDIRS, 5);
-    curl_easy_setopt(dl->curl, CURLOPT_USERAGENT,
-            "OpenTDM (" OPENTDM_VERSION ")");
     curl_easy_setopt(dl->curl, CURLOPT_REFERER, hostname->string);
     curl_easy_setopt(dl->curl, CURLOPT_URL, dl->URL);
 
@@ -310,6 +388,114 @@ void HTTP_Shutdown(void) {
     }
     curl_slist_free_all(http_header_slist);
     curl_global_cleanup();
+}
+
+/**
+ * Release everything a post request holds and free its slot.
+ */
+static void HTTP_ReleasePost(dlhandle_t *dl) {
+    free(dl->postData);
+    dl->postData = NULL;
+    curl_slist_free_all(dl->postHeaders);
+    dl->postHeaders = NULL;
+    curl_slist_free_all(dl->postResolve);
+    dl->postResolve = NULL;
+
+    if (dl->tempBuffer) {
+        gi.TagFree(dl->tempBuffer);
+        dl->tempBuffer = NULL;
+    }
+
+    dl->inuse = false;
+}
+
+/**
+ * A post request finished. Nobody waits on the result, just log it.
+ */
+static void HTTP_FinishPost(dlhandle_t *dl, CURLcode result) {
+    long responseCode;
+
+    if (result != CURLE_OK) {
+        gi.dprintf("HTTP Error: POST %s: %s\n", dl->URL,
+                curl_easy_strerror(result));
+    } else {
+        curl_easy_getinfo(dl->curl, CURLINFO_RESPONSE_CODE, &responseCode);
+        if (responseCode >= 200 && responseCode < 300) {
+            gi.dprintf("HTTP: POST %s: %ld\n", dl->URL, responseCode);
+        } else {
+            gi.dprintf("HTTP Error: POST %s: server returned %ld\n", dl->URL,
+                    responseCode);
+        }
+    }
+
+    curl_multi_remove_handle(multi, dl->curl);
+    HTTP_ReleasePost(dl);
+}
+
+/**
+ * Asynchronously POST a JSON document to url. Takes ownership of json (which
+ * must be malloc'd) and frees it in all cases. Returns false if the request
+ * couldn't be started.
+ */
+qboolean HTTP_PostJSON(const char *url, char *json, size_t len) {
+    unsigned i;
+    dlhandle_t *dl;
+
+    for (i = 0; i < MAX_DOWNLOADS; i++) {
+        if (!downloads[i].inuse) {
+            break;
+        }
+    }
+
+    if (i == MAX_DOWNLOADS) {
+        gi.dprintf("HTTP_PostJSON: no free request slots, not sending to %s\n",
+                url);
+        free(json);
+        return false;
+    }
+
+    dl = &downloads[i];
+    HTTP_SetupHandle(dl);
+
+    dl->inuse = true;
+    dl->tdm_handle = NULL;
+    dl->postData = json;
+    Q_strncpy(dl->URL, url, sizeof(dl->URL) - 1);
+
+    // use the pre-resolved address so curl doesn't block on DNS
+    HTTP_ResolveStatsServer();
+    if (stats_resolve_entry[0] && !strcmp(stats_resolve_url, url)) {
+        dl->postResolve = curl_slist_append(NULL, stats_resolve_entry);
+        curl_easy_setopt(dl->curl, CURLOPT_RESOLVE, dl->postResolve);
+    }
+
+    dl->postHeaders = curl_slist_append(NULL,
+            "Content-Type: application/json");
+    curl_easy_setopt(dl->curl, CURLOPT_HTTPHEADER, dl->postHeaders);
+
+    curl_easy_setopt(dl->curl, CURLOPT_URL, dl->URL);
+    curl_easy_setopt(dl->curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(dl->curl, CURLOPT_POSTFIELDS, dl->postData);
+    curl_easy_setopt(dl->curl, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t) len);
+
+    // don't verify https certificates, the static libcurl's CA path may not
+    // exist on the server
+    curl_easy_setopt(dl->curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(dl->curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+    // don't let a dead stats server hold a slot forever
+    curl_easy_setopt(dl->curl, CURLOPT_NOSIGNAL, 1L);
+    curl_easy_setopt(dl->curl, CURLOPT_CONNECTTIMEOUT, 10L);
+    curl_easy_setopt(dl->curl, CURLOPT_TIMEOUT, 30L);
+
+    if (curl_multi_add_handle(multi, dl->curl) != CURLM_OK) {
+        gi.dprintf("HTTP_PostJSON: curl_multi_add_handle: error\n");
+        HTTP_ReleasePost(dl);
+        return false;
+    }
+
+    handleCount++;
+    return true;
 }
 
 /**
@@ -354,6 +540,11 @@ static void HTTP_FinishDownload(void) {
         dl = &downloads[i];
 
         result = msg->data.result;
+
+        if (dl->postData) {
+            HTTP_FinishPost(dl, result);
+            continue;
+        }
 
         switch (result) {
         //for some reason curl returns CURLE_OK for a 404...
@@ -517,5 +708,20 @@ qboolean HTTP_QueueDownload(tdm_download_t *d) {
  *
  */
 void HTTP_ResolveOTDMServer(void) {
+}
+
+/**
+ *
+ */
+void HTTP_ResolveStatsServer(void) {
+}
+
+/**
+ *
+ */
+qboolean HTTP_PostJSON(const char *url, char *json, size_t len) {
+    gi.dprintf("Not sending match stats, OpenTDM was built without libcurl.\n");
+    free(json);
+    return false;
 }
 #endif

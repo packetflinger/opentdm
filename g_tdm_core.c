@@ -1196,6 +1196,8 @@ void TDM_BeginIntermission(void) {
             DisableChaseCam(client);
         }
     }
+
+    TDM_SendMatchStats();
 }
 
 /**
@@ -2514,6 +2516,7 @@ void TDM_ResetGameState(void) {
 
     //re-resolve otdm server in case of DNS change
     HTTP_ResolveOTDMServer();
+    HTTP_ResolveStatsServer();
 }
 
 /**

@@ -25,6 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "g_tdm.h"
 
+#include <openssl/evp.h>
+
 static const int tdmg_weapons[] =
 {
     0,
@@ -1224,6 +1226,7 @@ void TDM_SetupTeamInfoForPlayer(edict_t *ent, teamplayer_t *info) {
     }
 
     strcpy(info->name, ent->client->pers.netname);
+    TDM_GetStatsId(ent, info->stats_id, sizeof(info->stats_id));
 
     info->client = ent;
     info->ping = ent->client->ping;
@@ -1407,4 +1410,343 @@ void TDM_ItemGrabbed(edict_t *ent, edict_t *player) {
 
     //add it
     player->client->resp.teamplayerinfo->items_collected[ITEM_INDEX(ent->item)]++;
+}
+
+/**
+ * Identify a client for external stats: their stats_id userinfo if set,
+ * otherwise an MD5 hash (hex) of their IP address, or of their name if they
+ * have no IP address. Always produces a value.
+ */
+void TDM_GetStatsId(edict_t *ent, char *out, size_t size) {
+    const char *stats_id;
+    const char *key;
+    unsigned char md[EVP_MAX_MD_SIZE];
+    unsigned int mdlen, i;
+    size_t len;
+
+    out[0] = '\0';
+
+    stats_id = Info_ValueForKey(ent->client->pers.userinfo, "stats_id");
+    if (stats_id[0]) {
+        Q_strncpy(out, stats_id, size - 1);
+        return;
+    }
+
+    // no usable address (eg a loopback client), hash their name instead
+    if (ent->client->pers.address.type == NA_IP
+            || ent->client->pers.address.type == NA_IP6) {
+        key = IP(&ent->client->pers.address);
+    } else {
+        key = ent->client->pers.netname;
+    }
+
+    if (!EVP_Digest(key, strlen(key), md, &mdlen, EVP_md5(), NULL)) {
+        gi.dprintf("TDM_GetStatsId: MD5 failed, using the plain value for %s\n",
+                ent->client->pers.netname);
+        Q_strncpy(out, key, size - 1);
+        return;
+    }
+
+    len = 0;
+    for (i = 0; i < mdlen && len + 3 <= size; i++) {
+        len += sprintf(out + len, "%02x", md[i]);
+    }
+}
+
+/**
+ * Growable buffer used to build the stats JSON. Uses malloc since ownership
+ * is handed to the HTTP layer, which frees it when the request completes.
+ */
+typedef struct {
+    char *data;
+    size_t len;
+    size_t size;
+    qboolean failed;
+} jsonbuf_t;
+
+/**
+ * printf-style append to a jsonbuf_t, growing it as needed.
+ */
+static void JSON_Append(jsonbuf_t *b, const char *fmt, ...) {
+    va_list argptr;
+    int needed;
+    char *tmp;
+
+    if (b->failed) {
+        return;
+    }
+
+    va_start(argptr, fmt);
+    needed = vsnprintf(b->data + b->len, b->size - b->len, fmt, argptr);
+    va_end(argptr);
+
+    if (needed < 0) {
+        b->failed = true;
+        return;
+    }
+
+    if (b->len + needed >= b->size) {
+        size_t newsize = b->size;
+
+        while (b->len + needed >= newsize) {
+            newsize *= 2;
+        }
+
+        tmp = realloc(b->data, newsize);
+        if (!tmp) {
+            b->failed = true;
+            return;
+        }
+        b->data = tmp;
+        b->size = newsize;
+
+        va_start(argptr, fmt);
+        vsnprintf(b->data + b->len, b->size - b->len, fmt, argptr);
+        va_end(argptr);
+    }
+
+    b->len += needed;
+}
+
+/**
+ * Append a quoted JSON string, or null for NULL/empty. Quake 2 text uses the
+ * high bit for colored characters which isn't valid UTF-8, so it's stripped.
+ */
+static void JSON_AppendString(jsonbuf_t *b, const char *s) {
+    unsigned char c;
+
+    if (!s || !s[0]) {
+        JSON_Append(b, "null");
+        return;
+    }
+
+    JSON_Append(b, "\"");
+    for (; *s; s++) {
+        c = (unsigned char) *s & 0x7f;
+
+        if (c == '"' || c == '\\') {
+            JSON_Append(b, "\\%c", c);
+        } else if (c < 0x20 || c == 0x7f) {
+            JSON_Append(b, "\\u%04x", c);
+        } else {
+            JSON_Append(b, "%c", c);
+        }
+    }
+    JSON_Append(b, "\"");
+}
+
+/**
+ * Append one entry of a player's "items" array. Non-weapons pass tdmg 0 and
+ * report zero kills/deaths/damage and no accuracy.
+ */
+static void JSON_AppendItemStats(jsonbuf_t *b, matchinfo_t *m_info,
+        teamplayer_t *p, int item_index, int tdmg) {
+    const gitem_t *item;
+    unsigned missed;
+
+    item = GETITEM(item_index);
+
+    // only items that someone grabbed are counted, see TDM_ItemGrabbed
+    if (m_info->item_spawn_count[item_index] > p->items_collected[item_index]) {
+        missed = m_info->item_spawn_count[item_index]
+                - p->items_collected[item_index];
+    } else {
+        missed = 0;
+    }
+
+    JSON_Append(b, "{\"name\":");
+    JSON_AppendString(b,
+            (item_index == ITEM_ITEM_HEALTH) ? "MegaHealth" : item->pickup_name);
+    JSON_Append(b, ",\"classname\":");
+    JSON_AppendString(b, item->classname);
+
+    if (tdmg && p->shots_fired[tdmg]) {
+        JSON_Append(b, ",\"accuracy\":%.1f",
+                (float) p->shots_hit[tdmg] / (float) p->shots_fired[tdmg]
+                        * 100.0f);
+    } else {
+        JSON_Append(b, ",\"accuracy\":null");
+    }
+
+    JSON_Append(b, ",\"shots\":%u,\"hits\":%u,\"kills\":%u,\"deaths\":%u"
+            ",\"damage_dealt\":%u,\"damage_received\":%u"
+            ",\"pickups\":%u,\"missed\":%u}",
+            tdmg ? p->shots_fired[tdmg] : 0, tdmg ? p->shots_hit[tdmg] : 0,
+            tdmg ? p->killweapons[tdmg] : 0, tdmg ? p->deathweapons[tdmg] : 0,
+            tdmg ? p->damage_dealt[tdmg] : 0,
+            tdmg ? p->damage_received[tdmg] : 0,
+            p->items_collected[item_index], missed);
+}
+
+/**
+ * Append one entry of the "players" array.
+ */
+static void JSON_AppendPlayerStats(jsonbuf_t *b, matchinfo_t *m_info,
+        teamplayer_t *p) {
+    unsigned dealt, recvd;
+    int i;
+    qboolean first;
+
+    dealt = recvd = 0;
+    for (i = TDMG_BLASTER; i < TDMG_MAX; i++) {
+        dealt += p->damage_dealt[i];
+        recvd += p->damage_received[i];
+    }
+
+    JSON_Append(b, "{\"name\":");
+    JSON_AppendString(b, p->name);
+    JSON_Append(b, ",\"stats_id\":");
+    JSON_AppendString(b, p->stats_id);
+    JSON_Append(b, ",\"team\":\"%s\"", (p->team == TEAM_A) ? "home" : "away");
+    JSON_Append(b, ",\"kills\":%u,\"deaths\":%u,\"suicides\":%u"
+            ",\"team_kills\":%u,\"telefrags\":%u"
+            ",\"damage_dealt\":%u,\"damage_received\":%u"
+            ",\"team_damage_dealt\":%u,\"team_damage_received\":%u",
+            p->enemy_kills, p->deaths, p->suicides, p->team_kills,
+            p->telefrags, dealt, recvd, p->team_dealt, p->team_recvd);
+
+    // every weapon, then any non-weapon item that was picked up this match
+    JSON_Append(b, ",\"items\":[");
+    first = true;
+    for (i = TDMG_BLASTER; i < TDMG_MAX; i++) {
+        if (!first) {
+            JSON_Append(b, ",");
+        }
+        JSON_AppendItemStats(b, m_info, p, tdmg_weapons[i], i);
+        first = false;
+    }
+
+    for (i = 1; i < game.num_items; i++) {
+        if (i >= ITEM_WEAPON_BLASTER && i <= ITEM_AMMO_SLUGS) {
+            continue;
+        }
+
+        if (!p->items_collected[i] && !m_info->item_spawn_count[i]) {
+            continue;
+        }
+
+        JSON_Append(b, ",");
+        JSON_AppendItemStats(b, m_info, p, i, 0);
+    }
+    JSON_Append(b, "]}");
+}
+
+/**
+ * Build the JSON document describing the match that just ended. Returns a
+ * malloc'd string (length in *len) or NULL on failure.
+ */
+static char* TDM_BuildMatchStatsJSON(size_t *len) {
+    jsonbuf_t b;
+    char timestr[32];
+    time_t t;
+    cvar_t *demohostname;
+    edict_t *ent;
+    char stats_id[MAX_INFO_VALUE];
+    int i;
+    qboolean first;
+
+    b.size = 16384;
+    b.len = 0;
+    b.failed = false;
+    b.data = malloc(b.size);
+    if (!b.data) {
+        return NULL;
+    }
+    b.data[0] = '\0';
+
+    t = time(NULL);
+    strftime(timestr, sizeof(timestr), "%Y-%m-%dT%H:%M:%SZ", gmtime(&t));
+
+    JSON_Append(&b, "{\"time\":\"%s\",\"map\":", timestr);
+    JSON_AppendString(&b, current_matchinfo.mapname);
+
+    // still recording here, the file gets this name when the MVD is stopped
+    JSON_Append(&b, ",\"demo\":");
+    if (game.mvd.recording) {
+        JSON_AppendString(&b, va("%s.mvd2%s", game.mvd.filename,
+                game.mvd.compressed ? ".gz" : ""));
+    } else {
+        JSON_Append(&b, "null");
+    }
+
+    demohostname = gi.cvar("g_demo_hostname", NULL, 0);
+    JSON_Append(&b, ",\"demo_hostname\":");
+    JSON_AppendString(&b, demohostname ? demohostname->string : NULL);
+
+    JSON_Append(&b, ",\"home_team\":");
+    JSON_AppendString(&b, teaminfo[TEAM_A].name);
+    JSON_Append(&b, ",\"home_score\":%d,\"away_team\":", teaminfo[TEAM_A].score);
+    JSON_AppendString(&b, teaminfo[TEAM_B].name);
+    JSON_Append(&b, ",\"away_score\":%d", teaminfo[TEAM_B].score);
+
+    // includes players who disconnected before the end
+    JSON_Append(&b, ",\"players\":[");
+    first = true;
+    for (i = 0; i < current_matchinfo.num_teamplayers; i++) {
+        teamplayer_t *p = &current_matchinfo.teamplayers[i];
+
+        if (p->team != TEAM_A && p->team != TEAM_B) {
+            continue;
+        }
+
+        if (!first) {
+            JSON_Append(&b, ",");
+        }
+        JSON_AppendPlayerStats(&b, &current_matchinfo, p);
+        first = false;
+    }
+
+    JSON_Append(&b, "],\"spectators\":[");
+    first = true;
+    FOREACH_CLIENT(ent) {
+        if (!ent->inuse || ent->client->pers.team != TEAM_SPEC
+                || ent->client->pers.mvdclient) {
+            continue;
+        }
+
+        TDM_GetStatsId(ent, stats_id, sizeof(stats_id));
+
+        if (!first) {
+            JSON_Append(&b, ",");
+        }
+        JSON_Append(&b, "{\"name\":");
+        JSON_AppendString(&b, ent->client->pers.netname);
+        JSON_Append(&b, ",\"stats_id\":");
+        JSON_AppendString(&b, stats_id);
+        JSON_Append(&b, "}");
+        first = false;
+    }
+    JSON_Append(&b, "]}");
+
+    if (b.failed) {
+        free(b.data);
+        return NULL;
+    }
+
+    *len = b.len;
+    return b.data;
+}
+
+/**
+ * The match just ended, POST its stats to g_stats_url if enabled.
+ */
+void TDM_SendMatchStats(void) {
+    char *json;
+    size_t len;
+
+    if (!g_send_stats->value || !g_stats_url->string[0]) {
+        return;
+    }
+
+    if (!current_matchinfo.teamplayers) {
+        return;
+    }
+
+    json = TDM_BuildMatchStatsJSON(&len);
+    if (!json) {
+        gi.dprintf("TDM_SendMatchStats: failed to build stats JSON\n");
+        return;
+    }
+
+    HTTP_PostJSON(g_stats_url->string, json, len);
 }

@@ -770,6 +770,8 @@ extern cvar_t *g_http_debug;
 extern cvar_t *g_http_path;
 extern cvar_t *g_http_domain;
 extern cvar_t *g_playerconfig_enabled;
+extern cvar_t *g_send_stats;
+extern cvar_t *g_stats_url;
 extern cvar_t *g_debug_spawns;
 extern cvar_t *g_maplistfile;
 extern cvar_t *g_smartmapfile;
@@ -1107,6 +1109,9 @@ struct teamplayer_s {
     unsigned       team;
     unsigned       ping;
     unsigned       joincode;
+
+    // stats_id userinfo or MD5 of their IP, recorded at match join for g_send_stats
+    char           stats_id[MAX_INFO_VALUE];
 
     // actual players killed
     unsigned       enemy_kills;
