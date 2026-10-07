@@ -164,6 +164,8 @@ cvar_t *g_respawn_adren;
 cvar_t *g_respawn_ps;
 cvar_t *g_respawn_mega;
 
+cvar_t *g_aimfix;
+
 cvar_t *sv_mvd_enable;
 
 void SpawnEntities(const char *mapname, const char *entities,

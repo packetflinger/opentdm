@@ -30,17 +30,32 @@ void weapon_grenade_fire(edict_t *ent, qboolean held);
 /**
  *
  */
-static void P_ProjectSource(gclient_t *client, vec3_t point, vec3_t distance,
+static void P_ProjectSource(edict_t *ent, vec3_t point, vec3_t distance,
         vec3_t forward, vec3_t right, vec3_t result) {
     vec3_t _distance;
 
     VectorCopy(distance, _distance);
-    if (client->pers.hand == LEFT_HANDED) {
+    if (ent->client->pers.hand == LEFT_HANDED) {
         _distance[1] *= -1;
-    } else if (client->pers.hand == CENTER_HANDED) {
+    } else if (ent->client->pers.hand == CENTER_HANDED) {
         _distance[1] = 0;
     }
     G_ProjectSource(point, _distance, forward, right, result);
+
+    if ((int) g_aimfix->value)
+    {
+        vec3_t start, end;
+        VectorCopy(point, start);
+        start[2] += (float)ent->viewheight;
+        VectorMA(start, 8192, forward, end);
+
+        trace_t tr = gi.trace(start, NULL, NULL, end, ent, MASK_SHOT);
+        if (tr.fraction < 1)
+        {
+            VectorSubtract(tr.endpos, result, forward);
+            VectorNormalize(forward);
+        }
+    }
 }
 
 /**
@@ -546,7 +561,7 @@ void weapon_grenade_fire(edict_t *ent, qboolean held) {
 
     VectorSet(offset, 8, 8, ent->viewheight - 8);
     AngleVectors(ent->client->v_angle, forward, right, NULL);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
 
     timer = (ent->client->grenade_framenum - level.framenum) * FRAMETIME;
     speed = GRENADE_MINSPEED
@@ -706,7 +721,7 @@ void weapon_grenadelauncher_fire(edict_t *ent) {
 
     VectorSet(offset, 8, 8, ent->viewheight - 8);
     AngleVectors(ent->client->v_angle, forward, right, NULL);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
 
     VectorScale(forward, -2, ent->client->kick_origin_final);
     ent->client->kick_angles_final[0] = -1;
@@ -767,7 +782,7 @@ void Weapon_RocketLauncher_Fire(edict_t *ent) {
     ent->client->kick_origin_end = 0.1f * SERVER_FPS;
 
     VectorSet(offset, 8, 8, ent->viewheight - 8);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
     fire_rocket(ent, start, forward, damage, 650, damage_radius, radius_damage);
     TDM_WeaponFired(ent);
 
@@ -811,7 +826,7 @@ void Blaster_Fire(edict_t *ent, vec3_t g_offset, int damage, qboolean hyper,
     AngleVectors(ent->client->v_angle, forward, right, NULL);
     VectorSet(offset, 24, 8, ent->viewheight - 8);
     VectorAdd(offset, g_offset, offset);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
 
     VectorScale(forward, -2, ent->client->kick_origin_final);
     ent->client->kick_angles_final[0] = -1;
@@ -988,7 +1003,7 @@ void Machinegun_Fire(edict_t *ent) {
     VectorAdd(ent->client->v_angle, ent->client->kick_angles_final, angles);
     AngleVectors(angles, forward, right, NULL);
     VectorSet(offset, 0, 8, ent->viewheight - 8);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
     fire_bullet(ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD,
             DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
     TDM_WeaponFired(ent);
@@ -1118,7 +1133,7 @@ void Chaingun_Fire(edict_t *ent) {
         r = 7 + crandom() * 4;
         u = crandom() * 4;
         VectorSet(offset, 0, r, u + ent->viewheight - 8);
-        P_ProjectSource(ent->client, ent->s.origin, offset, forward, right,
+        P_ProjectSource(ent, ent->s.origin, offset, forward, right,
                 start);
 
         fire_bullet(ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD,
@@ -1172,7 +1187,7 @@ void weapon_shotgun_fire(edict_t *ent) {
     ent->client->kick_origin_end = 0.1f * SERVER_FPS;
 
     VectorSet(offset, 0, 8, ent->viewheight - 8);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
 
     if (is_quad == ent) {
         damage *= 4;
@@ -1229,7 +1244,7 @@ void weapon_supershotgun_fire(edict_t *ent) {
     ent->client->kick_origin_end = 0.1f * SERVER_FPS;
 
     VectorSet(offset, 0, 8, ent->viewheight - 8);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
 
     if (is_quad == ent) {
         damage *= 4;
@@ -1308,7 +1323,7 @@ void weapon_railgun_fire(edict_t *ent) {
     ent->client->kick_origin_end = 0.1f * SERVER_FPS;
 
     VectorSet(offset, 0, 7, ent->viewheight - 8);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
     fire_rail(ent, start, forward, damage, kick);
     TDM_WeaponFired(ent);
 
@@ -1382,7 +1397,7 @@ void weapon_bfg_fire(edict_t *ent) {
     ent->client->v_dmg_framenum = level.framenum + DAMAGE_FRAMES;
 
     VectorSet(offset, 8, 8, ent->viewheight - 8);
-    P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+    P_ProjectSource(ent, ent->s.origin, offset, forward, right, start);
     fire_bfg(ent, start, forward, damage, 400, damage_radius);
 
     TDM_WeaponFired(ent);
