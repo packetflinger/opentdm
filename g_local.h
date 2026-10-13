@@ -498,6 +498,7 @@ typedef struct {
     int           num_items;
     char          gamedir[MAX_QPATH];
     int           server_features;  // more than 0 == running q2pro
+    int           game_features;    // what we support
     int           match_count;      // matches played since mod was loaded
     server_demo_t mvd;              // auto server demo stuff
     smartmap_t    smartmaps[SM_MAX];// random known-good maps for team sizes

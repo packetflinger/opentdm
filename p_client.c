@@ -1538,7 +1538,8 @@ qboolean ClientConnect(edict_t *ent, char *ui) {
     char *tempip, *userinfo, *extra;
     netadr_t ip;
 
-    if (game.server_features & GMF_EXTRA_USERINFO) {
+    // Both srv and game need to support it.
+    if ((game.server_features & GMF_EXTRA_USERINFO) && (game.game_features & GMF_EXTRA_USERINFO)) {
         extra = ui + strlen(ui) + 1;
         if (strlen(extra) == 0) {
             Info_SetValueForKey(ui, "rejmsg", "invalid userinfo.");

@@ -382,6 +382,7 @@ void InitGame(void) {
     unsigned features = GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE |
             GMF_MVDSPEC | GMF_VARIABLE_FPS | GMF_IPV6_ADDRESS_AWARE;
     gi.cvar_forceset("g_features", va("%d", features));
+    game.game_features = features;
 
     // init server features
     sv_features = gi.cvar("sv_features", NULL, 0);
