@@ -380,7 +380,7 @@ void InitGame(void) {
     // ensure it has NOSET if it didn't exist
     g_features = gi.cvar("g_features", "0", CVAR_NOSET);
     unsigned features = GMF_CLIENTNUM | GMF_WANT_ALL_DISCONNECTS | GMF_PROPERINUSE |
-            GMF_MVDSPEC | GMF_VARIABLE_FPS | GMF_IPV6_ADDRESS_AWARE | GMF_EXTRA_USERINFO;
+            GMF_MVDSPEC | GMF_VARIABLE_FPS | GMF_IPV6_ADDRESS_AWARE;
     gi.cvar_forceset("g_features", va("%d", features));
 
     // init server features
